@@ -1,884 +1,560 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>RaneGame</title>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>RaneGame</title>
 
-<style>
-*{box-sizing:border-box}
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-html,body{
-    margin:0;
-    min-height:100%;
-    background:#24090b;
-    color:#f7eeee;
-    font-family:Arial,sans-serif;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-body{min-height:100vh}
+        body {
+            margin: 0;
+            background: #100606;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding-bottom: 85px;
+        }
 
-.app{
-    width:min(470px,100%);
-    margin:auto;
-    padding:14px 12px 100px;
-}
+        .top {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-.top{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin:4px 2px 18px;
-}
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #7b1111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
 
-.avatar{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background:#ef6b00;
-    display:grid;
-    place-items:center;
-    font-size:21px;
-}
+        .name {
+            font-size: 20px;
+            font-weight: bold;
+        }
 
-.user{font-weight:700}
-.user small{
-    display:block;
-    color:#a98e8e;
-    font-weight:400;
-    margin-top:2px;
-}
+        .username {
+            color: #999;
+            font-size: 14px;
+            margin-top: 3px;
+        }
 
-.page{
-    display:none;
-    animation:pageIn .22s ease;
-}
+        .page {
+            display: none;
+            padding: 0 16px;
+        }
 
-.page.active{display:block}
+        .page.active {
+            display: block;
+        }
 
-@keyframes pageIn{
-    from{opacity:0;transform:translateY(8px)}
-    to{opacity:1;transform:translateY(0)}
-}
+        .balance-card {
+            background: linear-gradient(135deg, #7d1111, #3b0808);
+            border-radius: 22px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
 
-.points{
-    text-align:center;
-    margin:8px 0 18px;
-}
+        .balance-title {
+            color: #ddd;
+            font-size: 14px;
+        }
 
-.points .big{
-    font-size:48px;
-    font-weight:800;
-}
+        .balance {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
 
-.rate{
-    color:#9f8585;
-    margin-top:5px;
-}
+        .income {
+            color: #72ff72;
+        }
 
-.mult{
-    display:inline-block;
-    border:1px solid #9b5900;
-    color:#ffad00;
-    border-radius:18px;
-    padding:8px 14px;
-    font-weight:700;
-    margin-top:16px;
-    background:#32130e;
-    cursor:pointer;
-}
+        .card {
+            background: #1c0b0b;
+            border: 1px solid #351515;
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
 
-.invite{
-    margin:14px 0 22px;
-    padding:15px 17px;
-    border-radius:13px;
-    background:#3b1719;
-    border-left:5px solid #ffad00;
-}
+        .card h3 {
+            margin-top: 0;
+        }
 
-.invite b{color:#ffad00}
+        button {
+            border: 0;
+            border-radius: 13px;
+            padding: 13px 18px;
+            background: #8f1717;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
 
-.section{margin-top:20px}
+        button:active {
+            transform: scale(.97);
+        }
 
-.head{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin:0 2px 10px;
-    font-size:17px;
-    font-weight:700;
-}
+        .shop-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
 
-.head span{
-    color:#ff6256;
-    font-size:13px;
-}
+        .price {
+            color: #ffd84d;
+            margin-top: 5px;
+        }
 
-.cards{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:6px;
-}
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 75px;
+            background: #180707;
+            border-top: 1px solid #351515;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
 
-.card{
-    min-height:84px;
-    border-radius:13px;
-    background:linear-gradient(145deg,#4b7b3e,#253b26);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    font-size:12px;
-    box-shadow:inset 0 0 0 1px #ffffff18;
-}
+        .nav button {
+            background: transparent;
+            color: #888;
+            padding: 8px;
+            font-size: 12px;
+        }
 
-.card:nth-child(2){
-    background:linear-gradient(145deg,#31477b,#24284f)
-}
+        .nav button.active {
+            color: white;
+        }
 
-.card:nth-child(3){
-    background:linear-gradient(145deg,#7b4a34,#3c241c)
-}
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #271010;
+            border: 1px solid #5c1a1a;
+            padding: 12px 18px;
+            border-radius: 12px;
+            display: none;
+            z-index: 200;
+        }
 
-.card:nth-child(4){
-    background:linear-gradient(145deg,#9b691f,#49300d)
-}
+        .loading {
+            text-align: center;
+            padding: 50px 20px;
+            color: #aaa;
+        }
 
-.card:nth-child(5){
-    background:linear-gradient(145deg,#7a4b89,#302044)
-}
-
-.card .emoji{font-size:25px}
-
-.card b{
-    font-size:11px;
-    margin-top:5px;
-}
-
-.card small{
-    color:#d9caca;
-    margin-top:2px;
-}
-
-.boiler{
-    margin-top:28px;
-    background:#3a181a;
-    border:1px solid #633335;
-    border-radius:18px;
-    padding:14px;
-}
-
-.timer{
-    float:right;
-    color:#ffad00;
-    font-weight:700;
-}
-
-.boilnum{
-    text-align:center;
-    font-size:32px;
-    font-weight:800;
-    margin-top:8px;
-}
-
-.sub{
-    text-align:center;
-    color:#9f8585;
-    font-size:12px;
-}
-
-.bar{
-    height:9px;
-    background:#543a3a;
-    border-radius:8px;
-    margin:12px 0;
-    overflow:hidden;
-}
-
-.bar i{
-    display:block;
-    width:64%;
-    height:100%;
-    background:#ff9e00;
-}
-
-.action{
-    width:100%;
-    border:0;
-    border-radius:13px;
-    padding:13px;
-    margin-top:10px;
-    background:#ff6d00;
-    color:white;
-    font-weight:800;
-    font-size:15px;
-    cursor:pointer;
-}
-
-.action:active,
-.mult:active,
-.nav button:active{
-    transform:scale(.97);
-}
-
-.panel{
-    background:#351517;
-    border:1px solid #5b2a2b;
-    border-radius:18px;
-    padding:16px;
-    margin-top:14px;
-}
-
-.panel h2{
-    margin:0 0 6px;
-}
-
-.panel p{
-    color:#bdaaaa;
-    font-size:13px;
-}
-
-.auction{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    background:#421b1d;
-    border-radius:15px;
-    padding:12px;
-    margin-top:10px;
-}
-
-.auction .icon{
-    font-size:34px;
-}
-
-.auction-info{
-    flex:1;
-}
-
-.auction-info b{
-    display:block;
-}
-
-.price{
-    color:#ffad00;
-    font-weight:700;
-    margin-top:4px;
-}
-
-.rank{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    background:#421b1d;
-    padding:13px;
-    border-radius:14px;
-    margin-top:8px;
-}
-
-.rank-number{
-    width:30px;
-    font-weight:800;
-    color:#ffad00;
-}
-
-.rank-name{
-    flex:1;
-}
-
-.rank-score{
-    font-weight:800;
-}
-
-.nav{
-    position:fixed;
-    bottom:10px;
-    left:50%;
-    transform:translateX(-50%);
-    width:min(470px,calc(100% - 24px));
-    background:#351517;
-    border:1px solid #5b2a2b;
-    border-radius:18px;
-    padding:8px;
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    box-shadow:0 8px 30px #0008;
-    z-index:100;
-}
-
-.nav button{
-    border:0;
-    background:none;
-    color:#9d8989;
-    padding:8px 2px;
-    border-radius:13px;
-    font-weight:700;
-    cursor:pointer;
-    transition:.15s;
-}
-
-.nav button.active{
-    background:#5a2020;
-    color:#ff6d5e;
-}
-
-.footer{
-    text-align:center;
-    color:#b29a9a;
-    font-size:11px;
-    margin-top:30px;
-}
-
-.toast{
-    position:fixed;
-    top:20px;
-    left:50%;
-    transform:translateX(-50%) translateY(-20px);
-    background:#4b2022;
-    border:1px solid #7b3639;
-    padding:12px 18px;
-    border-radius:13px;
-    opacity:0;
-    pointer-events:none;
-    transition:.25s;
-    z-index:999;
-    font-weight:700;
-}
-
-.toast.show{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-}
-</style>
+        .error {
+            background: #350b0b;
+            border: 1px solid #761717;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="toast" id="toast"></div>
+<div id="loading" class="loading">
+    Загрузка RaneGame...
+</div>
 
-<div class="app">
+<div id="game" style="display:none;">
 
     <div class="top">
-        <div class="avatar">🎮</div>
-        <div class="user">
-            <span id="username">RaneGame</span>
-            <small id="tgusername">@RaneGame</small>
+        <div class="avatar" id="avatar">R</div>
+
+        <div>
+            <div class="name" id="username">Игрок</div>
+            <div class="username" id="tgusername">@Telegram</div>
         </div>
     </div>
 
+    <!-- ГЛАВНАЯ -->
+    <section id="home" class="page active">
 
-    <!-- ДОМ -->
-    <div class="page active" id="home">
+        <div class="balance-card">
+            <div class="balance-title">Твой баланс</div>
 
-        <div class="points">
-            <div class="big">⭐ <span id="balance">3918</span></div>
-            <div class="rate">+<span id="income">201</span> в час</div>
+            <div class="balance" id="balance">
+                0
+            </div>
 
-            <div class="mult" id="spinBtn">
-                ×1.00 &nbsp; Крутить
+            <div>
+                Доход:
+                <span class="income">+<span id="income">0</span> ⭐/час</span>
             </div>
         </div>
 
-        <div class="invite">
-            🤝 &nbsp; <b>Позови 2 друзей</b><br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 из 2.
-            Награда: 500 звёзд и доход ×1.15
-        </div>
+        <div class="card">
+            <h3>🎁 Пригласи друга</h3>
+            <p>Приглашай игроков и получай награды.</p>
 
-        <div class="section">
-
-            <div class="head">
-                <span style="color:#fff;font-size:17px">Инвентарь</span>
-                <span>154 шт.</span>
-            </div>
-
-            <div class="cards">
-
-                <div class="card">
-                    <div class="emoji">🦌</div>
-                    <b>№3</b>
-                    <small>+6/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🦐</div>
-                    <b>Продаётся</b>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🦐</div>
-                    <b>Продаётся</b>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🍵</div>
-                    <b>Продаётся</b>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🫙</div>
-                    <b>№453</b>
-                </div>
-
-            </div>
-        </div>
-
-
-        <div class="boiler">
-
-            <span class="timer" id="timer">6:24</span>
-
-            <h3>Котёл</h3>
-
-            <div class="boilnum">557</div>
-
-            <div class="sub">
-                забирает один: 446
-            </div>
-
-            <div class="bar">
-                <i id="progress"></i>
-            </div>
-
-            <div class="sub">
-                64.1% &nbsp;&nbsp;&nbsp; 357
-            </div>
-
-            <button class="action" onclick="collectBoiler()">
-                🔥 Забрать
+            <button onclick="inviteFriend()">
+                Пригласить
             </button>
-
         </div>
 
-    </div>
+        <div class="card">
+            <h3>🔥 Бонус</h3>
+            <p>Забери ежедневную награду.</p>
 
+            <button onclick="collect()">
+                Забрать +446 ⭐
+            </button>
+        </div>
+
+    </section>
 
     <!-- АУКЦИОН -->
-    <div class="page" id="auction">
+    <section id="auction" class="page">
 
-        <div class="panel">
+        <div class="card">
+            <h2>🔨 Аукцион</h2>
+            <p>Здесь будут предметы игроков.</p>
 
-            <h2>🎰 Аукцион</h2>
-
-            <p>
-                Здесь можно покупать редкие предметы
-                за звёзды.
-            </p>
-
-            <div class="auction">
-                <div class="icon">🐉</div>
-
-                <div class="auction-info">
-                    <b>Дракон</b>
-                    <div class="price">⭐ 500</div>
-                </div>
-
-                <button class="action"
-                        style="width:auto;margin:0"
-                        onclick="buyItem('Дракон',500)">
-                    Купить
-                </button>
-            </div>
-
-
-            <div class="auction">
-                <div class="icon">🦈</div>
-
-                <div class="auction-info">
-                    <b>Акула</b>
-                    <div class="price">⭐ 750</div>
-                </div>
-
-                <button class="action"
-                        style="width:auto;margin:0"
-                        onclick="buyItem('Акула',750)">
-                    Купить
-                </button>
-            </div>
-
-
-            <div class="auction">
-                <div class="icon">👑</div>
-
-                <div class="auction-info">
-                    <b>Корона</b>
-                    <div class="price">⭐ 1500</div>
-                </div>
-
-                <button class="action"
-                        style="width:auto;margin:0"
-                        onclick="buyItem('Корона',1500)">
-                    Купить
-                </button>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ТОВАРЫ -->
-    <div class="page" id="shop">
-
-        <div class="panel">
-
-            <h2>🛒 Товары</h2>
-
-            <p>
-                Покупай предметы и увеличивай свой доход.
-            </p>
-
-            <div class="cards">
-
-                <div class="card">
-                    <div class="emoji">🐋</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🦀</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🦏</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🐍</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🔵</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-            </div>
-
-            <button class="action" onclick="buyItem('Предмет',15)">
-                🛒 Купить предмет за ⭐15
+            <button onclick="showToast('🔨 Аукцион скоро будет доступен')">
+                Открыть
             </button>
-
         </div>
 
-    </div>
+    </section>
 
+    <!-- МАГАЗИН -->
+    <section id="shop" class="page">
+
+        <div class="card">
+            <h2>🛒 Магазин</h2>
+        </div>
+
+        <div class="card shop-item">
+            <div>
+                <b>⚡ Улучшение дохода</b>
+                <div class="price">500 ⭐</div>
+            </div>
+
+            <button onclick="buy(500, 'Улучшение дохода')">
+                Купить
+            </button>
+        </div>
+
+        <div class="card shop-item">
+            <div>
+                <b>🔥 Супер-бонус</b>
+                <div class="price">1000 ⭐</div>
+            </div>
+
+            <button onclick="buy(1000, 'Супер-бонус')">
+                Купить
+            </button>
+        </div>
+
+        <div class="card shop-item">
+            <div>
+                <b>💎 Премиум</b>
+                <div class="price">2500 ⭐</div>
+            </div>
+
+            <button onclick="buy(2500, 'Премиум')">
+                Купить
+            </button>
+        </div>
+
+    </section>
 
     <!-- ТОП -->
-    <div class="page" id="top">
+    <section id="top" class="page">
 
-        <div class="panel">
-
+        <div class="card">
             <h2>🏆 Топ игроков</h2>
+            <p>Таблица лидеров появится здесь.</p>
 
-            <p>
-                Лучшие игроки RaneGame.
-            </p>
-
-            <div class="rank">
-                <div class="rank-number">1</div>
-                <div class="rank-name">🔥 Rane</div>
-                <div class="rank-score">⭐ 98231</div>
-            </div>
-
-            <div class="rank">
-                <div class="rank-number">2</div>
-                <div class="rank-name">🎮 Player</div>
-                <div class="rank-score">⭐ 72140</div>
-            </div>
-
-            <div class="rank">
-                <div class="rank-number">3</div>
-                <div class="rank-name">🐉 Dragon</div>
-                <div class="rank-score">⭐ 61420</div>
-            </div>
-
-            <div class="rank">
-                <div class="rank-number">4</div>
-                <div class="rank-name">⚡ Max</div>
-                <div class="rank-score">⭐ 50120</div>
-            </div>
-
+            <button onclick="showToast('🏆 Скоро появится топ игроков')">
+                Обновить
+            </button>
         </div>
 
-    </div>
+    </section>
 
+    <!-- НАВИГАЦИЯ -->
+    <div class="nav">
 
-    <div class="footer">
-        @RaneGameBot
+        <button class="active" data-page="home">
+            🏠<br>
+            Главная
+        </button>
+
+        <button data-page="auction">
+            🔨<br>
+            Аукцион
+        </button>
+
+        <button data-page="shop">
+            🛒<br>
+            Магазин
+        </button>
+
+        <button data-page="top">
+            🏆<br>
+            Топ
+        </button>
+
     </div>
 
 </div>
 
-
-<!-- НИЖНЕЕ МЕНЮ -->
-
-<div class="nav">
-
-    <button class="active" data-page="home">
-        🏠<br>Дом
-    </button>
-
-    <button data-page="auction">
-        🎰<br>Аукцион
-    </button>
-
-    <button data-page="shop">
-        🛒<br>Товары
-    </button>
-
-    <button data-page="top">
-        🏆<br>Топ
-    </button>
-
-</div>
-
+<div id="toast" class="toast"></div>
 
 <script>
 
-const tg = window.Telegram?.WebApp;
+const tg = window.Telegram && window.Telegram.WebApp;
 
-if(tg){
+let player = null;
+let balance = 0;
+let income = 0;
+
+
+/* TELEGRAM */
+
+if (tg) {
     tg.ready();
     tg.expand();
+}
 
-    if(tg.initDataUnsafe?.user){
 
-        const user = tg.initDataUnsafe.user;
+/* ЗАПРОС К СЕРВЕРУ */
 
-        const name =
-            user.first_name ||
-            user.username ||
-            "Игрок";
+async function loadPlayer() {
 
-        document.getElementById("username").textContent = name;
+    try {
+
+        if (!tg || !tg.initData) {
+            throw new Error("Игра должна быть открыта через Telegram");
+        }
+
+        const response = await fetch("/api/player", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                initData: tg.initData
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (!data.ok) {
+            throw new Error(data.error || "Ошибка загрузки игрока");
+        }
+
+        player = data.player;
+
+        balance = Number(player.balance);
+        income = Number(player.income);
+
+        updateScreen();
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("loading").innerHTML = `
+            <div class="error">
+                ❌ Не удалось загрузить игрока.<br><br>
+                ${error.message}
+            </div>
+        `;
+
+        return;
+    }
+
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("game").style.display = "block";
+}
+
+
+/* ЭКРАН */
+
+function updateScreen() {
+
+    document.getElementById("balance").textContent =
+        Math.floor(balance).toLocaleString("ru-RU");
+
+    document.getElementById("income").textContent =
+        income;
+
+    if (player) {
+
+        document.getElementById("username").textContent =
+            player.first_name || "Игрок";
 
         document.getElementById("tgusername").textContent =
-            user.username ? "@" + user.username : "Telegram";
+            player.username
+                ? "@" + player.username
+                : "Telegram";
+
+        document.getElementById("avatar").textContent =
+            (player.first_name || "R").charAt(0).toUpperCase();
     }
 }
 
 
-/* =========================
-   ДАННЫЕ ИГРОКА
-========================= */
+/* НАВИГАЦИЯ */
 
-let balance =
-    Number(localStorage.getItem("rane_balance")) || 3918;
+const navButtons = document.querySelectorAll(".nav button");
+const pages = document.querySelectorAll(".page");
 
-let income =
-    Number(localStorage.getItem("rane_income")) || 201;
+navButtons.forEach(function(button) {
 
+    button.addEventListener("click", function() {
 
-function save(){
+        const pageName =
+            button.getAttribute("data-page");
 
-    localStorage.setItem(
-        "rane_balance",
-        balance
-    );
-
-    localStorage.setItem(
-        "rane_income",
-        income
-    );
-}
-
-
-function update(){
-
-    document.getElementById("balance")
-        .textContent =
-        Math.floor(balance).toLocaleString("ru-RU");
-
-    document.getElementById("income")
-        .textContent = income;
-
-    save();
-}
-
-
-update();
-
-
-/* =========================
-   АВТОДОХОД
-========================= */
-
-setInterval(function(){
-
-    balance += income / 3600;
-
-    update();
-
-},1000);
-
-
-/* =========================
-   НАВИГАЦИЯ
-========================= */
-
-const buttons =
-    document.querySelectorAll(".nav button");
-
-const pages =
-    document.querySelectorAll(".page");
-
-
-buttons.forEach(button => {
-
-    button.addEventListener("click",function(){
-
-        const page =
-            this.dataset.page;
-
-        pages.forEach(p =>
-            p.classList.remove("active")
-        );
-
-        buttons.forEach(b =>
-            b.classList.remove("active")
-        );
-
-        document.getElementById(page)
-            .classList.add("active");
-
-        this.classList.add("active");
-
-        window.scrollTo({
-            top:0,
-            behavior:"smooth"
+        pages.forEach(function(page) {
+            page.classList.remove("active");
         });
 
+        navButtons.forEach(function(btn) {
+            btn.classList.remove("active");
+        });
+
+        const selectedPage =
+            document.getElementById(pageName);
+
+        if (selectedPage) {
+            selectedPage.classList.add("active");
+        }
+
+        button.classList.add("active");
+
+        window.scrollTo(0, 0);
     });
 
 });
 
 
-/* =========================
-   УВЕДОМЛЕНИЕ
-========================= */
+/* ПОКУПКА */
 
-function toast(text){
+function buy(price, name) {
 
-    const el =
-        document.getElementById("toast");
+    if (balance < price) {
 
-    el.textContent = text;
-
-    el.classList.add("show");
-
-    setTimeout(() => {
-
-        el.classList.remove("show");
-
-    },1800);
-}
-
-
-/* =========================
-   КРУТИТЬ
-========================= */
-
-document.getElementById("spinBtn")
-.addEventListener("click",function(){
-
-    const reward =
-        Math.floor(Math.random()*100)+10;
-
-    balance += reward;
-
-    update();
-
-    toast("🎉 Ты получил +" + reward + " ⭐");
-
-});
-
-
-/* =========================
-   ПОКУПКА
-========================= */
-
-function buyItem(name,price){
-
-    if(balance < price){
-
-        toast("❌ Не хватает ⭐");
+        showToast("❌ Не хватает ⭐");
 
         return;
     }
 
     balance -= price;
-
     income += 1;
 
-    update();
+    updateScreen();
 
-    toast(
-        "✅ Куплено: " +
-        name +
-        " (+1/ч)"
-    );
+    showToast("✅ Куплено: " + name);
+
 }
 
 
-/* =========================
-   КОТЁЛ
-========================= */
+/* БОНУС */
 
-function collectBoiler(){
+function collect() {
 
-    const reward = 446;
+    balance += 446;
 
-    balance += reward;
+    updateScreen();
 
-    update();
+    showToast("🔥 +446 ⭐");
 
-    toast(
-        "🔥 Забрано +" +
-        reward +
-        " ⭐"
-    );
 }
 
 
-/* =========================
-   ТАЙМЕР
-========================= */
+/* ПРИГЛАСИТЬ */
 
-let seconds = 6*60+24;
+function inviteFriend() {
 
-setInterval(function(){
+    if (!tg) return;
 
-    seconds--;
+    const botUsername = "RaneGameBot";
 
-    if(seconds <= 0){
+    const link =
+        "https://t.me/" +
+        botUsername +
+        "?start=ref_" +
+        (player ? player.telegram_id : "");
 
-        seconds = 6*60+24;
+    if (tg.openTelegramLink) {
+
+        tg.openTelegramLink(
+            "https://t.me/share/url?url=" +
+            encodeURIComponent(link) +
+            "&text=" +
+            encodeURIComponent("Заходи в RaneGame!")
+        );
+
+    } else {
+
+        navigator.clipboard.writeText(link);
+
+        showToast("🔗 Ссылка скопирована");
 
     }
 
-    const min =
-        Math.floor(seconds/60);
+}
 
-    const sec =
-        seconds%60;
 
-    document.getElementById("timer")
-        .textContent =
-        min + ":" +
-        String(sec).padStart(2,"0");
+/* УВЕДОМЛЕНИЕ */
 
-},1000);
+function showToast(text) {
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = text;
+    toast.style.display = "block";
+
+    setTimeout(function() {
+
+        toast.style.display = "none";
+
+    }, 2000);
+
+}
+
+
+/* ЗАПУСК */
+
+loadPlayer();
 
 </script>
 
