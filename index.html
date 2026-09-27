@@ -142,6 +142,11 @@ button:disabled {
     line-height: 1.5;
 }
 
+
+/* =================================
+   ЭКОНОМИКА
+================================= */
+
 .economy-card {
     background: linear-gradient(145deg, #260909, #140505);
     border: 1px solid #4d1616;
@@ -195,6 +200,29 @@ button:disabled {
     min-height: 20px;
 }
 
+.roulette-spin-button {
+    width: 100%;
+    font-size: 17px;
+    padding: 15px;
+}
+
+.claim-button {
+    width: 100%;
+    background: linear-gradient(135deg, #a91c1c, #681010);
+    font-size: 17px;
+    padding: 15px;
+    display: none;
+}
+
+.claim-button.show {
+    display: block;
+}
+
+
+/* =================================
+   РУЛЕТКА
+================================= */
+
 .roulette-window {
     position: relative;
     height: 92px;
@@ -247,72 +275,9 @@ button:disabled {
     border-color: #ff4444;
 }
 
-.roulette-spin-button {
-    width: 100%;
-    font-size: 17px;
-    padding: 15px;
-}
-
-.claim-button {
-    width: 100%;
-    background: linear-gradient(135deg, #a91c1c, #681010);
-    font-size: 17px;
-    padding: 15px;
-    display: none;
-}
-
-.claim-button.show {
-    display: block;
-}
-
-.roulette-result {
-    text-align: center;
-    color: #ff8585;
-    font-size: 14px;
-    min-height: 20px;
-    margin-bottom: 10px;
-}
-
-.roulette-lock {
-    position: fixed;
-    inset: 0;
-    background: rgba(8, 1, 1, .96);
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.roulette-lock.show {
-    display: flex;
-}
-
-.roulette-modal {
-    width: 100%;
-    max-width: 430px;
-    background: #170707;
-    border: 1px solid #561515;
-    border-radius: 24px;
-    padding: 22px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.7);
-}
-
-.roulette-modal h2 {
-    text-align: center;
-    margin-top: 0;
-}
-
-.roulette-modal-text {
-    text-align: center;
-    color: #999;
-    font-size: 14px;
-    margin-bottom: 15px;
-}
-
 
 /* =================================
-   МАГАЗИН
+   МАГАЗИН ПОДАРКОВ
 ================================= */
 
 .shop-tabs {
@@ -354,6 +319,12 @@ button:disabled {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+}
+
+.refresh-shop {
+    width: 100%;
+    background: #321010;
+    margin-bottom: 12px;
 }
 
 
@@ -446,11 +417,6 @@ button:disabled {
     isolation: isolate;
 }
 
-
-/* =================================
-   АУРА
-================================= */
-
 .gift-visual::before {
     content: "";
 
@@ -485,11 +451,6 @@ button:disabled {
     z-index: -1;
 }
 
-
-/* =================================
-   КОЛЬЦО
-================================= */
-
 .gift-visual::after {
     content: "";
 
@@ -520,11 +481,6 @@ button:disabled {
     pointer-events: none;
 }
 
-
-/* =================================
-   САМ ПОДАРОК
-================================= */
-
 .gift-emoji {
     position: relative;
 
@@ -538,7 +494,6 @@ button:disabled {
     justify-content: center;
 
     font-size: 72px;
-
     line-height: 1;
 
     user-select: none;
@@ -591,43 +546,30 @@ button:disabled {
 .gift-spark-1 {
     top: 9px;
     left: 12px;
-
     font-size: 17px;
-
     animation-delay: 0s;
 }
 
 .gift-spark-2 {
     top: 18px;
     right: 10px;
-
     font-size: 10px;
-
     animation-delay: .45s;
 }
 
 .gift-spark-3 {
     left: 9px;
     bottom: 17px;
-
     font-size: 9px;
-
     animation-delay: .9s;
 }
 
 .gift-spark-4 {
     right: 14px;
     bottom: 11px;
-
     font-size: 14px;
-
     animation-delay: 1.3s;
 }
-
-
-/* =================================
-   ЧАСТИЦЫ
-================================= */
 
 .gift-visual .gift-spark::after {
     content: "";
@@ -654,14 +596,13 @@ button:disabled {
 
 
 /* =================================
-   АУРА
+   АНИМАЦИИ
 ================================= */
 
 @keyframes giftAura {
 
     0%, 100% {
         opacity: .35;
-
         transform:
             translate(-50%, -50%)
             scale(.78);
@@ -673,7 +614,6 @@ button:disabled {
 
     50% {
         opacity: .95;
-
         transform:
             translate(-50%, -50%)
             scale(1.16);
@@ -684,16 +624,10 @@ button:disabled {
     }
 }
 
-
-/* =================================
-   КОЛЬЦО
-================================= */
-
 @keyframes giftRing {
 
     0% {
         opacity: .8;
-
         transform:
             translate(-50%, -50%)
             scale(.55);
@@ -701,7 +635,6 @@ button:disabled {
 
     70% {
         opacity: 0;
-
         transform:
             translate(-50%, -50%)
             scale(1.45);
@@ -712,16 +645,10 @@ button:disabled {
     }
 }
 
-
-/* =================================
-   ИСКРЫ
-================================= */
-
 @keyframes sparkFloat {
 
     0% {
         opacity: .15;
-
         transform:
             translateY(7px)
             scale(.55)
@@ -730,7 +657,6 @@ button:disabled {
 
     25% {
         opacity: 1;
-
         transform:
             translateY(-3px)
             scale(1.2)
@@ -739,7 +665,6 @@ button:disabled {
 
     50% {
         opacity: .45;
-
         transform:
             translateY(-10px)
             scale(.8)
@@ -748,7 +673,6 @@ button:disabled {
 
     75% {
         opacity: 1;
-
         transform:
             translateY(-4px)
             scale(1.05)
@@ -757,7 +681,6 @@ button:disabled {
 
     100% {
         opacity: .15;
-
         transform:
             translateY(7px)
             scale(.55)
@@ -765,31 +688,22 @@ button:disabled {
     }
 }
 
-
-/* =================================
-   ЧАСТИЦЫ
-================================= */
-
 @keyframes particleBlink {
 
     0%, 100% {
         opacity: .1;
-
-        transform:
-            scale(.4);
+        transform: scale(.4);
     }
 
     50% {
         opacity: 1;
-
-        transform:
-            scale(1.4);
+        transform: scale(1.4);
     }
 }
 
 
 /* =================================
-   ❤️ СЕРДЦА
+   СЕРДЦА
 ================================= */
 
 .gift-animation-heart .gift-emoji {
@@ -812,7 +726,6 @@ button:disabled {
 }
 
 .gift-animation-heart {
-
     background:
         radial-gradient(
             circle,
@@ -863,7 +776,7 @@ button:disabled {
 
 
 /* =================================
-   💎 АЛМАЗЫ
+   АЛМАЗЫ / ЗОЛОТО
 ================================= */
 
 .gift-animation-shine .gift-emoji {
@@ -886,7 +799,6 @@ button:disabled {
 }
 
 .gift-animation-shine {
-
     background:
         radial-gradient(
             circle,
@@ -936,7 +848,7 @@ button:disabled {
 
 
 /* =================================
-   🚀 РАКЕТА
+   РАКЕТА
 ================================= */
 
 .gift-animation-rocket .gift-emoji {
@@ -959,7 +871,6 @@ button:disabled {
 }
 
 .gift-animation-rocket {
-
     background:
         radial-gradient(
             circle,
@@ -1009,7 +920,7 @@ button:disabled {
 
 
 /* =================================
-   🔮 МАГИЯ
+   МАГИЯ
 ================================= */
 
 .gift-animation-magic .gift-emoji {
@@ -1032,7 +943,6 @@ button:disabled {
 }
 
 .gift-animation-magic {
-
     background:
         radial-gradient(
             circle,
@@ -1082,7 +992,7 @@ button:disabled {
 
 
 /* =================================
-   🎁 ОБЫЧНЫЕ ПОДАРКИ
+   ОБЫЧНЫЕ ПОДАРКИ
 ================================= */
 
 .gift-animation-bounce .gift-emoji {
@@ -1391,10 +1301,13 @@ button:disabled {
     background: #180808;
     border-radius: 12px;
     padding: 9px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     gap: 8px;
+
     font-size: 12px;
 }
 
@@ -1419,10 +1332,14 @@ button:disabled {
     padding: 35px 15px;
 }
 
-.refresh-shop {
-    width: 100%;
-    background: #321010;
-    margin-bottom: 12px;
+
+/* =================================
+   АУКЦИОН
+================================= */
+
+.auction-placeholder {
+    text-align: center;
+    padding: 30px 10px;
 }
 
 
@@ -1432,6 +1349,7 @@ button:disabled {
 
 .nav {
     position: fixed;
+
     bottom: 0;
     left: 0;
     right: 0;
@@ -1452,13 +1370,78 @@ button:disabled {
 .nav button {
     background: transparent;
     color: #777;
+
     padding: 8px 12px;
+
     font-size: 12px;
+
     min-width: 70px;
 }
 
 .nav button.active {
     color: white;
+}
+
+
+/* =================================
+   МОДАЛКА РУЛЕТКИ
+================================= */
+
+.roulette-lock {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(8, 1, 1, .96);
+
+    z-index: 1000;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.roulette-lock.show {
+    display: flex;
+}
+
+.roulette-modal {
+    width: 100%;
+    max-width: 430px;
+
+    background: #170707;
+
+    border: 1px solid #561515;
+
+    border-radius: 24px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.7);
+}
+
+.roulette-modal h2 {
+    text-align: center;
+    margin-top: 0;
+}
+
+.roulette-modal-text {
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.roulette-result {
+    text-align: center;
+    color: #ff8585;
+    font-size: 14px;
+    min-height: 20px;
+    margin-bottom: 10px;
 }
 
 
@@ -1534,7 +1517,7 @@ button:disabled {
 
 
 <!-- =================================
-     ВЕРХ
+     ВЕРХНИЙ ПРОФИЛЬ
 ================================= -->
 
 <div class="top">
@@ -1571,7 +1554,7 @@ button:disabled {
 
 
 <!-- =================================
-     ГЛАВНАЯ
+     МЕНЮ
 ================================= -->
 
 <section
@@ -1607,13 +1590,15 @@ button:disabled {
 </div>
 
 
+<!-- ЭКОНОМИКА -->
+
 <div class="economy-card">
 
     <div class="economy-header">
 
         <div class="economy-title">
 
-            крутим
+            Крутим
 
         </div>
 
@@ -1651,17 +1636,19 @@ button:disabled {
         class="roulette-spin-button"
         onclick="openRoulette()">
 
-        Крутить
+        🎰 Крутить
 
     </button>
 
 </div>
 
 
+<!-- РЕФЕРАЛКА -->
+
 <div class="card">
 
     <h3>
-        Твоя ссылка
+        🔗 Твоя ссылка
     </h3>
 
     <div
@@ -1702,6 +1689,8 @@ button:disabled {
 </div>
 
 
+<!-- БОНУС -->
+
 <div class="card">
 
     <h3>
@@ -1723,47 +1712,9 @@ button:disabled {
 </div>
 
 
-</section>
-
-
 <!-- =================================
-     АУКЦИОН
+     ПОДАРКИ ТЕПЕРЬ ВНУТРИ МЕНЮ
 ================================= -->
-
-<section
-    id="auction"
-    class="page">
-
-<div class="card">
-
-    <h2>
-        🔨 Аукцион
-    </h2>
-
-    <p>
-        Здесь скоро появится аукцион.
-    </p>
-
-    <button
-        onclick="showToast('🔨 Аукцион скоро будет доступен')">
-
-        Открыть
-
-    </button>
-
-</div>
-
-</section>
-
-
-<!-- =================================
-     ПОДАРКИ
-================================= -->
-
-<section
-    id="shop"
-    class="page">
-
 
 <div class="card">
 
@@ -1795,85 +1746,139 @@ button:disabled {
 
     </div>
 
-</div>
+
+    <!-- МАГАЗИН -->
+
+    <div id="giftShop">
 
 
-<div id="giftShop">
+        <div class="shop-info">
+
+            🔄 Ассортимент обновляется
+            <b>раз в 3 часа</b>.<br>
+
+            🎁 Каждый подарок даёт
+            <b>+1 ⭐/час</b>.<br>
+
+            📦 Одного вида можно купить
+            максимум <b>5 раз</b>.
+
+        </div>
 
 
-<div class="shop-info">
+        <button
+            class="refresh-shop"
+            onclick="loadGiftShop()">
 
-    🔄 Ассортимент обновляется
-    <b>раз в 3 часа</b>.<br>
+            🔄 Обновить магазин
 
-    🎁 Каждый подарок даёт
-    <b>+1 ⭐/час</b>.<br>
-
-    📦 Одного вида можно купить
-    максимум <b>5 раз</b>.
-
-</div>
+        </button>
 
 
-<button
-    class="refresh-shop"
-    onclick="loadGiftShop()">
+        <div
+            id="shopGrid"
+            class="shop-grid">
 
-    🔄 Обновить магазин
+            <div
+                class="empty-inventory"
+                style="grid-column:1/-1;">
 
-</button>
+                Загрузка подарков...
+
+            </div>
+
+        </div>
 
 
-<div
-    id="shopGrid"
-    class="shop-grid">
+    </div>
 
-    <div class="empty-inventory">
 
-        Загрузка подарков...
+    <!-- ИНВЕНТАРЬ -->
+
+    <div
+        id="giftInventory"
+        style="display:none;">
+
+
+        <div class="shop-info">
+
+            💰 Подарок можно продать за его
+            <b>полную цену</b>.<br>
+
+            ⏳ После покупки должно пройти
+            <b>5 часов</b>.<br>
+
+            ⭐ Доход от подарка:
+            <b>+1 ⭐/час</b>.
+
+        </div>
+
+
+        <div
+            id="inventoryList"
+            class="inventory-list">
+
+            <div class="empty-inventory">
+
+                Загрузка инвентаря...
+
+            </div>
+
+        </div>
+
 
     </div>
 
 </div>
 
 
-</div>
+</section>
 
 
-<div
-    id="giftInventory"
-    style="display:none;">
+<!-- =================================
+     АУКЦИОН
+================================= -->
 
+<section
+    id="auction"
+    class="page">
 
-<div class="shop-info">
+<div class="card">
 
-    💰 Подарок можно продать за его
-    <b>полную цену</b>.<br>
+    <h2>
+        🔨 Аукцион
+    </h2>
 
-    ⏳ После покупки должно пройти
-    <b>5 часов</b>.<br>
+    <div class="auction-placeholder">
 
-    ⭐ Доход от подарка:
-    <b>+1 ⭐/час</b>.
+        <div
+            style="
+                font-size:55px;
+                margin-bottom:15px;
+            ">
 
-</div>
+            🔨
 
+        </div>
 
-<div
-    id="inventoryList"
-    class="inventory-list">
+        <p>
+            Здесь скоро появится аукцион.
+        </p>
 
-    <div class="empty-inventory">
+        <button
+            onclick="
+                showToast(
+                    '🔨 Аукцион скоро будет доступен'
+                )
+            ">
 
-        Загрузка инвентаря...
+            Открыть
+
+        </button>
 
     </div>
 
 </div>
-
-
-</div>
-
 
 </section>
 
@@ -1897,7 +1902,11 @@ button:disabled {
     </p>
 
     <button
-        onclick="showToast('🏆 Топ скоро появится')">
+        onclick="
+            showToast(
+                '🏆 Топ скоро появится'
+            )
+        ">
 
         Обновить
 
@@ -1909,7 +1918,7 @@ button:disabled {
 
 
 <!-- =================================
-     НАВИГАЦИЯ
+     НИЖНЯЯ НАВИГАЦИЯ
 ================================= -->
 
 <div class="nav">
@@ -1921,7 +1930,7 @@ button:disabled {
 
     🏠
     <br>
-    Главная
+    Меню
 
 </button>
 
@@ -1932,16 +1941,6 @@ button:disabled {
     🔨
     <br>
     Аукцион
-
-</button>
-
-
-<button
-    data-page="shop">
-
-    🎁
-    <br>
-    Подарки
 
 </button>
 
@@ -2613,7 +2612,7 @@ navButtons.forEach(
 
                 if (
                     pageName ===
-                    "shop"
+                    "home"
                 ) {
 
                     loadGiftShop();
@@ -3078,7 +3077,7 @@ function renderGiftShop() {
 
 
 /* =================================
-   КУПИТЬ
+   КУПИТЬ ПОДАРОК
 ================================= */
 
 async function buyGift(
@@ -3891,7 +3890,7 @@ function buildRoulette() {
 
 
 /* =================================
-   КРУТИТЬ
+   КРУТИТЬ РУЛЕТКУ
 ================================= */
 
 async function spinRoulette() {
@@ -4181,7 +4180,7 @@ function finishRoulette() {
 
 
 /* =================================
-   ЗАБРАТЬ РУЛЕТКУ
+   ЗАБРАТЬ МНОЖИТЕЛЬ
 ================================= */
 
 async function claimRoulette() {
@@ -4397,7 +4396,7 @@ async function collect() {
 
 
 /* =================================
-   ПРИГЛАСИТЬ
+   ПРИГЛАСИТЬ ДРУГА
 ================================= */
 
 function inviteFriend() {
@@ -4466,7 +4465,7 @@ function inviteFriend() {
 
 
 /* =================================
-   КОПИРОВАТЬ
+   КОПИРОВАТЬ ССЫЛКУ
 ================================= */
 
 function copyInviteLink() {
@@ -4556,7 +4555,7 @@ function showToast(text) {
 
 
 /* =================================
-   ESCAPE
+   ESCAPE HTML
 ================================= */
 
 function escapeHtml(text) {
