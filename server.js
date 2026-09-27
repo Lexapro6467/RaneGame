@@ -60,12 +60,6 @@ function validateTelegramInitData(initData) {
         .map(([key, value]) => `${key}=${value}`)
         .join("\n");
 
-
-    /*
-       Telegram:
-       secret_key = HMAC_SHA256(bot_token, "WebAppData")
-    */
-
     const secretKey = crypto
         .createHmac(
             "sha256",
@@ -73,7 +67,6 @@ function validateTelegramInitData(initData) {
         )
         .update(BOT_TOKEN)
         .digest();
-
 
     const calculatedHash = crypto
         .createHmac(
@@ -83,17 +76,11 @@ function validateTelegramInitData(initData) {
         .update(dataCheckString)
         .digest("hex");
 
-
-    /*
-       Безопасное сравнение
-    */
-
     const receivedBuffer =
         Buffer.from(receivedHash, "hex");
 
     const calculatedBuffer =
         Buffer.from(calculatedHash, "hex");
-
 
     if (
         receivedBuffer.length !==
@@ -105,7 +92,6 @@ function validateTelegramInitData(initData) {
                 "HASH не совпал — проверь BOT_TOKEN в Render"
         };
     }
-
 
     if (
         !crypto.timingSafeEqual(
@@ -120,11 +106,6 @@ function validateTelegramInitData(initData) {
         };
     }
 
-
-    /*
-       Получаем пользователя
-    */
-
     const userData =
         params.get("user");
 
@@ -134,7 +115,6 @@ function validateTelegramInitData(initData) {
             error: "Данные пользователя отсутствуют"
         };
     }
-
 
     let user;
 
@@ -148,7 +128,6 @@ function validateTelegramInitData(initData) {
         };
     }
 
-
     if (!user.id) {
         return {
             ok: false,
@@ -156,7 +135,6 @@ function validateTelegramInitData(initData) {
                 "Telegram ID отсутствует"
         };
     }
-
 
     return {
         ok: true,
@@ -182,7 +160,6 @@ async function getPlayer(telegramId) {
         }
     );
 
-
     if (!response.ok) {
 
         console.error(
@@ -194,15 +171,12 @@ async function getPlayer(telegramId) {
         );
     }
 
-
     const players =
         await response.json();
-
 
     if (!players.length) {
         return null;
     }
-
 
     return players[0];
 }
@@ -244,7 +218,6 @@ async function createPlayer(user) {
         }
     );
 
-
     if (!response.ok) {
 
         console.error(
@@ -256,10 +229,8 @@ async function createPlayer(user) {
         );
     }
 
-
     const players =
         await response.json();
-
 
     return players[0];
 }
@@ -297,7 +268,6 @@ async function updatePlayer(
         }
     );
 
-
     if (!response.ok) {
 
         console.error(
@@ -309,12 +279,82 @@ async function updatePlayer(
         );
     }
 
-
     const players =
         await response.json();
 
-
     return players[0];
+}
+
+
+/* =====================================================
+   ПОДПИСЬ РЕЗУЛЬТАТА РУЛЕТКИ
+===================================================== */
+
+function getRouletteSecret() {
+
+    return crypto
+        .createHash("sha256")
+        .update(
+            BOT_TOKEN +
+            "|" +
+            SUPABASE_KEY
+        )
+        .digest("hex");
+
+}
+
+
+function signRouletteResult(
+    telegramId,
+    multiplier,
+    issuedAt
+) {
+
+    const payload =
+        `${telegramId}:${multiplier}:${issuedAt}`;
+
+    return crypto
+        .createHmac(
+            "sha256",
+            getRouletteSecret()
+        )
+        .update(payload)
+        .digest("hex");
+
+}
+
+
+function verifyRouletteResult(
+    telegramId,
+    multiplier,
+    issuedAt,
+    signature
+) {
+
+    const expected =
+        signRouletteResult(
+            telegramId,
+            multiplier,
+            issuedAt
+        );
+
+    const a =
+        Buffer.from(
+            String(signature),
+            "hex"
+        );
+
+    const b =
+        Buffer.from(
+            expected,
+            "hex"
+        );
+
+    if (a.length !== b.length) {
+        return false;
+    }
+
+    return crypto.timingSafeEqual(a, b);
 }
 
 
@@ -364,7 +404,6 @@ app.post(
                     req.body.initData
                 );
 
-
             if (!auth.ok) {
 
                 return res.status(401).json({
@@ -374,16 +413,13 @@ app.post(
 
             }
 
-
             const user =
                 auth.user;
-
 
             let player =
                 await getPlayer(
                     user.id
                 );
-
 
             if (!player) {
 
@@ -394,12 +430,10 @@ app.post(
 
             }
 
-
             res.json({
                 ok: true,
                 player
             });
-
 
         } catch (error) {
 
@@ -408,11 +442,352 @@ app.post(
                 error
             );
 
-
             res.status(500).json({
                 ok: false,
                 error:
                     "Ошибка сервера"
+            });
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   РУЛЕТКА — КРУТИТЬ
+===================================================== */
+
+app.post(
+    "/api/roulette/spin",
+    async (req, res) => {
+
+        try {
+
+            const auth =
+                validateTelegramInitData(
+                    req.body.initData
+                );
+
+            if (!auth.ok) {
+
+                return res.status(401).json({
+                    ok: false,
+                    error: auth.error
+                });
+
+            }
+
+            const user =
+                auth.user;
+
+            const player =
+                await getPlayer(
+                    user.id
+                );
+
+            if (!player) {
+
+                return res.status(404).json({
+                    ok: false,
+                    error:
+                        "Игрок не найден"
+                });
+
+            }
+
+
+            /*
+             * Если предыдущий множитель
+             * ещё действует — новую рулетку
+             * крутить нельзя.
+             */
+
+            if (
+                player.economy_expires_at &&
+                new Date(
+                    player.economy_expires_at
+                ).getTime() > Date.now()
+            ) {
+
+                return res.status(400).json({
+                    ok: false,
+                    error:
+                        "Множитель уже активен"
+                });
+
+            }
+
+
+            /*
+             * x0.1 ... x2.0
+             */
+
+            const multiplier =
+                Number(
+                    (
+                        0.1 +
+                        Math.floor(
+                            Math.random() * 20
+                        ) * 0.1
+                    ).toFixed(2)
+                );
+
+
+            const issuedAt =
+                Date.now();
+
+
+            const signature =
+                signRouletteResult(
+                    user.id,
+                    multiplier,
+                    issuedAt
+                );
+
+
+            res.json({
+                ok: true,
+
+                multiplier,
+
+                issuedAt,
+
+                signature
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                "ROULETTE SPIN ERROR:",
+                error
+            );
+
+            res.status(500).json({
+                ok: false,
+                error:
+                    "Ошибка рулетки"
+            });
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   РУЛЕТКА — ЗАБРАТЬ
+===================================================== */
+
+app.post(
+    "/api/roulette/claim",
+    async (req, res) => {
+
+        try {
+
+            const auth =
+                validateTelegramInitData(
+                    req.body.initData
+                );
+
+            if (!auth.ok) {
+
+                return res.status(401).json({
+                    ok: false,
+                    error: auth.error
+                });
+
+            }
+
+            const user =
+                auth.user;
+
+
+            const multiplier =
+                Number(
+                    req.body.multiplier
+                );
+
+            const issuedAt =
+                Number(
+                    req.body.issuedAt
+                );
+
+            const signature =
+                req.body.signature;
+
+
+            /*
+             * Проверяем диапазон
+             */
+
+            if (
+                !Number.isFinite(multiplier) ||
+                multiplier < 0.1 ||
+                multiplier > 2.0
+            ) {
+
+                return res.status(400).json({
+                    ok: false,
+                    error:
+                        "Неверный множитель"
+                });
+
+            }
+
+
+            /*
+             * Только значения 0.1,
+             * 0.2 ... 2.0
+             */
+
+            const tenth =
+                Math.round(
+                    multiplier * 10
+                );
+
+            if (
+                Math.abs(
+                    multiplier -
+                    tenth / 10
+                ) > 0.0001
+            ) {
+
+                return res.status(400).json({
+                    ok: false,
+                    error:
+                        "Неверное значение множителя"
+                });
+
+            }
+
+
+            /*
+             * Результат должен быть
+             * свежим
+             */
+
+            if (
+                !Number.isFinite(issuedAt) ||
+                Date.now() - issuedAt > 10 * 60 * 1000 ||
+                issuedAt - Date.now() > 60 * 1000
+            ) {
+
+                return res.status(400).json({
+                    ok: false,
+                    error:
+                        "Результат рулетки устарел"
+                });
+
+            }
+
+
+            /*
+             * Проверяем подпись сервера
+             */
+
+            if (
+                !verifyRouletteResult(
+                    user.id,
+                    multiplier,
+                    issuedAt,
+                    signature
+                )
+            ) {
+
+                return res.status(400).json({
+                    ok: false,
+                    error:
+                        "Недействительный результат рулетки"
+                });
+
+            }
+
+
+            const player =
+                await getPlayer(
+                    user.id
+                );
+
+            if (!player) {
+
+                return res.status(404).json({
+                    ok: false,
+                    error:
+                        "Игрок не найден"
+                });
+
+            }
+
+
+            /*
+             * Проверяем, что множитель
+             * не был активирован раньше.
+             */
+
+            if (
+                player.economy_expires_at &&
+                new Date(
+                    player.economy_expires_at
+                ).getTime() > Date.now()
+            ) {
+
+                return res.status(400).json({
+                    ok: false,
+                    error:
+                        "У тебя уже есть активный множитель"
+                });
+
+            }
+
+
+            /*
+             * 4 часа
+             */
+
+            const expiresAt =
+                new Date(
+                    Date.now() +
+                    4 * 60 * 60 * 1000
+                ).toISOString();
+
+
+            const updated =
+                await updatePlayer(
+                    user.id,
+                    {
+                        economy_multiplier:
+                            multiplier,
+
+                        economy_expires_at:
+                            expiresAt
+                    }
+                );
+
+
+            res.json({
+                ok: true,
+
+                player: updated,
+
+                multiplier,
+
+                expiresAt
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                "ROULETTE CLAIM ERROR:",
+                error
+            );
+
+            res.status(500).json({
+                ok: false,
+                error:
+                    "Ошибка получения множителя"
             });
 
         }
@@ -436,7 +811,6 @@ app.post(
                     req.body.initData
                 );
 
-
             if (!auth.ok) {
 
                 return res.status(401).json({
@@ -446,16 +820,13 @@ app.post(
 
             }
 
-
             const user =
                 auth.user;
-
 
             const player =
                 await getPlayer(
                     user.id
                 );
-
 
             if (!player) {
 
@@ -467,10 +838,8 @@ app.post(
 
             }
 
-
             const balance =
                 Number(player.balance);
-
 
             const updated =
                 await updatePlayer(
@@ -481,12 +850,10 @@ app.post(
                     }
                 );
 
-
             res.json({
                 ok: true,
                 player: updated
             });
-
 
         } catch (error) {
 
@@ -494,7 +861,6 @@ app.post(
                 "COLLECT ERROR:",
                 error
             );
-
 
             res.status(500).json({
                 ok: false,
@@ -523,7 +889,6 @@ app.post(
                     req.body.initData
                 );
 
-
             if (!auth.ok) {
 
                 return res.status(401).json({
@@ -533,14 +898,11 @@ app.post(
 
             }
 
-
             const user =
                 auth.user;
 
-
             const price =
                 Number(req.body.price);
-
 
             if (
                 !Number.isInteger(price) ||
@@ -555,12 +917,10 @@ app.post(
 
             }
 
-
             const player =
                 await getPlayer(
                     user.id
                 );
-
 
             if (!player) {
 
@@ -572,10 +932,8 @@ app.post(
 
             }
 
-
             const balance =
                 Number(player.balance);
-
 
             if (balance < price) {
 
@@ -587,10 +945,8 @@ app.post(
 
             }
 
-
             const income =
                 Number(player.income);
-
 
             const updated =
                 await updatePlayer(
@@ -604,12 +960,10 @@ app.post(
                     }
                 );
 
-
             res.json({
                 ok: true,
                 player: updated
             });
-
 
         } catch (error) {
 
@@ -617,7 +971,6 @@ app.post(
                 "BUY ERROR:",
                 error
             );
-
 
             res.status(500).json({
                 ok: false,
