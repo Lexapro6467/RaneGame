@@ -1,248 +1,495 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width,
-                   initial-scale=1.0,
-                   maximum-scale=1.0,
-                   user-scalable=no">
-
-    <title>RaneGame</title>
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            margin: 0;
-            background: #100606;
-            color: white;
-            font-family: Arial, sans-serif;
-            padding-bottom: 90px;
-        }
-
-        button {
-            border: 0;
-            border-radius: 14px;
-            padding: 13px 18px;
-            background: #8f1717;
-            color: white;
-            font-weight: bold;
-            font-size: 15px;
-            cursor: pointer;
-        }
-
-        button:active {
-            transform: scale(.96);
-        }
-
-        /* ЗАГРУЗКА */
-
-        .loading {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: #aaa;
-            padding: 20px;
-        }
-
-        .error {
-            background: #350b0b;
-            border: 1px solid #761717;
-            padding: 18px;
-            border-radius: 16px;
-            max-width: 400px;
-        }
-
-        /* ВЕРХ */
-
-        .top {
-            padding: 20px 18px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: #7b1111;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .name {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .username {
-            color: #999;
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        /* СТРАНИЦЫ */
-
-        .page {
-            display: none;
-            padding: 0 16px;
-        }
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>RaneGame</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    background: #100606;
+    color: white;
+    font-family: Arial, sans-serif;
+    padding-bottom: 90px;
+}
+
+button {
+    border: 0;
+    border-radius: 14px;
+    padding: 13px 18px;
+    background: #8f1717;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(.96);
+}
+
+button:disabled {
+    opacity: .5;
+}
+
+/* ЗАГРУЗКА */
+
+.loading {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #aaa;
+    padding: 20px;
+}
+
+.error {
+    background: #350b0b;
+    border: 1px solid #761717;
+    padding: 18px;
+    border-radius: 16px;
+    max-width: 400px;
+}
+
+/* ВЕРХ */
+
+.top {
+    padding: 20px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #7b1111;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.username {
+    color: #999;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* СТРАНИЦЫ */
+
+.page {
+    display: none;
+    padding: 0 16px;
+}
+
+.page.active {
+    display: block;
+}
+
+/* БАЛАНС */
+
+.balance-card {
+    background:
+        linear-gradient(
+            135deg,
+            #7d1111,
+            #3b0808
+        );
 
-        .page.active {
-            display: block;
-        }
+    border-radius: 24px;
+    padding: 28px 20px;
+
+    text-align: center;
+
+    margin-bottom: 15px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.3);
+}
+
+.balance-title {
+    color: #ddd;
+    font-size: 14px;
+}
+
+.balance {
+    font-size: 44px;
+    font-weight: bold;
+    margin: 10px 0;
+}
 
-        /* БАЛАНС */
+.income {
+    color: #72ff72;
+}
 
-        .balance-card {
-            background:
-                linear-gradient(
-                    135deg,
-                    #7d1111,
-                    #3b0808
-                );
+/* КАРТОЧКИ */
 
-            border-radius: 24px;
-            padding: 28px 20px;
+.card {
+    background: #1c0b0b;
+    border: 1px solid #351515;
 
-            text-align: center;
+    border-radius: 18px;
 
-            margin-bottom: 15px;
+    padding: 18px;
+    margin-bottom: 14px;
+}
 
-            box-shadow:
-                0 10px 30px rgba(0,0,0,.3);
-        }
+.card h2,
+.card h3 {
+    margin-top: 0;
+}
 
-        .balance-title {
-            color: #ddd;
-            font-size: 14px;
-        }
+.card p {
+    color: #aaa;
+    line-height: 1.5;
+}
 
-        .balance {
-            font-size: 44px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
+/* =====================================================
+   ЭКОНОМИКА
+===================================================== */
 
-        .income {
-            color: #72ff72;
-        }
+.economy-card {
+    background:
+        linear-gradient(
+            145deg,
+            #260909,
+            #140505
+        );
 
-        /* КАРТОЧКИ */
+    border: 1px solid #4d1616;
+    border-radius: 22px;
 
-        .card {
-            background: #1c0b0b;
-            border: 1px solid #351515;
+    padding: 20px;
+    margin-bottom: 15px;
 
-            border-radius: 18px;
+    overflow: hidden;
+}
 
-            padding: 18px;
-            margin-bottom: 14px;
-        }
+.economy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
 
-        .card h2,
-        .card h3 {
-            margin-top: 0;
-        }
+.economy-title {
+    font-size: 20px;
+    font-weight: bold;
+}
 
-        .card p {
-            color: #aaa;
-            line-height: 1.5;
-        }
+.multiplier-active {
+    background: #163516;
+    color: #72ff72;
 
-        /* МАГАЗИН */
+    padding: 7px 10px;
+    border-radius: 10px;
 
-        .shop-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+    font-weight: bold;
+    font-size: 13px;
+}
 
-            gap: 12px;
-        }
+.multiplier-none {
+    background: #321010;
+    color: #ff7777;
 
-        .price {
-            color: #ffd84d;
-            margin-top: 6px;
-        }
+    padding: 7px 10px;
+    border-radius: 10px;
 
-        /* НИЖНЕЕ МЕНЮ */
+    font-weight: bold;
+    font-size: 13px;
+}
 
-        .nav {
-            position: fixed;
+.current-multiplier {
+    text-align: center;
+    font-size: 48px;
+    font-weight: bold;
 
-            bottom: 0;
-            left: 0;
-            right: 0;
+    margin: 12px 0 4px;
+}
 
-            height: 78px;
+.multiplier-time {
+    text-align: center;
+    color: #aaa;
+    font-size: 14px;
 
-            background: #180707;
-            border-top: 1px solid #351515;
+    min-height: 20px;
+}
 
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
+/* РУЛЕТКА */
 
-            z-index: 100;
-        }
+.roulette-window {
+    position: relative;
 
-        .nav button {
-            background: transparent;
+    height: 92px;
 
-            color: #777;
+    margin: 18px 0;
 
-            padding: 8px 12px;
+    overflow: hidden;
 
-            font-size: 12px;
+    border-radius: 18px;
 
-            min-width: 70px;
-        }
+    background: #0d0404;
 
-        .nav button.active {
-            color: white;
-        }
+    border: 1px solid #421313;
+}
 
-        /* УВЕДОМЛЕНИЕ */
+.roulette-window::before {
+    content: "";
 
-        .toast {
-            position: fixed;
+    position: absolute;
 
-            bottom: 95px;
-            left: 50%;
+    left: 50%;
+    top: 0;
+    bottom: 0;
 
-            transform: translateX(-50%);
+    width: 3px;
 
-            background: #271010;
-            border: 1px solid #5c1a1a;
+    transform: translateX(-50%);
 
-            padding: 12px 18px;
+    background: #ff4545;
 
-            border-radius: 12px;
+    box-shadow:
+        0 0 14px rgba(255,50,50,.8);
 
-            display: none;
+    z-index: 5;
+}
 
-            z-index: 200;
+.roulette-track {
+    height: 100%;
 
-            white-space: nowrap;
-        }
+    display: flex;
+    align-items: center;
 
-    </style>
+    gap: 10px;
+
+    transform: translateX(0);
+
+    will-change: transform;
+}
+
+.roulette-item {
+    flex: 0 0 76px;
+
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #281010;
+
+    border: 1px solid #4a1717;
+
+    color: #aaa;
+
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.roulette-item.selected {
+    background: #791414;
+    color: white;
+    border-color: #ff4444;
+}
+
+.roulette-spin-button {
+    width: 100%;
+    font-size: 17px;
+    padding: 15px;
+}
+
+.claim-button {
+    width: 100%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a91c1c,
+            #681010
+        );
+
+    font-size: 17px;
+
+    padding: 15px;
+
+    display: none;
+}
+
+.claim-button.show {
+    display: block;
+}
+
+.roulette-result {
+    text-align: center;
+
+    color: #ff8585;
+
+    font-size: 14px;
+
+    min-height: 20px;
+
+    margin-bottom: 10px;
+}
+
+/* БЛОКИРОВКА РУЛЕТКИ */
+
+.roulette-lock {
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(8, 1, 1, .96);
+
+    z-index: 1000;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.roulette-lock.show {
+    display: flex;
+}
+
+.roulette-modal {
+    width: 100%;
+    max-width: 430px;
+
+    background: #170707;
+
+    border: 1px solid #561515;
+
+    border-radius: 24px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.7);
+}
+
+.roulette-modal h2 {
+    text-align: center;
+    margin-top: 0;
+}
+
+.roulette-modal-text {
+    text-align: center;
+
+    color: #999;
+
+    font-size: 14px;
+
+    margin-bottom: 15px;
+}
+
+/* МАГАЗИН */
+
+.shop-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.price {
+    color: #ffd84d;
+    margin-top: 6px;
+}
+
+/* НИЖНЕЕ МЕНЮ */
+
+.nav {
+    position: fixed;
+
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 78px;
+
+    background: #180707;
+    border-top: 1px solid #351515;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    z-index: 100;
+}
+
+.nav button {
+    background: transparent;
+
+    color: #777;
+
+    padding: 8px 12px;
+
+    font-size: 12px;
+
+    min-width: 70px;
+}
+
+.nav button.active {
+    color: white;
+}
+
+/* УВЕДОМЛЕНИЕ */
+
+.toast {
+    position: fixed;
+
+    bottom: 95px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    background: #271010;
+    border: 1px solid #5c1a1a;
+
+    padding: 12px 18px;
+
+    border-radius: 12px;
+
+    display: none;
+
+    z-index: 2000;
+
+    white-space: nowrap;
+}
+
+</style>
 </head>
 
 <body>
@@ -264,310 +511,420 @@
 <div id="game" style="display:none;">
 
 
-    <!-- ПРОФИЛЬ -->
+<!-- ПРОФИЛЬ -->
 
-    <div class="top">
+<div class="top">
 
-        <div class="avatar" id="avatar">
-            R
+    <div class="avatar" id="avatar">
+        R
+    </div>
+
+    <div>
+
+        <div class="name" id="username">
+            Игрок
         </div>
 
-        <div>
+        <div class="username" id="tgusername">
+            @Telegram
+        </div>
 
-            <div class="name" id="username">
-                Игрок
-            </div>
+    </div>
 
-            <div class="username" id="tgusername">
-                @Telegram
-            </div>
+</div>
+
+
+<!-- =========================
+     ГЛАВНАЯ
+========================= -->
+
+<section id="home" class="page active">
+
+
+<!-- БАЛАНС -->
+
+<div class="balance-card">
+
+    <div class="balance-title">
+        Твой баланс
+    </div>
+
+    <div class="balance" id="balance">
+        0
+    </div>
+
+    <div>
+
+        Доход:
+
+        <span class="income">
+            +<span id="income">0</span> ⭐/час
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     ЭКОНОМИКА
+========================= -->
+
+<div class="economy-card">
+
+    <div class="economy-header">
+
+        <div class="economy-title">
+            🎰 Экономика
+        </div>
+
+        <div
+            id="economyStatus"
+            class="multiplier-none">
+
+            Не активна
 
         </div>
 
     </div>
 
 
-    <!-- =========================
-         ГЛАВНАЯ
-    ========================= -->
-
-    <section id="home" class="page active">
-
-
-        <!-- БАЛАНС -->
-
-        <div class="balance-card">
-
-            <div class="balance-title">
-                Твой баланс
-            </div>
-
-            <div class="balance" id="balance">
-                0
-            </div>
-
-            <div>
-
-                Доход:
-
-                <span class="income">
-                    +<span id="income">0</span> ⭐/час
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <!-- ПРИГЛАСИТЬ -->
-
-        <div class="card">
-
-            <h3>
-                🎁 Пригласи друга
-            </h3>
-
-            <p>
-                Приглашай игроков в RaneGame
-                и получай награды.
-            </p>
-
-            <button onclick="inviteFriend()">
-                Пригласить
-            </button>
-
-        </div>
-
-
-        <!-- БОНУС -->
-
-        <div class="card">
-
-            <h3>
-                🔥 Ежедневный бонус
-            </h3>
-
-            <p>
-                Забери ежедневную награду.
-            </p>
-
-            <button
-                id="bonusButton"
-                onclick="collect()">
-
-                Забрать +446 ⭐
-
-            </button>
-
-        </div>
-
-
-    </section>
-
-
-    <!-- =========================
-         АУКЦИОН
-    ========================= -->
-
-    <section id="auction" class="page">
-
-        <div class="card">
-
-            <h2>
-                🔨 Аукцион
-            </h2>
-
-            <p>
-                Здесь игроки смогут
-                выставлять свои предметы
-                на продажу.
-            </p>
-
-            <button
-                onclick="showToast('🔨 Аукцион скоро будет доступен')">
-
-                Открыть
-
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         МАГАЗИН
-    ========================= -->
-
-    <section id="shop" class="page">
-
-        <div class="card">
-
-            <h2>
-                🛒 Магазин
-            </h2>
-
-            <p>
-                Покупай улучшения
-                за ⭐.
-            </p>
-
-        </div>
-
-
-        <!-- ПРЕДМЕТ 1 -->
-
-        <div class="card shop-item">
-
-            <div>
-
-                <b>
-                    ⚡ Улучшение дохода
-                </b>
-
-                <div class="price">
-                    500 ⭐
-                </div>
-
-            </div>
-
-            <button
-                onclick="buy(500, 'Улучшение дохода')">
-
-                Купить
-
-            </button>
-
-        </div>
-
-
-        <!-- ПРЕДМЕТ 2 -->
-
-        <div class="card shop-item">
-
-            <div>
-
-                <b>
-                    🔥 Супер-бонус
-                </b>
-
-                <div class="price">
-                    1000 ⭐
-                </div>
-
-            </div>
-
-            <button
-                onclick="buy(1000, 'Супер-бонус')">
-
-                Купить
-
-            </button>
-
-        </div>
-
-
-        <!-- ПРЕДМЕТ 3 -->
-
-        <div class="card shop-item">
-
-            <div>
-
-                <b>
-                    💎 Премиум
-                </b>
-
-                <div class="price">
-                    2500 ⭐
-                </div>
-
-            </div>
-
-            <button
-                onclick="buy(2500, 'Премиум')">
-
-                Купить
-
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         ТОП
-    ========================= -->
-
-    <section id="top" class="page">
-
-        <div class="card">
-
-            <h2>
-                🏆 Топ игроков
-            </h2>
-
-            <p>
-                Таблица лидеров появится здесь.
-            </p>
-
-            <button
-                onclick="showToast('🏆 Топ скоро появится')">
-
-                Обновить
-
-            </button>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         НИЖНЕЕ МЕНЮ
-    ========================= -->
-
-    <div class="nav">
-
-        <button
-            class="active"
-            data-page="home">
-
-            🏠
-            <br>
-            Главная
-
-        </button>
-
-        <button
-            data-page="auction">
-
-            🔨
-            <br>
-            Аукцион
-
-        </button>
-
-        <button
-            data-page="shop">
-
-            🛒
-            <br>
-            Магазин
-
-        </button>
-
-        <button
-            data-page="top">
-
-            🏆
-            <br>
-            Топ
-
-        </button>
+    <div
+        class="current-multiplier"
+        id="currentMultiplier">
+
+        x1.0
 
     </div>
 
+
+    <div
+        class="multiplier-time"
+        id="multiplierTime">
+
+        Крути рулетку
+
+    </div>
+
+
+    <button
+        id="openRouletteButton"
+        class="roulette-spin-button"
+        onclick="openRoulette()">
+
+        🎰 Крутить
+
+    </button>
+
+</div>
+
+
+<!-- ПРИГЛАСИТЬ -->
+
+<div class="card">
+
+    <h3>
+        🎁 Пригласи друга
+    </h3>
+
+    <p>
+        Приглашай игроков в RaneGame
+        и получай награды.
+    </p>
+
+    <button onclick="inviteFriend()">
+        Пригласить
+    </button>
+
+</div>
+
+
+<!-- БОНУС -->
+
+<div class="card">
+
+    <h3>
+        🔥 Ежедневный бонус
+    </h3>
+
+    <p>
+        Забери ежедневную награду.
+    </p>
+
+    <button
+        id="bonusButton"
+        onclick="collect()">
+
+        Забрать +446 ⭐
+
+    </button>
+
+</div>
+
+
+</section>
+
+
+<!-- =========================
+     АУКЦИОН
+========================= -->
+
+<section id="auction" class="page">
+
+<div class="card">
+
+    <h2>
+        🔨 Аукцион
+    </h2>
+
+    <p>
+        Здесь игроки смогут
+        выставлять свои предметы
+        на продажу.
+    </p>
+
+    <button
+        onclick="showToast('🔨 Аукцион скоро будет доступен')">
+
+        Открыть
+
+    </button>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     МАГАЗИН
+========================= -->
+
+<section id="shop" class="page">
+
+<div class="card">
+
+    <h2>
+        🛒 Магазин
+    </h2>
+
+    <p>
+        Покупай улучшения
+        за ⭐.
+    </p>
+
+</div>
+
+
+<div class="card shop-item">
+
+    <div>
+
+        <b>
+            ⚡ Улучшение дохода
+        </b>
+
+        <div class="price">
+            500 ⭐
+        </div>
+
+    </div>
+
+    <button
+        onclick="buy(500, 'Улучшение дохода')">
+
+        Купить
+
+    </button>
+
+</div>
+
+
+<div class="card shop-item">
+
+    <div>
+
+        <b>
+            🔥 Супер-бонус
+        </b>
+
+        <div class="price">
+            1000 ⭐
+        </div>
+
+    </div>
+
+    <button
+        onclick="buy(1000, 'Супер-бонус')">
+
+        Купить
+
+    </button>
+
+</div>
+
+
+<div class="card shop-item">
+
+    <div>
+
+        <b>
+            💎 Премиум
+        </b>
+
+        <div class="price">
+            2500 ⭐
+        </div>
+
+    </div>
+
+    <button
+        onclick="buy(2500, 'Премиум')">
+
+        Купить
+
+    </button>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     ТОП
+========================= -->
+
+<section id="top" class="page">
+
+<div class="card">
+
+    <h2>
+        🏆 Топ игроков
+    </h2>
+
+    <p>
+        Таблица лидеров появится здесь.
+    </p>
+
+    <button
+        onclick="showToast('🏆 Топ скоро появится')">
+
+        Обновить
+
+    </button>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     НИЖНЕЕ МЕНЮ
+========================= -->
+
+<div class="nav">
+
+<button
+    class="active"
+    data-page="home">
+
+    🏠
+    <br>
+    Главная
+
+</button>
+
+<button
+    data-page="auction">
+
+    🔨
+    <br>
+    Аукцион
+
+</button>
+
+<button
+    data-page="shop">
+
+    🛒
+    <br>
+    Магазин
+
+</button>
+
+<button
+    data-page="top">
+
+    🏆
+    <br>
+    Топ
+
+</button>
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     РУЛЕТКА — ПОЛНОЭКРАННОЕ ОКНО
+===================================================== -->
+
+<div
+    id="rouletteLock"
+    class="roulette-lock">
+
+<div class="roulette-modal">
+
+    <h2>
+        🎰 Экономика
+    </h2>
+
+    <div class="roulette-modal-text">
+        Крути рулетку и получи множитель
+        на 4 часа.
+    </div>
+
+
+    <div class="roulette-window">
+
+        <div
+            id="rouletteTrack"
+            class="roulette-track">
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="rouletteResult"
+        class="roulette-result">
+
+        Выбери свой множитель
+
+    </div>
+
+
+    <button
+        id="rouletteSpinButton"
+        class="roulette-spin-button"
+        onclick="spinRoulette()">
+
+        🎰 Крутить
+
+    </button>
+
+
+    <button
+        id="rouletteClaimButton"
+        class="claim-button"
+        onclick="claimRoulette()">
+
+        Забрать
+
+    </button>
+
+</div>
 
 </div>
 
@@ -580,9 +937,9 @@
 <script>
 
 
-/* =========================
+/* =====================================================
    TELEGRAM
-========================= */
+===================================================== */
 
 const tg =
     window.Telegram &&
@@ -598,9 +955,9 @@ if (tg) {
 }
 
 
-/* =========================
-   ДАННЫЕ ИГРОКА
-========================= */
+/* =====================================================
+   ДАННЫЕ
+===================================================== */
 
 let player = null;
 
@@ -608,15 +965,29 @@ let balance = 0;
 
 let income = 0;
 
+let economyMultiplier = 1.0;
 
-/* =========================
+let economyExpiresAt = null;
+
+
+/* Результат текущего вращения */
+
+let rouletteResult = null;
+
+let rouletteIssuedAt = null;
+
+let rouletteSignature = null;
+
+let rouletteSpinning = false;
+
+
+/* =====================================================
    ЗАГРУЗКА ИГРОКА
-========================= */
+===================================================== */
 
 async function loadPlayer() {
 
     try {
-
 
         if (!tg || !tg.initData) {
 
@@ -627,25 +998,26 @@ async function loadPlayer() {
         }
 
 
-        const response = await fetch(
-            "/api/player",
-            {
-                method: "POST",
+        const response =
+            await fetch(
+                "/api/player",
+                {
+                    method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
 
-                body: JSON.stringify({
+                    body: JSON.stringify({
 
-                    initData:
-                        tg.initData
+                        initData:
+                            tg.initData
 
-                })
+                    })
 
-            }
-        );
+                }
+            );
 
 
         const data =
@@ -673,6 +1045,18 @@ async function loadPlayer() {
             Number(player.income);
 
 
+        economyMultiplier =
+            Number(
+                player.economy_multiplier ||
+                1
+            );
+
+
+        economyExpiresAt =
+            player.economy_expires_at ||
+            null;
+
+
         updateScreen();
 
 
@@ -686,8 +1070,10 @@ async function loadPlayer() {
             .style.display = "block";
 
 
-    } catch (error) {
+        startMultiplierTimer();
 
+
+    } catch (error) {
 
         console.error(error);
 
@@ -720,12 +1106,11 @@ async function loadPlayer() {
 }
 
 
-/* =========================
+/* =====================================================
    ЭКРАН
-========================= */
+===================================================== */
 
 function updateScreen() {
-
 
     document
         .getElementById("balance")
@@ -775,12 +1160,165 @@ function updateScreen() {
         .charAt(0)
         .toUpperCase();
 
+
+    updateEconomyScreen();
+
 }
 
 
-/* =========================
+/* =====================================================
+   ЭКОНОМИКА НА ГЛАВНОЙ
+===================================================== */
+
+function updateEconomyScreen() {
+
+    const multiplierElement =
+        document.getElementById(
+            "currentMultiplier"
+        );
+
+    const statusElement =
+        document.getElementById(
+            "economyStatus"
+        );
+
+    const timeElement =
+        document.getElementById(
+            "multiplierTime"
+        );
+
+
+    if (
+        economyExpiresAt &&
+        new Date(
+            economyExpiresAt
+        ).getTime() > Date.now()
+    ) {
+
+        multiplierElement.textContent =
+            "x" +
+            Number(
+                economyMultiplier
+            ).toFixed(1);
+
+
+        statusElement.textContent =
+            "Активна";
+
+
+        statusElement.className =
+            "multiplier-active";
+
+
+        timeElement.textContent =
+            "Осталось: " +
+            formatTime(
+                new Date(
+                    economyExpiresAt
+                ).getTime() -
+                Date.now()
+            );
+
+
+        return;
+
+    }
+
+
+    economyMultiplier = 1.0;
+
+    economyExpiresAt = null;
+
+
+    multiplierElement.textContent =
+        "x1.0";
+
+
+    statusElement.textContent =
+        "Не активна";
+
+
+    statusElement.className =
+        "multiplier-none";
+
+
+    timeElement.textContent =
+        "Крути рулетку";
+
+}
+
+
+/* =====================================================
+   ТАЙМЕР
+===================================================== */
+
+function startMultiplierTimer() {
+
+    clearInterval(
+        window.multiplierTimer
+    );
+
+
+    window.multiplierTimer =
+        setInterval(
+            function() {
+
+                updateEconomyScreen();
+
+            },
+            1000
+        );
+
+}
+
+
+/* =====================================================
+   ФОРМАТ ВРЕМЕНИ
+===================================================== */
+
+function formatTime(ms) {
+
+    if (ms <= 0) {
+        return "00:00:00";
+    }
+
+
+    const totalSeconds =
+        Math.floor(
+            ms / 1000
+        );
+
+
+    const hours =
+        Math.floor(
+            totalSeconds / 3600
+        );
+
+
+    const minutes =
+        Math.floor(
+            (totalSeconds % 3600) / 60
+        );
+
+
+    const seconds =
+        totalSeconds % 60;
+
+
+    return (
+        String(hours).padStart(2, "0") +
+        ":" +
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(seconds).padStart(2, "0")
+    );
+
+}
+
+
+/* =====================================================
    НАВИГАЦИЯ
-========================= */
+===================================================== */
 
 const navButtons =
     document.querySelectorAll(
@@ -797,10 +1335,27 @@ const pages =
 navButtons.forEach(
     function(button) {
 
-
         button.addEventListener(
             "click",
             function() {
+
+                /*
+                 * Если рулетка открыта —
+                 * меню заблокировано.
+                 */
+
+                if (
+                    document
+                        .getElementById(
+                            "rouletteLock"
+                        )
+                        .classList
+                        .contains("show")
+                ) {
+
+                    return;
+
+                }
 
 
                 const pageName =
@@ -863,12 +1418,668 @@ navButtons.forEach(
 );
 
 
-/* =========================
+/* =====================================================
+   ОТКРЫТЬ РУЛЕТКУ
+===================================================== */
+
+function openRoulette() {
+
+    if (
+        economyExpiresAt &&
+        new Date(
+            economyExpiresAt
+        ).getTime() > Date.now()
+    ) {
+
+        showToast(
+            "⚡ Множитель уже активен"
+        );
+
+        return;
+
+    }
+
+
+    rouletteResult = null;
+
+    rouletteIssuedAt = null;
+
+    rouletteSignature = null;
+
+    rouletteSpinning = false;
+
+
+    const lock =
+        document.getElementById(
+            "rouletteLock"
+        );
+
+
+    const spinButton =
+        document.getElementById(
+            "rouletteSpinButton"
+        );
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    const resultText =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    spinButton.disabled = false;
+
+    spinButton.style.display =
+        "block";
+
+    spinButton.textContent =
+        "🎰 Крутить";
+
+
+    claimButton.classList.remove(
+        "show"
+    );
+
+
+    resultText.textContent =
+        "Выбери свой множитель";
+
+
+    buildRoulette();
+
+
+    lock.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =====================================================
+   СОЗДАТЬ РУЛЕТКУ
+===================================================== */
+
+function buildRoulette() {
+
+    const track =
+        document.getElementById(
+            "rouletteTrack"
+        );
+
+
+    track.innerHTML = "";
+
+
+    /*
+     * Делаем много значений,
+     * чтобы была длинная прокрутка.
+     */
+
+    const values = [];
+
+
+    for (
+        let repeat = 0;
+        repeat < 7;
+        repeat++
+    ) {
+
+        for (
+            let i = 1;
+            i <= 20;
+            i++
+        ) {
+
+            values.push(
+                (i / 10).toFixed(1)
+            );
+
+        }
+
+    }
+
+
+    values.forEach(
+        function(value) {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "roulette-item";
+
+
+            item.textContent =
+                "x" + value;
+
+
+            track.appendChild(
+                item
+            );
+
+        }
+    );
+
+
+    track.style.transition =
+        "none";
+
+
+    track.style.transform =
+        "translateX(0)";
+
+}
+
+
+/* =====================================================
+   КРУТИТЬ РУЛЕТКУ
+===================================================== */
+
+async function spinRoulette() {
+
+    if (rouletteSpinning) {
+        return;
+    }
+
+
+    rouletteSpinning = true;
+
+
+    const spinButton =
+        document.getElementById(
+            "rouletteSpinButton"
+        );
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    const resultText =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    spinButton.disabled =
+        true;
+
+
+    spinButton.textContent =
+        "⏳ Крутим...";
+
+
+    claimButton.classList.remove(
+        "show"
+    );
+
+
+    resultText.textContent =
+        "Рулетка вращается...";
+
+
+    try {
+
+        /*
+         * Сервер выбирает настоящий
+         * результат.
+         */
+
+        const response =
+            await fetch(
+                "/api/roulette/spin",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        initData:
+                            tg.initData
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.ok) {
+
+            throw new Error(
+                data.error ||
+                "Ошибка рулетки"
+            );
+
+        }
+
+
+        rouletteResult =
+            Number(
+                data.multiplier
+            );
+
+
+        rouletteIssuedAt =
+            Number(
+                data.issuedAt
+            );
+
+
+        rouletteSignature =
+            data.signature;
+
+
+        /*
+         * Запускаем красивую
+         * анимацию.
+         */
+
+        animateRoulette(
+            rouletteResult
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        rouletteSpinning =
+            false;
+
+
+        spinButton.disabled =
+            false;
+
+
+        spinButton.textContent =
+            "🎰 Крутить";
+
+
+        resultText.textContent =
+            "Ошибка";
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   АНИМАЦИЯ
+===================================================== */
+
+function animateRoulette(
+    result
+) {
+
+    const track =
+        document.getElementById(
+            "rouletteTrack"
+        );
+
+
+    const items =
+        track.querySelectorAll(
+            ".roulette-item"
+        );
+
+
+    /*
+     * Последняя серия.
+     * Ставим результат примерно
+     * в середину видимой области.
+     */
+
+    const resultIndex =
+        120 +
+        Math.floor(
+            Math.random() * 8
+        );
+
+
+    /*
+     * Находим ближайший элемент
+     * с нужным множителем.
+     */
+
+    let targetIndex =
+        resultIndex;
+
+
+    for (
+        let i = resultIndex;
+        i < items.length;
+        i++
+    ) {
+
+        if (
+            Number(
+                items[i]
+                    .textContent
+                    .replace("x", "")
+            ) === result
+        ) {
+
+            targetIndex = i;
+
+            break;
+
+        }
+
+    }
+
+
+    const item =
+        items[targetIndex];
+
+
+    if (!item) {
+
+        finishRoulette();
+
+        return;
+
+    }
+
+
+    const container =
+        document.querySelector(
+            ".roulette-window"
+        );
+
+
+    const containerCenter =
+        container.offsetWidth / 2;
+
+
+    const itemCenter =
+        item.offsetLeft +
+        item.offsetWidth / 2;
+
+
+    const offset =
+        containerCenter -
+        itemCenter;
+
+
+    track.style.transition =
+        "transform 5s cubic-bezier(.08,.72,.12,1)";
+
+
+    track.style.transform =
+        "translateX(" +
+        offset +
+        "px)";
+
+
+    setTimeout(
+        function() {
+
+            items.forEach(
+                function(el) {
+
+                    el.classList.remove(
+                        "selected"
+                    );
+
+                }
+            );
+
+
+            item.classList.add(
+                "selected"
+            );
+
+
+            finishRoulette();
+
+        },
+        5100
+    );
+
+}
+
+
+/* =====================================================
+   КОНЕЦ ВРАЩЕНИЯ
+===================================================== */
+
+function finishRoulette() {
+
+    rouletteSpinning =
+        false;
+
+
+    const spinButton =
+        document.getElementById(
+            "rouletteSpinButton"
+        );
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    const resultText =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    spinButton.style.display =
+        "none";
+
+
+    resultText.textContent =
+        "Выпало: x" +
+        rouletteResult.toFixed(1);
+
+
+    claimButton.textContent =
+        "Забрать x" +
+        rouletteResult.toFixed(1);
+
+
+    claimButton.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =====================================================
+   ЗАБРАТЬ РЕЗУЛЬТАТ
+===================================================== */
+
+async function claimRoulette() {
+
+    if (
+        rouletteResult === null ||
+        rouletteIssuedAt === null ||
+        !rouletteSignature
+    ) {
+
+        return;
+
+    }
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    claimButton.disabled =
+        true;
+
+
+    claimButton.textContent =
+        "⏳ Активируем...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/roulette/claim",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        initData:
+                            tg.initData,
+
+                        multiplier:
+                            rouletteResult,
+
+                        issuedAt:
+                            rouletteIssuedAt,
+
+                        signature:
+                            rouletteSignature
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.ok) {
+
+            throw new Error(
+                data.error ||
+                "Не удалось забрать результат"
+            );
+
+        }
+
+
+        player =
+            data.player;
+
+
+        balance =
+            Number(
+                player.balance
+            );
+
+
+        income =
+            Number(
+                player.income
+            );
+
+
+        economyMultiplier =
+            Number(
+                player.economy_multiplier
+            );
+
+
+        economyExpiresAt =
+            player.economy_expires_at;
+
+
+        updateScreen();
+
+
+        /*
+         * Закрываем рулетку только
+         * после успешного получения.
+         */
+
+        document
+            .getElementById(
+                "rouletteLock"
+            )
+            .classList
+            .remove("show");
+
+
+        rouletteResult =
+            null;
+
+        rouletteIssuedAt =
+            null;
+
+        rouletteSignature =
+            null;
+
+
+        showToast(
+            "🔥 Активирован x" +
+            economyMultiplier.toFixed(1) +
+            " на 4 часа"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        claimButton.disabled =
+            false;
+
+
+        claimButton.textContent =
+            "Забрать x" +
+            rouletteResult.toFixed(1);
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
    ПОКУПКА
-========================= */
+===================================================== */
 
 async function buy(price, name) {
-
 
     if (!tg || !tg.initData) {
 
@@ -882,7 +2093,6 @@ async function buy(price, name) {
 
 
     try {
-
 
         showToast(
             "⏳ Покупка..."
@@ -960,7 +2170,6 @@ async function buy(price, name) {
 
     } catch (error) {
 
-
         console.error(error);
 
 
@@ -973,12 +2182,11 @@ async function buy(price, name) {
 }
 
 
-/* =========================
+/* =====================================================
    БОНУС
-========================= */
+===================================================== */
 
 async function collect() {
-
 
     if (!tg || !tg.initData) {
 
@@ -993,14 +2201,14 @@ async function collect() {
 
     try {
 
-
         const button =
             document.getElementById(
                 "bonusButton"
             );
 
 
-        button.disabled = true;
+        button.disabled =
+            true;
 
 
         button.textContent =
@@ -1043,10 +2251,14 @@ async function collect() {
                 )
             );
 
-            button.disabled = false;
+
+            button.disabled =
+                false;
+
 
             button.textContent =
                 "Забрать +446 ⭐";
+
 
             return;
 
@@ -1083,7 +2295,6 @@ async function collect() {
 
     } catch (error) {
 
-
         console.error(error);
 
 
@@ -1098,7 +2309,8 @@ async function collect() {
             );
 
 
-        button.disabled = false;
+        button.disabled =
+            false;
 
 
         button.textContent =
@@ -1109,17 +2321,14 @@ async function collect() {
 }
 
 
-/* =========================
+/* =====================================================
    ПРИГЛАСИТЬ
-========================= */
+===================================================== */
 
 function inviteFriend() {
 
-
     if (!tg) {
-
         return;
-
     }
 
 
@@ -1175,12 +2384,11 @@ function inviteFriend() {
 }
 
 
-/* =========================
-   УВЕДОМЛЕНИЕ
-========================= */
+/* =====================================================
+   TOAST
+===================================================== */
 
 function showToast(text) {
-
 
     const toast =
         document.getElementById(
@@ -1209,15 +2417,15 @@ function showToast(text) {
                     "none";
 
             },
-            2000
+            2500
         );
 
 }
 
 
-/* =========================
-   БЕЗОПАСНЫЙ ТЕКСТ ОШИБКИ
-========================= */
+/* =====================================================
+   ESCAPE
+===================================================== */
 
 function escapeHtml(text) {
 
@@ -1246,9 +2454,9 @@ function escapeHtml(text) {
 }
 
 
-/* =========================
+/* =====================================================
    ЗАПУСК
-========================= */
+===================================================== */
 
 loadPlayer();
 
