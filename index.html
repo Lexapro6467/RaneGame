@@ -1,36 +1,46 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>RaneGame</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
 
 html,body{
     margin:0;
+    padding:0;
     min-height:100%;
     background:#24090b;
-    color:#f7eeee;
+    color:#fff;
     font-family:Arial,sans-serif;
 }
 
-body{min-height:100vh}
+body{
+    min-height:100vh;
+}
 
 .app{
     width:min(470px,100%);
     margin:auto;
-    padding:14px 12px 100px;
+    padding:15px 12px 100px;
 }
+
+/* TOP */
 
 .top{
     display:flex;
     align-items:center;
     gap:10px;
-    margin:4px 2px 18px;
+    margin-bottom:20px;
 }
 
 .avatar{
@@ -38,83 +48,93 @@ body{min-height:100vh}
     height:42px;
     border-radius:50%;
     background:#ef6b00;
-    display:grid;
-    place-items:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     font-size:21px;
 }
 
-.user{font-weight:700}
+.user{
+    font-weight:bold;
+}
+
 .user small{
     display:block;
     color:#a98e8e;
-    font-weight:400;
-    margin-top:2px;
+    font-weight:normal;
+    margin-top:3px;
 }
+
+/* PAGES */
 
 .page{
     display:none;
-    animation:pageIn .22s ease;
 }
 
-.page.active{display:block}
-
-@keyframes pageIn{
-    from{opacity:0;transform:translateY(8px)}
-    to{opacity:1;transform:translateY(0)}
+.page.active{
+    display:block;
 }
+
+/* BALANCE */
 
 .points{
     text-align:center;
-    margin:8px 0 18px;
+    margin:10px 0 20px;
 }
 
-.points .big{
+.big{
     font-size:48px;
     font-weight:800;
 }
 
 .rate{
-    color:#9f8585;
+    color:#a58d8d;
     margin-top:5px;
 }
 
 .mult{
     display:inline-block;
-    border:1px solid #9b5900;
-    color:#ffad00;
-    border-radius:18px;
-    padding:8px 14px;
-    font-weight:700;
-    margin-top:16px;
+    margin-top:15px;
+    padding:9px 15px;
+    border:1px solid #a35f00;
+    border-radius:20px;
     background:#32130e;
+    color:#ffad00;
+    font-weight:bold;
     cursor:pointer;
 }
 
+/* INVITE */
+
 .invite{
-    margin:14px 0 22px;
-    padding:15px 17px;
-    border-radius:13px;
     background:#3b1719;
     border-left:5px solid #ffad00;
+    border-radius:13px;
+    padding:15px;
+    margin-bottom:25px;
 }
 
-.invite b{color:#ffad00}
+.invite b{
+    color:#ffad00;
+}
 
-.section{margin-top:20px}
+/* HEAD */
 
 .head{
     display:flex;
-    justify-content:space-between;
     align-items:center;
-    margin:0 2px 10px;
+    justify-content:space-between;
+    margin-bottom:10px;
     font-size:17px;
-    font-weight:700;
+    font-weight:bold;
 }
 
-.head span{
+.head small{
     color:#ff6256;
     font-size:13px;
 }
+
+/* CARDS */
 
 .cards{
     display:grid;
@@ -123,35 +143,35 @@ body{min-height:100vh}
 }
 
 .card{
-    min-height:84px;
+    min-height:82px;
     border-radius:13px;
-    background:linear-gradient(145deg,#4b7b3e,#253b26);
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
     text-align:center;
-    font-size:12px;
-    box-shadow:inset 0 0 0 1px #ffffff18;
+    background:linear-gradient(145deg,#4b7b3e,#253b26);
 }
 
 .card:nth-child(2){
-    background:linear-gradient(145deg,#31477b,#24284f)
+    background:linear-gradient(145deg,#31477b,#24284f);
 }
 
 .card:nth-child(3){
-    background:linear-gradient(145deg,#7b4a34,#3c241c)
+    background:linear-gradient(145deg,#7b4a34,#3c241c);
 }
 
 .card:nth-child(4){
-    background:linear-gradient(145deg,#9b691f,#49300d)
+    background:linear-gradient(145deg,#9b691f,#49300d);
 }
 
 .card:nth-child(5){
-    background:linear-gradient(145deg,#7a4b89,#302044)
+    background:linear-gradient(145deg,#7a4b89,#302044);
 }
 
-.card .emoji{font-size:25px}
+.emoji{
+    font-size:25px;
+}
 
 .card b{
     font-size:11px;
@@ -159,29 +179,35 @@ body{min-height:100vh}
 }
 
 .card small{
-    color:#d9caca;
-    margin-top:2px;
+    color:#ddd;
+    font-size:10px;
 }
+
+/* BOILER */
 
 .boiler{
     margin-top:28px;
+    padding:15px;
     background:#3a181a;
     border:1px solid #633335;
     border-radius:18px;
-    padding:14px;
+}
+
+.boiler h3{
+    margin:0;
 }
 
 .timer{
     float:right;
     color:#ffad00;
-    font-weight:700;
+    font-weight:bold;
 }
 
 .boilnum{
     text-align:center;
     font-size:32px;
-    font-weight:800;
-    margin-top:8px;
+    font-weight:bold;
+    margin-top:10px;
 }
 
 .sub{
@@ -193,9 +219,9 @@ body{min-height:100vh}
 .bar{
     height:9px;
     background:#543a3a;
-    border-radius:8px;
-    margin:12px 0;
+    border-radius:10px;
     overflow:hidden;
+    margin:12px 0;
 }
 
 .bar i{
@@ -205,35 +231,36 @@ body{min-height:100vh}
     background:#ff9e00;
 }
 
+/* BUTTON */
+
 .action{
     width:100%;
     border:0;
     border-radius:13px;
     padding:13px;
-    margin-top:10px;
+    margin-top:12px;
     background:#ff6d00;
     color:white;
-    font-weight:800;
     font-size:15px;
+    font-weight:bold;
     cursor:pointer;
 }
 
-.action:active,
-.mult:active,
-.nav button:active{
+.action:active{
     transform:scale(.97);
 }
+
+/* PANELS */
 
 .panel{
     background:#351517;
     border:1px solid #5b2a2b;
     border-radius:18px;
     padding:16px;
-    margin-top:14px;
 }
 
 .panel h2{
-    margin:0 0 6px;
+    margin:0 0 8px;
 }
 
 .panel p{
@@ -241,18 +268,20 @@ body{min-height:100vh}
     font-size:13px;
 }
 
+/* AUCTION */
+
 .auction{
     display:flex;
     align-items:center;
-    gap:12px;
-    background:#421b1d;
-    border-radius:15px;
+    gap:10px;
     padding:12px;
     margin-top:10px;
+    background:#421b1d;
+    border-radius:14px;
 }
 
-.auction .icon{
-    font-size:34px;
+.auction-icon{
+    font-size:35px;
 }
 
 .auction-info{
@@ -265,9 +294,21 @@ body{min-height:100vh}
 
 .price{
     color:#ffad00;
-    font-weight:700;
+    font-weight:bold;
     margin-top:4px;
 }
+
+.buy{
+    border:0;
+    border-radius:10px;
+    padding:9px 12px;
+    background:#ff6d00;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* RANK */
 
 .rank{
     display:flex;
@@ -280,9 +321,9 @@ body{min-height:100vh}
 }
 
 .rank-number{
-    width:30px;
-    font-weight:800;
+    width:25px;
     color:#ffad00;
+    font-weight:bold;
 }
 
 .rank-name{
@@ -290,39 +331,88 @@ body{min-height:100vh}
 }
 
 .rank-score{
-    font-weight:800;
+    font-weight:bold;
 }
+
+/* NAVIGATION */
 
 .nav{
     position:fixed;
+    z-index:9999;
+
     bottom:10px;
     left:50%;
+
     transform:translateX(-50%);
+
     width:min(470px,calc(100% - 24px));
+
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+
+    gap:5px;
+
+    padding:8px;
+
     background:#351517;
     border:1px solid #5b2a2b;
     border-radius:18px;
-    padding:8px;
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
+
     box-shadow:0 8px 30px #0008;
-    z-index:100;
 }
 
 .nav button{
     border:0;
-    background:none;
+    background:transparent;
+
     color:#9d8989;
-    padding:8px 2px;
+
+    padding:9px 2px;
+
     border-radius:13px;
-    font-weight:700;
+
+    font-size:12px;
+    font-weight:bold;
+
     cursor:pointer;
-    transition:.15s;
+
+    touch-action:manipulation;
 }
 
 .nav button.active{
     background:#5a2020;
     color:#ff6d5e;
+}
+
+/* TOAST */
+
+.toast{
+    position:fixed;
+
+    top:20px;
+    left:50%;
+
+    transform:translate(-50%,-20px);
+
+    background:#4b2022;
+    border:1px solid #7b3639;
+
+    padding:12px 18px;
+
+    border-radius:13px;
+
+    opacity:0;
+
+    transition:.25s;
+
+    z-index:10000;
+
+    pointer-events:none;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
 }
 
 .footer{
@@ -332,313 +422,459 @@ body{min-height:100vh}
     margin-top:30px;
 }
 
-.toast{
-    position:fixed;
-    top:20px;
-    left:50%;
-    transform:translateX(-50%) translateY(-20px);
-    background:#4b2022;
-    border:1px solid #7b3639;
-    padding:12px 18px;
-    border-radius:13px;
-    opacity:0;
-    pointer-events:none;
-    transition:.25s;
-    z-index:999;
-    font-weight:700;
-}
-
-.toast.show{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-}
 </style>
 </head>
 
 <body>
 
-<div class="toast" id="toast"></div>
+<div id="toast" class="toast"></div>
 
 <div class="app">
 
-    <div class="top">
-        <div class="avatar">🎮</div>
-        <div class="user">
-            <span id="username">RaneGame</span>
-            <small id="tgusername">@RaneGame</small>
-        </div>
+<!-- USER -->
+
+<div class="top">
+
+    <div class="avatar">
+        🎮
     </div>
 
+    <div class="user">
 
-    <!-- ДОМ -->
-    <div class="page active" id="home">
+        <span id="username">
+            RaneGame
+        </span>
 
-        <div class="points">
-            <div class="big">⭐ <span id="balance">3918</span></div>
-            <div class="rate">+<span id="income">201</span> в час</div>
+        <small id="tgusername">
+            @RaneGame
+        </small>
 
-            <div class="mult" id="spinBtn">
-                ×1.00 &nbsp; Крутить
-            </div>
-        </div>
-
-        <div class="invite">
-            🤝 &nbsp; <b>Позови 2 друзей</b><br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 из 2.
-            Награда: 500 звёзд и доход ×1.15
-        </div>
-
-        <div class="section">
-
-            <div class="head">
-                <span style="color:#fff;font-size:17px">Инвентарь</span>
-                <span>154 шт.</span>
-            </div>
-
-            <div class="cards">
-
-                <div class="card">
-                    <div class="emoji">🦌</div>
-                    <b>№3</b>
-                    <small>+6/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🦐</div>
-                    <b>Продаётся</b>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🦐</div>
-                    <b>Продаётся</b>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🍵</div>
-                    <b>Продаётся</b>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🫙</div>
-                    <b>№453</b>
-                </div>
-
-            </div>
-        </div>
-
-
-        <div class="boiler">
-
-            <span class="timer" id="timer">6:24</span>
-
-            <h3>Котёл</h3>
-
-            <div class="boilnum">557</div>
-
-            <div class="sub">
-                забирает один: 446
-            </div>
-
-            <div class="bar">
-                <i id="progress"></i>
-            </div>
-
-            <div class="sub">
-                64.1% &nbsp;&nbsp;&nbsp; 357
-            </div>
-
-            <button class="action" onclick="collectBoiler()">
-                🔥 Забрать
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- АУКЦИОН -->
-    <div class="page" id="auction">
-
-        <div class="panel">
-
-            <h2>🎰 Аукцион</h2>
-
-            <p>
-                Здесь можно покупать редкие предметы
-                за звёзды.
-            </p>
-
-            <div class="auction">
-                <div class="icon">🐉</div>
-
-                <div class="auction-info">
-                    <b>Дракон</b>
-                    <div class="price">⭐ 500</div>
-                </div>
-
-                <button class="action"
-                        style="width:auto;margin:0"
-                        onclick="buyItem('Дракон',500)">
-                    Купить
-                </button>
-            </div>
-
-
-            <div class="auction">
-                <div class="icon">🦈</div>
-
-                <div class="auction-info">
-                    <b>Акула</b>
-                    <div class="price">⭐ 750</div>
-                </div>
-
-                <button class="action"
-                        style="width:auto;margin:0"
-                        onclick="buyItem('Акула',750)">
-                    Купить
-                </button>
-            </div>
-
-
-            <div class="auction">
-                <div class="icon">👑</div>
-
-                <div class="auction-info">
-                    <b>Корона</b>
-                    <div class="price">⭐ 1500</div>
-                </div>
-
-                <button class="action"
-                        style="width:auto;margin:0"
-                        onclick="buyItem('Корона',1500)">
-                    Купить
-                </button>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ТОВАРЫ -->
-    <div class="page" id="shop">
-
-        <div class="panel">
-
-            <h2>🛒 Товары</h2>
-
-            <p>
-                Покупай предметы и увеличивай свой доход.
-            </p>
-
-            <div class="cards">
-
-                <div class="card">
-                    <div class="emoji">🐋</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🦀</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🦏</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🐍</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-                <div class="card">
-                    <div class="emoji">🔵</div>
-                    <b>⭐15</b>
-                    <small>+1/ч</small>
-                </div>
-
-            </div>
-
-            <button class="action" onclick="buyItem('Предмет',15)">
-                🛒 Купить предмет за ⭐15
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- ТОП -->
-    <div class="page" id="top">
-
-        <div class="panel">
-
-            <h2>🏆 Топ игроков</h2>
-
-            <p>
-                Лучшие игроки RaneGame.
-            </p>
-
-            <div class="rank">
-                <div class="rank-number">1</div>
-                <div class="rank-name">🔥 Rane</div>
-                <div class="rank-score">⭐ 98231</div>
-            </div>
-
-            <div class="rank">
-                <div class="rank-number">2</div>
-                <div class="rank-name">🎮 Player</div>
-                <div class="rank-score">⭐ 72140</div>
-            </div>
-
-            <div class="rank">
-                <div class="rank-number">3</div>
-                <div class="rank-name">🐉 Dragon</div>
-                <div class="rank-score">⭐ 61420</div>
-            </div>
-
-            <div class="rank">
-                <div class="rank-number">4</div>
-                <div class="rank-name">⚡ Max</div>
-                <div class="rank-score">⭐ 50120</div>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="footer">
-        @RaneGameBot
     </div>
 
 </div>
 
 
-<!-- НИЖНЕЕ МЕНЮ -->
+<!-- ================= HOME ================= -->
+
+<div class="page active" id="home">
+
+    <div class="points">
+
+        <div class="big">
+            ⭐ <span id="balance">3918</span>
+        </div>
+
+        <div class="rate">
+            +<span id="income">201</span> в час
+        </div>
+
+        <div class="mult" id="spin">
+            ×1.00 &nbsp; Крутить
+        </div>
+
+    </div>
+
+
+    <div class="invite">
+
+        🤝 &nbsp;
+        <b>Позови 2 друзей</b>
+
+        <br>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        0 из 2.
+        Награда: 500 звёзд и доход ×1.15
+
+    </div>
+
+
+    <div class="head">
+
+        <span>Инвентарь</span>
+
+        <small>
+            154 шт.
+        </small>
+
+    </div>
+
+
+    <div class="cards">
+
+        <div class="card">
+            <div class="emoji">🦌</div>
+            <b>№3</b>
+            <small>+6/ч</small>
+        </div>
+
+        <div class="card">
+            <div class="emoji">🦐</div>
+            <b>Продаётся</b>
+        </div>
+
+        <div class="card">
+            <div class="emoji">🦐</div>
+            <b>Продаётся</b>
+        </div>
+
+        <div class="card">
+            <div class="emoji">🍵</div>
+            <b>Продаётся</b>
+        </div>
+
+        <div class="card">
+            <div class="emoji">🫙</div>
+            <b>№453</b>
+        </div>
+
+    </div>
+
+
+    <div class="boiler">
+
+        <span class="timer" id="timer">
+            6:24
+        </span>
+
+        <h3>
+            Котёл
+        </h3>
+
+        <div class="boilnum">
+            557
+        </div>
+
+        <div class="sub">
+            забирает один: 446
+        </div>
+
+        <div class="bar">
+            <i></i>
+        </div>
+
+        <div class="sub">
+            64.1% &nbsp;&nbsp; 357
+        </div>
+
+        <button
+            class="action"
+            onclick="collect()">
+
+            🔥 Забрать 446 ⭐
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ================= AUCTION ================= -->
+
+<div class="page" id="auction">
+
+    <div class="panel">
+
+        <h2>
+            🎰 Аукцион
+        </h2>
+
+        <p>
+            Покупай редкие предметы за звёзды.
+        </p>
+
+
+        <div class="auction">
+
+            <div class="auction-icon">
+                🐉
+            </div>
+
+            <div class="auction-info">
+
+                <b>
+                    Дракон
+                </b>
+
+                <div class="price">
+                    ⭐ 500
+                </div>
+
+            </div>
+
+            <button
+                class="buy"
+                onclick="buy(500,'Дракон')">
+
+                Купить
+
+            </button>
+
+        </div>
+
+
+        <div class="auction">
+
+            <div class="auction-icon">
+                🦈
+            </div>
+
+            <div class="auction-info">
+
+                <b>
+                    Акула
+                </b>
+
+                <div class="price">
+                    ⭐ 750
+                </div>
+
+            </div>
+
+            <button
+                class="buy"
+                onclick="buy(750,'Акула')">
+
+                Купить
+
+            </button>
+
+        </div>
+
+
+        <div class="auction">
+
+            <div class="auction-icon">
+                👑
+            </div>
+
+            <div class="auction-info">
+
+                <b>
+                    Корона
+                </b>
+
+                <div class="price">
+                    ⭐ 1500
+                </div>
+
+            </div>
+
+            <button
+                class="buy"
+                onclick="buy(1500,'Корона')">
+
+                Купить
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= SHOP ================= -->
+
+<div class="page" id="shop">
+
+    <div class="panel">
+
+        <h2>
+            🛒 Товары
+        </h2>
+
+        <p>
+            Покупай предметы и увеличивай доход.
+        </p>
+
+
+        <div class="cards">
+
+            <div class="card">
+                <div class="emoji">🐋</div>
+                <b>⭐15</b>
+                <small>+1/ч</small>
+            </div>
+
+            <div class="card">
+                <div class="emoji">🦀</div>
+                <b>⭐15</b>
+                <small>+1/ч</small>
+            </div>
+
+            <div class="card">
+                <div class="emoji">🦏</div>
+                <b>⭐15</b>
+                <small>+1/ч</small>
+            </div>
+
+            <div class="card">
+                <div class="emoji">🐍</div>
+                <b>⭐15</b>
+                <small>+1/ч</small>
+            </div>
+
+            <div class="card">
+                <div class="emoji">🔵</div>
+                <b>⭐15</b>
+                <small>+1/ч</small>
+            </div>
+
+        </div>
+
+
+        <button
+            class="action"
+            onclick="buy(15,'Предмет')">
+
+            🛒 Купить за ⭐15
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ================= TOP ================= -->
+
+<div class="page" id="top">
+
+    <div class="panel">
+
+        <h2>
+            🏆 Топ игроков
+        </h2>
+
+        <p>
+            Лучшие игроки RaneGame.
+        </p>
+
+
+        <div class="rank">
+
+            <div class="rank-number">
+                1
+            </div>
+
+            <div class="rank-name">
+                🔥 Rane
+            </div>
+
+            <div class="rank-score">
+                ⭐98231
+            </div>
+
+        </div>
+
+
+        <div class="rank">
+
+            <div class="rank-number">
+                2
+            </div>
+
+            <div class="rank-name">
+                🎮 Player
+            </div>
+
+            <div class="rank-score">
+                ⭐72140
+            </div>
+
+        </div>
+
+
+        <div class="rank">
+
+            <div class="rank-number">
+                3
+            </div>
+
+            <div class="rank-name">
+                🐉 Dragon
+            </div>
+
+            <div class="rank-score">
+                ⭐61420
+            </div>
+
+        </div>
+
+
+        <div class="rank">
+
+            <div class="rank-number">
+                4
+            </div>
+
+            <div class="rank-name">
+                ⚡ Max
+            </div>
+
+            <div class="rank-score">
+                ⭐50120
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="footer">
+    @RaneGameBot
+</div>
+
+</div>
+
+
+<!-- ================= NAV ================= -->
 
 <div class="nav">
 
-    <button class="active" data-page="home">
-        🏠<br>Дом
+    <button
+        class="active"
+        data-page="home">
+
+        🏠
+        <br>
+        Дом
+
     </button>
 
-    <button data-page="auction">
-        🎰<br>Аукцион
+
+    <button
+        data-page="auction">
+
+        🎰
+        <br>
+        Аукцион
+
     </button>
 
-    <button data-page="shop">
-        🛒<br>Товары
+
+    <button
+        data-page="shop">
+
+        🛒
+        <br>
+        Товары
+
     </button>
 
-    <button data-page="top">
-        🏆<br>Топ
+
+    <button
+        data-page="top">
+
+        🏆
+        <br>
+        Топ
+
     </button>
 
 </div>
@@ -646,39 +882,56 @@ body{min-height:100vh}
 
 <script>
 
-const tg = window.Telegram?.WebApp;
+/* TELEGRAM */
+
+const tg =
+    window.Telegram &&
+    window.Telegram.WebApp;
 
 if(tg){
+
     tg.ready();
+
     tg.expand();
 
-    if(tg.initDataUnsafe?.user){
+    if(tg.initDataUnsafe &&
+       tg.initDataUnsafe.user){
 
-        const user = tg.initDataUnsafe.user;
+        const user =
+            tg.initDataUnsafe.user;
 
-        const name =
+        document.getElementById("username")
+            .textContent =
             user.first_name ||
-            user.username ||
             "Игрок";
 
-        document.getElementById("username").textContent = name;
-
-        document.getElementById("tgusername").textContent =
-            user.username ? "@" + user.username : "Telegram";
+        document.getElementById("tgusername")
+            .textContent =
+            user.username
+            ? "@" + user.username
+            : "Telegram";
     }
 }
 
 
-/* =========================
-   ДАННЫЕ ИГРОКА
-========================= */
+/* DATA */
 
 let balance =
-    Number(localStorage.getItem("rane_balance")) || 3918;
+    Number(localStorage.getItem("rane_balance"));
+
+if(!balance){
+    balance = 3918;
+}
 
 let income =
-    Number(localStorage.getItem("rane_income")) || 201;
+    Number(localStorage.getItem("rane_income"));
 
+if(!income){
+    income = 201;
+}
+
+
+/* SAVE */
 
 function save(){
 
@@ -694,25 +947,85 @@ function save(){
 }
 
 
+/* UPDATE */
+
 function update(){
 
     document.getElementById("balance")
         .textContent =
-        Math.floor(balance).toLocaleString("ru-RU");
+        Math.floor(balance)
+        .toLocaleString("ru-RU");
 
     document.getElementById("income")
-        .textContent = income;
+        .textContent =
+        income;
 
     save();
 }
 
-
 update();
 
 
-/* =========================
-   АВТОДОХОД
-========================= */
+/* NAVIGATION */
+
+const navButtons =
+    document.querySelectorAll(".nav button");
+
+const pages =
+    document.querySelectorAll(".page");
+
+
+navButtons.forEach(function(button){
+
+    button.addEventListener("click",function(){
+
+        const pageName =
+            button.getAttribute("data-page");
+
+
+        /* HIDE ALL */
+
+        pages.forEach(function(page){
+
+            page.classList.remove("active");
+
+        });
+
+
+        /* REMOVE ACTIVE */
+
+        navButtons.forEach(function(btn){
+
+            btn.classList.remove("active");
+
+        });
+
+
+        /* SHOW PAGE */
+
+        const selectedPage =
+            document.getElementById(pageName);
+
+        if(selectedPage){
+
+            selectedPage.classList.add("active");
+
+        }
+
+
+        /* ACTIVE BUTTON */
+
+        button.classList.add("active");
+
+
+        window.scrollTo(0,0);
+
+    });
+
+});
+
+
+/* INCOME */
 
 setInterval(function(){
 
@@ -723,73 +1036,9 @@ setInterval(function(){
 },1000);
 
 
-/* =========================
-   НАВИГАЦИЯ
-========================= */
+/* SPIN */
 
-const buttons =
-    document.querySelectorAll(".nav button");
-
-const pages =
-    document.querySelectorAll(".page");
-
-
-buttons.forEach(button => {
-
-    button.addEventListener("click",function(){
-
-        const page =
-            this.dataset.page;
-
-        pages.forEach(p =>
-            p.classList.remove("active")
-        );
-
-        buttons.forEach(b =>
-            b.classList.remove("active")
-        );
-
-        document.getElementById(page)
-            .classList.add("active");
-
-        this.classList.add("active");
-
-        window.scrollTo({
-            top:0,
-            behavior:"smooth"
-        });
-
-    });
-
-});
-
-
-/* =========================
-   УВЕДОМЛЕНИЕ
-========================= */
-
-function toast(text){
-
-    const el =
-        document.getElementById("toast");
-
-    el.textContent = text;
-
-    el.classList.add("show");
-
-    setTimeout(() => {
-
-        el.classList.remove("show");
-
-    },1800);
-}
-
-
-/* =========================
-   КРУТИТЬ
-========================= */
-
-document.getElementById("spinBtn")
+document.getElementById("spin")
 .addEventListener("click",function(){
 
     const reward =
@@ -799,23 +1048,28 @@ document.getElementById("spinBtn")
 
     update();
 
-    toast("🎉 Ты получил +" + reward + " ⭐");
+    showToast(
+        "🎉 +" +
+        reward +
+        " ⭐"
+    );
 
 });
 
 
-/* =========================
-   ПОКУПКА
-========================= */
+/* BUY */
 
-function buyItem(name,price){
+function buy(price,name){
 
     if(balance < price){
 
-        toast("❌ Не хватает ⭐");
+        showToast(
+            "❌ Не хватает ⭐"
+        );
 
         return;
     }
+
 
     balance -= price;
 
@@ -823,60 +1077,83 @@ function buyItem(name,price){
 
     update();
 
-    toast(
+
+    showToast(
         "✅ Куплено: " +
-        name +
-        " (+1/ч)"
+        name
     );
+
 }
 
 
-/* =========================
-   КОТЁЛ
-========================= */
+/* BOILER */
 
-function collectBoiler(){
+function collect(){
 
-    const reward = 446;
-
-    balance += reward;
+    balance += 446;
 
     update();
 
-    toast(
-        "🔥 Забрано +" +
-        reward +
-        " ⭐"
+    showToast(
+        "🔥 +446 ⭐"
     );
+
 }
 
 
-/* =========================
-   ТАЙМЕР
-========================= */
+/* TOAST */
 
-let seconds = 6*60+24;
+function showToast(text){
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = text;
+
+    toast.classList.add("show");
+
+
+    setTimeout(function(){
+
+        toast.classList.remove("show");
+
+    },1800);
+
+}
+
+
+/* TIMER */
+
+let seconds =
+    6 * 60 + 24;
+
 
 setInterval(function(){
 
     seconds--;
 
+
     if(seconds <= 0){
 
-        seconds = 6*60+24;
+        seconds =
+            6 * 60 + 24;
 
     }
 
-    const min =
-        Math.floor(seconds/60);
+
+    const minutes =
+        Math.floor(seconds / 60);
 
     const sec =
-        seconds%60;
+        seconds % 60;
+
 
     document.getElementById("timer")
         .textContent =
-        min + ":" +
+        minutes +
+        ":" +
         String(sec).padStart(2,"0");
+
 
 },1000);
 
