@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+
 <meta charset="UTF-8">
 
 <meta name="viewport"
@@ -15,32 +16,71 @@
 
 <style>
 
+/* =================================
+   ОСНОВА
+================================= */
+
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     margin: 0;
-    background: #100606;
-    color: white;
-    font-family: Arial, sans-serif;
-    padding-bottom: 90px;
+    padding: 0 0 90px;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #210909 0%,
+            #100606 42%,
+            #080303 100%
+        );
+
+    color: #fff;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
 }
 
 button {
     border: 0;
+    outline: none;
+
     border-radius: 14px;
+
     padding: 13px 18px;
+
     background: #8f1717;
-    color: white;
+    color: #fff;
+
     font-weight: bold;
     font-size: 15px;
+
     cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        filter .15s ease,
+        opacity .15s ease;
 }
 
 button:active {
     transform: scale(.96);
+}
+
+button:hover {
+    filter: brightness(1.08);
 }
 
 button:disabled {
@@ -50,39 +90,70 @@ button:disabled {
 
 .loading {
     min-height: 100vh;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     text-align: center;
+
     color: #aaa;
+
     padding: 20px;
 }
 
 .error {
     background: #350b0b;
+
     border: 1px solid #761717;
+
     padding: 18px;
+
     border-radius: 16px;
+
     max-width: 400px;
+
+    line-height: 1.5;
 }
+
+
+/* =================================
+   ВЕРХНИЙ ПРОФИЛЬ
+================================= */
 
 .top {
     padding: 20px 18px;
+
     display: flex;
     align-items: center;
+
     gap: 12px;
 }
 
 .avatar {
     width: 52px;
     height: 52px;
+
+    flex-shrink: 0;
+
     border-radius: 50%;
-    background: #7b1111;
+
+    background:
+        linear-gradient(
+            145deg,
+            #a51d1d,
+            #510909
+        );
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     font-size: 22px;
     font-weight: bold;
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,.35);
 }
 
 .name {
@@ -96,27 +167,74 @@ button:disabled {
     margin-top: 4px;
 }
 
+
+/* =================================
+   СТРАНИЦЫ
+================================= */
+
 .page {
     display: none;
+
     padding: 0 16px;
+
+    animation:
+        pageAppear
+        .2s
+        ease;
 }
 
 .page.active {
     display: block;
 }
 
+@keyframes pageAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* =================================
+   БАЛАНС
+================================= */
+
 .balance-card {
-    background: linear-gradient(135deg, #7d1111, #3b0808);
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(255,70,70,.20),
+            transparent 55%
+        ),
+        linear-gradient(
+            135deg,
+            #7d1111,
+            #3b0808
+        );
+
     border-radius: 24px;
+
     padding: 28px 20px;
+
     text-align: center;
+
     margin-bottom: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.3);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.3);
 }
 
 .balance {
     font-size: 44px;
     font-weight: bold;
+
     margin: 10px 0;
 }
 
@@ -124,12 +242,29 @@ button:disabled {
     color: #72ff72;
 }
 
+
+/* =================================
+   КАРТОЧКИ
+================================= */
+
 .card {
-    background: #1c0b0b;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(35,13,13,.98),
+            rgba(21,7,7,.98)
+        );
+
     border: 1px solid #351515;
+
     border-radius: 18px;
+
     padding: 18px;
+
     margin-bottom: 14px;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.18);
 }
 
 .card h2,
@@ -148,18 +283,32 @@ button:disabled {
 ================================= */
 
 .economy-card {
-    background: linear-gradient(145deg, #260909, #140505);
+    background:
+        linear-gradient(
+            145deg,
+            #260909,
+            #140505
+        );
+
     border: 1px solid #4d1616;
+
     border-radius: 22px;
+
     padding: 20px;
+
     margin-bottom: 15px;
+
     overflow: hidden;
 }
 
 .economy-header {
     display: flex;
+
     justify-content: space-between;
     align-items: center;
+
+    gap: 10px;
+
     margin-bottom: 14px;
 }
 
@@ -171,8 +320,11 @@ button:disabled {
 .multiplier-active {
     background: #163516;
     color: #72ff72;
+
     padding: 7px 10px;
+
     border-radius: 10px;
+
     font-weight: bold;
     font-size: 13px;
 }
@@ -180,37 +332,58 @@ button:disabled {
 .multiplier-none {
     background: #321010;
     color: #ff7777;
+
     padding: 7px 10px;
+
     border-radius: 10px;
+
     font-weight: bold;
     font-size: 13px;
 }
 
 .current-multiplier {
     text-align: center;
+
     font-size: 48px;
     font-weight: bold;
+
     margin: 12px 0 4px;
 }
 
 .multiplier-time {
     text-align: center;
+
     color: #aaa;
+
     font-size: 14px;
+
     min-height: 20px;
+
+    margin-bottom: 15px;
 }
 
 .roulette-spin-button {
     width: 100%;
+
     font-size: 17px;
+
     padding: 15px;
 }
 
 .claim-button {
     width: 100%;
-    background: linear-gradient(135deg, #a91c1c, #681010);
+
+    background:
+        linear-gradient(
+            135deg,
+            #a91c1c,
+            #681010
+        );
+
     font-size: 17px;
+
     padding: 15px;
+
     display: none;
 }
 
@@ -225,89 +398,131 @@ button:disabled {
 
 .roulette-window {
     position: relative;
+
     height: 92px;
+
     margin: 18px 0;
+
     overflow: hidden;
+
     border-radius: 18px;
+
     background: #0d0404;
+
     border: 1px solid #421313;
 }
 
 .roulette-window::before {
     content: "";
+
     position: absolute;
+
     left: 50%;
     top: 0;
     bottom: 0;
+
     width: 3px;
+
     transform: translateX(-50%);
+
     background: #ff4545;
-    box-shadow: 0 0 14px rgba(255,50,50,.8);
+
+    box-shadow:
+        0 0 14px rgba(255,50,50,.8);
+
     z-index: 5;
 }
 
 .roulette-track {
     height: 100%;
+
     display: flex;
     align-items: center;
+
     gap: 10px;
+
     transform: translateX(0);
+
     will-change: transform;
 }
 
 .roulette-item {
     flex: 0 0 76px;
+
     height: 60px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     border-radius: 14px;
+
     background: #281010;
+
     border: 1px solid #4a1717;
+
     color: #aaa;
+
     font-size: 17px;
     font-weight: bold;
 }
 
 .roulette-item.selected {
     background: #791414;
-    color: white;
+
+    color: #fff;
+
     border-color: #ff4444;
 }
 
 
 /* =================================
-   МАГАЗИН ПОДАРКОВ
+   ВКЛАДКИ ПОДАРКОВ
 ================================= */
 
 .shop-tabs {
     display: flex;
+
     gap: 8px;
+
     margin-bottom: 14px;
 }
 
 .shop-tab {
     flex: 1;
+
     background: #241010;
+
     border: 1px solid #3b1515;
+
     color: #888;
+
     padding: 11px 8px;
 }
 
 .shop-tab.active {
     background: #761414;
+
     border-color: #a52626;
+
     color: white;
 }
 
 .shop-info {
     background: #241010;
+
     border: 1px solid #3b1515;
+
     border-radius: 16px;
+
     padding: 13px;
+
     margin-bottom: 14px;
+
     color: #aaa;
+
     font-size: 13px;
+
     line-height: 1.5;
 }
 
@@ -315,16 +530,29 @@ button:disabled {
     color: white;
 }
 
-.shop-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
 .refresh-shop {
     width: 100%;
+
     background: #321010;
+
     margin-bottom: 12px;
+}
+
+
+/* =================================
+   СЕТКА ПОДАРКОВ
+================================= */
+
+.shop-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
 }
 
 
@@ -334,6 +562,7 @@ button:disabled {
 
 .gift-card {
     position: relative;
+
     overflow: hidden;
 
     min-height: 285px;
@@ -343,7 +572,7 @@ button:disabled {
     background:
         radial-gradient(
             circle at 50% 20%,
-            rgba(255, 60, 60, .12),
+            rgba(255,60,60,.10),
             transparent 45%
         ),
         linear-gradient(
@@ -353,37 +582,34 @@ button:disabled {
             #100607
         );
 
-    border: 1px solid rgba(255, 92, 92, .20);
+    border: 1px solid
+        rgba(255,92,92,.20);
 
     border-radius: 22px;
 
     text-align: center;
 
     box-shadow:
-        0 10px 30px rgba(0,0,0,.35),
-        inset 0 1px 0 rgba(255,255,255,.04);
+        0 8px 22px
+        rgba(0,0,0,.30);
 
-    transition:
-        transform .18s ease,
-        border-color .18s ease,
-        box-shadow .18s ease;
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
 }
 
 .gift-card:active {
-    transform: scale(.97);
-}
-
-.gift-card:hover {
-    border-color: rgba(255, 100, 100, .42);
-
-    box-shadow:
-        0 14px 38px rgba(0,0,0,.45),
-        0 0 25px rgba(255,60,60,.08);
+    transform:
+        translateZ(0)
+        scale(.97);
 }
 
 
 /* =================================
-   АНИМАЦИЯ ПОДАРКА
+   ОПТИМИЗИРОВАННАЯ АНИМАЦИЯ
 ================================= */
 
 .gift-visual {
@@ -402,19 +628,21 @@ button:disabled {
 
     background:
         radial-gradient(
-            circle at 50% 50%,
-            rgba(255,70,70,.18),
-            rgba(255,30,30,.05) 52%,
-            transparent 75%
+            circle,
+            rgba(255,70,70,.16),
+            transparent 72%
         );
-
-    box-shadow:
-        0 0 25px rgba(255,40,40,.10),
-        inset 0 0 25px rgba(255,50,50,.06);
 
     overflow: visible;
 
     isolation: isolate;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
 }
 
 .gift-visual::before {
@@ -425,28 +653,37 @@ button:disabled {
     left: 50%;
     top: 50%;
 
-    width: 100px;
-    height: 100px;
+    width: 88px;
+    height: 88px;
 
-    transform: translate(-50%, -50%);
+    transform:
+        translate3d(
+            -50%,
+            -50%,
+            0
+        )
+        scale(.8);
 
     border-radius: 50%;
 
     background:
         radial-gradient(
             circle,
-            rgba(255,70,70,.45),
-            rgba(255,40,40,.16) 38%,
-            transparent 72%
+            rgba(255,70,70,.34),
+            transparent 70%
         );
 
-    filter: blur(13px);
+    opacity: .45;
 
     animation:
-        giftAura
-        2s
+        giftAuraOptimized
+        2.6s
         ease-in-out
         infinite;
+
+    will-change:
+        transform,
+        opacity;
 
     z-index: -1;
 }
@@ -459,24 +696,34 @@ button:disabled {
     left: 50%;
     top: 50%;
 
-    width: 80px;
-    height: 80px;
-
-    transform: translate(-50%, -50%);
+    width: 72px;
+    height: 72px;
 
     border-radius: 50%;
 
-    border: 1px solid rgba(255,100,100,.16);
+    border:
+        1px solid
+        rgba(255,90,90,.12);
 
-    box-shadow:
-        0 0 18px rgba(255,60,60,.18),
-        inset 0 0 18px rgba(255,60,60,.10);
+    transform:
+        translate3d(
+            -50%,
+            -50%,
+            0
+        )
+        scale(.65);
+
+    opacity: .5;
 
     animation:
-        giftRing
-        2.8s
+        giftRingOptimized
+        3.4s
         ease-out
         infinite;
+
+    will-change:
+        transform,
+        opacity;
 
     pointer-events: none;
 }
@@ -494,6 +741,7 @@ button:disabled {
     justify-content: center;
 
     font-size: 72px;
+
     line-height: 1;
 
     user-select: none;
@@ -501,18 +749,14 @@ button:disabled {
     transform-origin: center;
 
     will-change:
-        transform,
-        filter;
+        transform;
 
-    filter:
-        drop-shadow(
-            0 9px 7px
-            rgba(0,0,0,.5)
-        )
-        drop-shadow(
-            0 0 12px
-            rgba(255,60,60,.3)
-        );
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
 }
 
 
@@ -527,117 +771,181 @@ button:disabled {
 
     pointer-events: none;
 
-    color: #fff;
+    color: white;
 
     font-weight: bold;
 
     text-shadow:
-        0 0 5px #fff,
-        0 0 10px rgba(255,70,70,.9),
-        0 0 18px rgba(255,50,50,.6);
+        0 0 5px
+        rgba(255,255,255,.8);
 
     animation:
-        sparkFloat
-        1.8s
+        sparkOptimized
+        2.2s
         ease-in-out
         infinite;
+
+    will-change:
+        transform,
+        opacity;
 }
 
 .gift-spark-1 {
     top: 9px;
     left: 12px;
+
     font-size: 17px;
-    animation-delay: 0s;
 }
 
 .gift-spark-2 {
     top: 18px;
     right: 10px;
+
     font-size: 10px;
-    animation-delay: .45s;
+
+    animation-delay: .5s;
 }
 
 .gift-spark-3 {
     left: 9px;
     bottom: 17px;
+
     font-size: 9px;
-    animation-delay: .9s;
+
+    animation-delay: 1s;
 }
 
 .gift-spark-4 {
     right: 14px;
     bottom: 11px;
+
     font-size: 14px;
-    animation-delay: 1.3s;
-}
 
-.gift-visual .gift-spark::after {
-    content: "";
-
-    position: absolute;
-
-    width: 5px;
-    height: 5px;
-
-    border-radius: 50%;
-
-    background: white;
-
-    box-shadow:
-        0 0 8px white,
-        0 0 15px rgba(255,80,80,.8);
-
-    animation:
-        particleBlink
-        1.3s
-        ease-in-out
-        infinite;
+    animation-delay: 1.5s;
 }
 
 
 /* =================================
-   АНИМАЦИИ
+   АНИМАЦИИ ПОДАРКОВ
 ================================= */
 
-@keyframes giftAura {
+.gift-animation-bounce
+.gift-emoji {
+    animation:
+        normalGiftOptimized
+        2.4s
+        ease-in-out
+        infinite;
 
-    0%, 100% {
-        opacity: .35;
+    will-change:
+        transform;
+}
+
+.gift-animation-heart
+.gift-emoji {
+    animation:
+        heartGiftOptimized
+        1.5s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-shine
+.gift-emoji {
+    animation:
+        diamondGiftOptimized
+        2.2s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-rocket
+.gift-emoji {
+    animation:
+        rocketGiftOptimized
+        1.7s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-magic
+.gift-emoji {
+    animation:
+        magicGiftOptimized
+        1.9s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+
+/* =================================
+   KEYFRAMES
+================================= */
+
+@keyframes giftAuraOptimized {
+
+    0%,
+    100% {
         transform:
-            translate(-50%, -50%)
+            translate3d(
+                -50%,
+                -50%,
+                0
+            )
             scale(.78);
-    }
 
-    25% {
-        opacity: .55;
+        opacity: .25;
     }
 
     50% {
-        opacity: .95;
         transform:
-            translate(-50%, -50%)
-            scale(1.16);
-    }
+            translate3d(
+                -50%,
+                -50%,
+                0
+            )
+            scale(1.12);
 
-    75% {
-        opacity: .55;
+        opacity: .65;
     }
 }
 
-@keyframes giftRing {
+@keyframes giftRingOptimized {
 
     0% {
-        opacity: .8;
         transform:
-            translate(-50%, -50%)
-            scale(.55);
+            translate3d(
+                -50%,
+                -50%,
+                0
+            )
+            scale(.6);
+
+        opacity: .45;
     }
 
-    70% {
-        opacity: 0;
+    75% {
         transform:
-            translate(-50%, -50%)
-            scale(1.45);
+            translate3d(
+                -50%,
+                -50%,
+                0
+            )
+            scale(1.35);
+
+        opacity: 0;
     }
 
     100% {
@@ -645,394 +953,209 @@ button:disabled {
     }
 }
 
-@keyframes sparkFloat {
+@keyframes sparkOptimized {
 
-    0% {
+    0%,
+    100% {
         opacity: .15;
+
         transform:
-            translateY(7px)
-            scale(.55)
+            translate3d(
+                0,
+                5px,
+                0
+            )
+            scale(.7)
             rotate(0deg);
     }
 
-    25% {
-        opacity: 1;
-        transform:
-            translateY(-3px)
-            scale(1.2)
-            rotate(25deg);
-    }
-
     50% {
-        opacity: .45;
-        transform:
-            translateY(-10px)
-            scale(.8)
-            rotate(55deg);
-    }
+        opacity: .9;
 
-    75% {
-        opacity: 1;
         transform:
-            translateY(-4px)
-            scale(1.05)
-            rotate(90deg);
+            translate3d(
+                0,
+                -7px,
+                0
+            )
+            scale(1.08)
+            rotate(35deg);
     }
+}
 
+@keyframes normalGiftOptimized {
+
+    0%,
     100% {
-        opacity: .15;
         transform:
-            translateY(7px)
-            scale(.55)
-            rotate(120deg);
-    }
-}
-
-@keyframes particleBlink {
-
-    0%, 100% {
-        opacity: .1;
-        transform: scale(.4);
+            translate3d(
+                0,
+                0,
+                0
+            )
+            rotate(-2deg)
+            scale(1);
     }
 
     50% {
-        opacity: 1;
-        transform: scale(1.4);
+        transform:
+            translate3d(
+                0,
+                -7px,
+                0
+            )
+            rotate(2deg)
+            scale(1.06);
     }
 }
 
+@keyframes heartGiftOptimized {
 
-/* =================================
-   СЕРДЦА
-================================= */
-
-.gift-animation-heart .gift-emoji {
-
-    animation:
-        heartGift
-        1.35s
-        ease-in-out
-        infinite;
-
-    filter:
-        drop-shadow(
-            0 9px 7px
-            rgba(0,0,0,.5)
-        )
-        drop-shadow(
-            0 0 25px
-            rgba(255,30,100,.9)
-        );
-}
-
-.gift-animation-heart {
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,30,100,.25),
-            rgba(255,30,100,.07) 55%,
-            transparent 78%
-        );
-}
-
-@keyframes heartGift {
-
-    0%, 100% {
+    0%,
+    100% {
         transform:
+            translate3d(
+                0,
+                0,
+                0
+            )
             scale(1)
-            rotate(-5deg);
-    }
-
-    15% {
-        transform:
-            scale(1.12)
-            rotate(5deg);
-    }
-
-    30% {
-        transform:
-            scale(.96)
             rotate(-4deg);
     }
 
-    48% {
+    25% {
         transform:
-            scale(1.2)
+            translate3d(
+                0,
+                -3px,
+                0
+            )
+            scale(1.1)
             rotate(4deg);
     }
 
-    65% {
+    50% {
         transform:
-            scale(1.06)
-            rotate(-2deg);
+            translate3d(
+                0,
+                -5px,
+                0
+            )
+            scale(.97)
+            rotate(-3deg);
     }
 
-    82% {
+    75% {
         transform:
-            scale(1.12)
+            translate3d(
+                0,
+                -3px,
+                0
+            )
+            scale(1.08)
             rotate(3deg);
     }
 }
 
+@keyframes diamondGiftOptimized {
 
-/* =================================
-   АЛМАЗЫ / ЗОЛОТО
-================================= */
-
-.gift-animation-shine .gift-emoji {
-
-    animation:
-        diamondGift
-        2s
-        ease-in-out
-        infinite;
-
-    filter:
-        drop-shadow(
-            0 9px 7px
-            rgba(0,0,0,.5)
-        )
-        drop-shadow(
-            0 0 28px
-            rgba(255,220,60,.95)
-        );
-}
-
-.gift-animation-shine {
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,215,60,.30),
-            rgba(255,170,20,.07) 58%,
-            transparent 80%
-        );
-}
-
-@keyframes diamondGift {
-
-    0%, 100% {
+    0%,
+    100% {
         transform:
-            translateY(2px)
-            rotate(-6deg)
+            translate3d(
+                0,
+                2px,
+                0
+            )
+            rotate(-5deg)
             scale(1);
     }
 
-    20% {
+    50% {
         transform:
-            translateY(-5px)
-            rotate(2deg)
-            scale(1.05);
-    }
-
-    40% {
-        transform:
-            translateY(-11px)
-            rotate(7deg)
-            scale(1.12);
-    }
-
-    60% {
-        transform:
-            translateY(-5px)
-            rotate(-2deg)
-            scale(1.05);
-    }
-
-    80% {
-        transform:
-            translateY(-2px)
-            rotate(4deg)
-            scale(1.08);
+            translate3d(
+                0,
+                -9px,
+                0
+            )
+            rotate(5deg)
+            scale(1.09);
     }
 }
 
+@keyframes rocketGiftOptimized {
 
-/* =================================
-   РАКЕТА
-================================= */
-
-.gift-animation-rocket .gift-emoji {
-
-    animation:
-        rocketGift
-        1.55s
-        ease-in-out
-        infinite;
-
-    filter:
-        drop-shadow(
-            0 9px 7px
-            rgba(0,0,0,.5)
-        )
-        drop-shadow(
-            0 0 27px
-            rgba(40,160,255,.95)
-        );
-}
-
-.gift-animation-rocket {
-    background:
-        radial-gradient(
-            circle,
-            rgba(40,160,255,.30),
-            rgba(40,90,255,.07) 58%,
-            transparent 80%
-        );
-}
-
-@keyframes rocketGift {
-
-    0%, 100% {
+    0%,
+    100% {
         transform:
-            translateY(7px)
-            rotate(-7deg)
+            translate3d(
+                0,
+                6px,
+                0
+            )
+            rotate(-5deg)
             scale(1);
-    }
-
-    20% {
-        transform:
-            translateY(-3px)
-            rotate(-2deg)
-            scale(1.04);
     }
 
     45% {
         transform:
-            translateY(-17px)
+            translate3d(
+                0,
+                -14px,
+                0
+            )
             rotate(5deg)
-            scale(1.12);
+            scale(1.08);
     }
 
-    65% {
+    70% {
         transform:
-            translateY(-7px)
+            translate3d(
+                0,
+                -7px,
+                0
+            )
             rotate(1deg)
-            scale(1.06);
+            scale(1.04);
+    }
+}
+
+@keyframes magicGiftOptimized {
+
+    0%,
+    100% {
+        transform:
+            translate3d(
+                0,
+                2px,
+                0
+            )
+            rotate(-4deg)
+            scale(1);
     }
 
-    82% {
+    50% {
         transform:
-            translateY(-13px)
-            rotate(4deg)
+            translate3d(
+                0,
+                -9px,
+                0
+            )
+            rotate(5deg)
             scale(1.1);
     }
 }
 
 
 /* =================================
-   МАГИЯ
+   ПАУЗА ДЛЯ НЕВИДИМЫХ ПОДАРКОВ
 ================================= */
 
-.gift-animation-magic .gift-emoji {
-
-    animation:
-        magicGift
-        1.7s
-        ease-in-out
-        infinite;
-
-    filter:
-        drop-shadow(
-            0 9px 7px
-            rgba(0,0,0,.5)
-        )
-        drop-shadow(
-            0 0 30px
-            rgba(190,70,255,.95)
-        );
-}
-
-.gift-animation-magic {
-    background:
-        radial-gradient(
-            circle,
-            rgba(190,70,255,.30),
-            rgba(100,30,255,.07) 58%,
-            transparent 80%
-        );
-}
-
-@keyframes magicGift {
-
-    0%, 100% {
-        transform:
-            translateY(2px)
-            rotate(-4deg)
-            scale(1);
-    }
-
-    20% {
-        transform:
-            translateY(-5px)
-            rotate(4deg)
-            scale(1.06);
-    }
-
-    40% {
-        transform:
-            translateY(-10px)
-            rotate(-5deg)
-            scale(1.13);
-    }
-
-    60% {
-        transform:
-            translateY(-3px)
-            rotate(5deg)
-            scale(1.08);
-    }
-
-    80% {
-        transform:
-            translateY(-8px)
-            rotate(-2deg)
-            scale(1.11);
-    }
-}
-
-
-/* =================================
-   ОБЫЧНЫЕ ПОДАРКИ
-================================= */
-
-.gift-animation-bounce .gift-emoji {
-
-    animation:
-        normalGift
-        2.2s
-        ease-in-out
-        infinite;
-}
-
-@keyframes normalGift {
-
-    0%, 100% {
-        transform:
-            translateY(0)
-            rotate(-2deg)
-            scale(1);
-    }
-
-    25% {
-        transform:
-            translateY(-4px)
-            rotate(2deg)
-            scale(1.04);
-    }
-
-    50% {
-        transform:
-            translateY(-10px)
-            rotate(-2deg)
-            scale(1.08);
-    }
-
-    75% {
-        transform:
-            translateY(-4px)
-            rotate(2deg)
-            scale(1.04);
-    }
+.gift-paused *,
+.gift-paused::before,
+.gift-paused::after {
+    animation-play-state:
+        paused !important;
 }
 
 
@@ -1075,7 +1198,8 @@ button:disabled {
 
     border-radius: 8px;
 
-    background: rgba(70,255,120,.07);
+    background:
+        rgba(70,255,120,.07);
 }
 
 .gift-price {
@@ -1088,9 +1212,6 @@ button:disabled {
     font-weight: 800;
 
     margin-bottom: 9px;
-
-    text-shadow:
-        0 0 12px rgba(255,216,77,.18);
 }
 
 .gift-buy {
@@ -1104,7 +1225,6 @@ button:disabled {
     border-radius: 12px;
 
     font-size: 13px;
-    font-weight: 700;
 
     background:
         linear-gradient(
@@ -1112,28 +1232,13 @@ button:disabled {
             #a91f2b,
             #74111a
         );
-
-    border: 1px solid rgba(255,120,120,.16);
-
-    box-shadow:
-        0 5px 14px rgba(0,0,0,.25);
-
-    transition:
-        transform .15s ease,
-        filter .15s ease;
-}
-
-.gift-buy:hover {
-    filter: brightness(1.12);
-}
-
-.gift-buy:active {
-    transform: scale(.95);
 }
 
 .gift-buy:disabled {
     background: #321519;
+
     color: #777;
+
     border-color: #3b1b1f;
 }
 
@@ -1151,17 +1256,17 @@ button:disabled {
 
     border-radius: 10px;
 
-    background: rgba(120,17,30,.9);
+    background:
+        rgba(120,17,30,.9);
 
-    border: 1px solid rgba(255,100,100,.18);
+    border:
+        1px solid
+        rgba(255,100,100,.18);
 
     color: #fff;
 
     font-size: 11px;
     font-weight: 700;
-
-    box-shadow:
-        0 4px 12px rgba(0,0,0,.3);
 }
 
 
@@ -1171,26 +1276,47 @@ button:disabled {
 
 .inventory-list {
     display: flex;
+
     flex-direction: column;
+
     gap: 10px;
 }
 
 .inventory-card {
-    background: #241010;
+    background:
+        linear-gradient(
+            145deg,
+            #241010,
+            #160808
+        );
+
     border: 1px solid #3b1515;
+
     border-radius: 18px;
+
     padding: 14px;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
 }
 
 .inventory-top {
     display: flex;
+
     align-items: center;
+
     gap: 12px;
 }
 
 .inventory-emoji {
-    width: 55px;
-    height: 55px;
+    width: 58px;
+    height: 58px;
+
+    flex-shrink: 0;
 
     display: flex;
     align-items: center;
@@ -1203,107 +1329,116 @@ button:disabled {
     background:
         radial-gradient(
             circle,
-            rgba(255,80,80,.14),
+            rgba(255,70,70,.12),
             transparent 70%
         );
 
+    will-change:
+        transform;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+.inventory-emoji.gift-animation-bounce {
     animation:
-        inventoryFloat
-        2.8s
+        normalGiftOptimized
+        2.4s
         ease-in-out
         infinite;
 }
 
 .inventory-emoji.gift-animation-heart {
     animation:
-        heartGift
-        1.35s
+        heartGiftOptimized
+        1.5s
         ease-in-out
         infinite;
 }
 
 .inventory-emoji.gift-animation-shine {
     animation:
-        diamondGift
-        2s
+        diamondGiftOptimized
+        2.2s
         ease-in-out
         infinite;
 }
 
 .inventory-emoji.gift-animation-rocket {
     animation:
-        rocketGift
-        1.55s
+        rocketGiftOptimized
+        1.7s
         ease-in-out
         infinite;
 }
 
 .inventory-emoji.gift-animation-magic {
     animation:
-        magicGift
-        1.7s
+        magicGiftOptimized
+        1.9s
         ease-in-out
         infinite;
 }
 
-.inventory-emoji.gift-animation-bounce {
-    animation:
-        normalGift
-        2.2s
-        ease-in-out
-        infinite;
-}
-
-@keyframes inventoryFloat {
-
-    0%, 100% {
-        transform:
-            translateY(0)
-            rotate(-2deg);
-    }
-
-    50% {
-        transform:
-            translateY(-4px)
-            rotate(2deg);
-    }
+.inventory-paused
+.inventory-emoji {
+    animation-play-state:
+        paused !important;
 }
 
 .inventory-info {
     flex: 1;
+
+    min-width: 0;
 }
 
 .inventory-name {
     font-weight: bold;
+
     font-size: 16px;
 }
 
 .inventory-count {
     color: #aaa;
+
     font-size: 13px;
+
     margin-top: 5px;
 }
 
 .inventory-income {
     color: #72ff72;
+
     font-size: 13px;
+
     margin-top: 4px;
 }
 
 .inventory-purchases {
     margin-top: 12px;
+
     display: flex;
+
     flex-direction: column;
+
     gap: 7px;
 }
 
 .purchase-row {
     background: #180808;
+
     border-radius: 12px;
+
     padding: 9px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
     gap: 8px;
@@ -1317,8 +1452,11 @@ button:disabled {
 
 .sell-button {
     background: #5d1111;
+
     padding: 8px 10px;
+
     font-size: 12px;
+
     white-space: nowrap;
 }
 
@@ -1328,7 +1466,9 @@ button:disabled {
 
 .empty-inventory {
     text-align: center;
+
     color: #888;
+
     padding: 35px 15px;
 }
 
@@ -1339,12 +1479,13 @@ button:disabled {
 
 .auction-placeholder {
     text-align: center;
+
     padding: 30px 10px;
 }
 
 
 /* =================================
-   НАВИГАЦИЯ
+   НИЖНЯЯ НАВИГАЦИЯ
 ================================= */
 
 .nav {
@@ -1356,19 +1497,27 @@ button:disabled {
 
     height: 78px;
 
-    background: #180707;
+    background:
+        rgba(24,7,7,.97);
 
-    border-top: 1px solid #351515;
+    border-top:
+        1px solid #351515;
 
     display: flex;
+
     justify-content: space-around;
+
     align-items: center;
 
     z-index: 100;
+
+    backdrop-filter:
+        blur(12px);
 }
 
 .nav button {
     background: transparent;
+
     color: #777;
 
     padding: 8px 12px;
@@ -1384,7 +1533,7 @@ button:disabled {
 
 
 /* =================================
-   МОДАЛКА РУЛЕТКИ
+   РУЛЕТКА МОДАЛКА
 ================================= */
 
 .roulette-lock {
@@ -1392,7 +1541,8 @@ button:disabled {
 
     inset: 0;
 
-    background: rgba(8, 1, 1, .96);
+    background:
+        rgba(8,1,1,.96);
 
     z-index: 1000;
 
@@ -1410,6 +1560,7 @@ button:disabled {
 
 .roulette-modal {
     width: 100%;
+
     max-width: 430px;
 
     background: #170707;
@@ -1421,26 +1572,35 @@ button:disabled {
     padding: 22px;
 
     box-shadow:
-        0 20px 60px rgba(0,0,0,.7);
+        0 20px 60px
+        rgba(0,0,0,.7);
 }
 
 .roulette-modal h2 {
     text-align: center;
+
     margin-top: 0;
 }
 
 .roulette-modal-text {
     text-align: center;
+
     color: #999;
+
     font-size: 14px;
+
     margin-bottom: 15px;
 }
 
 .roulette-result {
     text-align: center;
+
     color: #ff8585;
+
     font-size: 14px;
+
     min-height: 20px;
+
     margin-bottom: 10px;
 }
 
@@ -1453,9 +1613,11 @@ button:disabled {
     position: fixed;
 
     bottom: 95px;
+
     left: 50%;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%);
 
     background: #271010;
 
@@ -1470,6 +1632,13 @@ button:disabled {
     z-index: 2000;
 
     white-space: nowrap;
+
+    max-width:
+        calc(100vw - 30px);
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
 
@@ -1499,6 +1668,30 @@ button:disabled {
 
 }
 
+
+/* =================================
+   ЕСЛИ У ПОЛЬЗОВАТЕЛЯ
+   ОТКЛЮЧЕНА АНИМАЦИЯ
+================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        scroll-behavior: auto !important;
+
+        transition-duration:
+            .01ms !important;
+    }
+
+}
+
 </style>
 </head>
 
@@ -1506,18 +1699,26 @@ button:disabled {
 <body>
 
 
-<div id="loading" class="loading">
+<!-- =================================
+     ЗАГРУЗКА
+================================= -->
+
+<div
+    id="loading"
+    class="loading">
 
     Загрузка RaneGame...
 
 </div>
 
 
-<div id="game" style="display:none;">
+<div
+    id="game"
+    style="display:none;">
 
 
 <!-- =================================
-     ВЕРХНИЙ ПРОФИЛЬ
+     ПРОФИЛЬ
 ================================= -->
 
 <div class="top">
@@ -1562,6 +1763,8 @@ button:disabled {
     class="page active">
 
 
+<!-- БАЛАНС -->
+
 <div class="balance-card">
 
     <div class="balance">
@@ -1581,6 +1784,7 @@ button:disabled {
             <span id="income">
                 0
             </span>
+
             в час
 
         </span>
@@ -1678,7 +1882,6 @@ button:disabled {
         onclick="copyInviteLink()"
         style="
             background:#555;
-            color:white;
             margin-top:8px;
         ">
 
@@ -1713,7 +1916,7 @@ button:disabled {
 
 
 <!-- =================================
-     ПОДАРКИ ТЕПЕРЬ ВНУТРИ МЕНЮ
+     ПОДАРКИ
 ================================= -->
 
 <div class="card">
@@ -1749,7 +1952,8 @@ button:disabled {
 
     <!-- МАГАЗИН -->
 
-    <div id="giftShop">
+    <div
+        id="giftShop">
 
 
         <div class="shop-info">
@@ -1768,7 +1972,7 @@ button:disabled {
 
         <button
             class="refresh-shop"
-            onclick="loadGiftShop()">
+            onclick="loadGiftShop(true)">
 
             🔄 Обновить магазин
 
@@ -1923,37 +2127,35 @@ button:disabled {
 
 <div class="nav">
 
+    <button
+        class="active"
+        data-page="home">
 
-<button
-    class="active"
-    data-page="home">
+        🏠
+        <br>
+        Меню
 
-    🏠
-    <br>
-    Меню
-
-</button>
-
-
-<button
-    data-page="auction">
-
-    🔨
-    <br>
-    Аукцион
-
-</button>
+    </button>
 
 
-<button
-    data-page="top">
+    <button
+        data-page="auction">
 
-    🏆
-    <br>
-    Топ
+        🔨
+        <br>
+        Аукцион
 
-</button>
+    </button>
 
+
+    <button
+        data-page="top">
+
+        🏆
+        <br>
+        Топ
+
+    </button>
 
 </div>
 
@@ -2030,6 +2232,10 @@ button:disabled {
 </div>
 
 
+<!-- =================================
+     TOAST
+================================= -->
+
 <div
     id="toast"
     class="toast">
@@ -2037,7 +2243,6 @@ button:disabled {
 
 
 <script>
-
 
 /* =================================
    API
@@ -2066,7 +2271,7 @@ if (tg) {
 
 
 /* =================================
-   ПЕРЕМЕННЫЕ
+   СОСТОЯНИЕ
 ================================= */
 
 let player = null;
@@ -2090,6 +2295,12 @@ let rouletteSpinning = false;
 let giftShop = [];
 
 let inventory = [];
+
+let giftObserver = null;
+
+let shopLoaded = false;
+
+let inventoryLoaded = false;
 
 
 /* =================================
@@ -2243,9 +2454,10 @@ async function loadPlayer() {
         startMultiplierTimer();
 
 
-        await loadGiftShop();
-
-        await loadInventory();
+        await Promise.all([
+            loadGiftShop(),
+            loadInventory()
+        ]);
 
 
     } catch (error) {
@@ -2424,12 +2636,9 @@ function updateEconomyScreen() {
     }
 
 
-    economyMultiplier =
-        1.0;
+    economyMultiplier = 1.0;
 
-
-    economyExpiresAt =
-        null;
+    economyExpiresAt = null;
 
 
     multiplierElement.textContent =
@@ -2554,7 +2763,9 @@ navButtons.forEach(
                             "rouletteLock"
                         )
                         .classList
-                        .contains("show")
+                        .contains(
+                            "show"
+                        )
                 ) {
 
                     return;
@@ -2600,7 +2811,9 @@ navButtons.forEach(
 
                     selectedPage
                         .classList
-                        .add("active");
+                        .add(
+                            "active"
+                        );
 
                 }
 
@@ -2610,16 +2823,18 @@ navButtons.forEach(
                 );
 
 
-                if (
-                    pageName ===
-                    "home"
-                ) {
-
-                    loadGiftShop();
-
-                    loadInventory();
-
-                }
+                /*
+                 * ВАЖНО:
+                 * здесь больше НЕТ
+                 *
+                 * loadGiftShop();
+                 * loadInventory();
+                 *
+                 * при каждом открытии меню.
+                 *
+                 * Это убирает лишние запросы
+                 * и лишние перерисовки.
+                 */
 
 
                 window.scrollTo(
@@ -2665,8 +2880,7 @@ function showShopTab(tab) {
 
 
     if (
-        tab ===
-        "shop"
+        tab === "shop"
     ) {
 
         shop.style.display =
@@ -2687,8 +2901,11 @@ function showShopTab(tab) {
         );
 
 
-        loadGiftShop();
+        if (!shopLoaded) {
 
+            loadGiftShop();
+
+        }
 
     } else {
 
@@ -2710,7 +2927,11 @@ function showShopTab(tab) {
         );
 
 
-        loadInventory();
+        if (!inventoryLoaded) {
+
+            loadInventory();
+
+        }
 
     }
 
@@ -2721,7 +2942,19 @@ function showShopTab(tab) {
    МАГАЗИН
 ================================= */
 
-async function loadGiftShop() {
+async function loadGiftShop(
+    forceReload = false
+) {
+
+    if (
+        shopLoaded &&
+        !forceReload
+    ) {
+
+        return;
+
+    }
+
 
     const grid =
         document.getElementById(
@@ -2731,17 +2964,21 @@ async function loadGiftShop() {
 
     try {
 
-        grid.innerHTML = `
+        if (!giftShop.length) {
 
-            <div
-                class="empty-inventory"
-                style="grid-column:1/-1;">
+            grid.innerHTML = `
 
-                🔄 Загружаем магазин...
+                <div
+                    class="empty-inventory"
+                    style="grid-column:1/-1;">
 
-            </div>
+                    🔄 Загружаем магазин...
 
-        `;
+                </div>
+
+            `;
+
+        }
 
 
         const response =
@@ -2771,6 +3008,10 @@ async function loadGiftShop() {
             )
                 ? data.gifts
                 : [];
+
+
+        shopLoaded =
+            true;
 
 
         renderGiftShop();
@@ -2892,7 +3133,7 @@ function getGiftAnimationClass(
 
 
 /* =================================
-   ОТРИСОВКА МАГАЗИНА
+   МАГАЗИН
 ================================= */
 
 function renderGiftShop() {
@@ -2916,6 +3157,8 @@ function renderGiftShop() {
             </div>
 
         `;
+
+        setupGiftAnimationObserver();
 
         return;
 
@@ -2966,11 +3209,15 @@ function renderGiftShop() {
                         <div
                             class="gift-card">
 
+
                             ${
                                 quantity > 0
                                     ? `
-                                        <div class="gift-count">
+                                        <div
+                                            class="gift-count">
+
                                             ${quantity}/5
+
                                         </div>
                                       `
                                     : ""
@@ -2982,22 +3229,33 @@ function renderGiftShop() {
 
                                 <span
                                     class="gift-spark gift-spark-1">
+
                                     ✦
+
                                 </span>
+
 
                                 <span
                                     class="gift-spark gift-spark-2">
+
                                     ✧
+
                                 </span>
+
 
                                 <span
                                     class="gift-spark gift-spark-3">
+
                                     ·
+
                                 </span>
+
 
                                 <span
                                     class="gift-spark gift-spark-4">
+
                                     ✦
+
                                 </span>
 
 
@@ -3048,14 +3306,20 @@ function renderGiftShop() {
 
                             <button
                                 class="gift-buy"
+
                                 ${
                                     maxReached
                                         ? "disabled"
                                         : ""
                                 }
-                                onclick="buyGift(${Number(
-                                    gift.id
-                                )})">
+
+                                onclick="
+                                    buyGift(
+                                        ${Number(
+                                            gift.id
+                                        )}
+                                    )
+                                ">
 
                                 ${
                                     maxReached
@@ -3065,6 +3329,7 @@ function renderGiftShop() {
 
                             </button>
 
+
                         </div>
 
                     `;
@@ -3073,11 +3338,14 @@ function renderGiftShop() {
             )
             .join("");
 
+
+    setupGiftAnimationObserver();
+
 }
 
 
 /* =================================
-   КУПИТЬ ПОДАРОК
+   ПОКУПКА
 ================================= */
 
 async function buyGift(
@@ -3210,7 +3478,16 @@ async function buyGift(
         );
 
 
+        /*
+         * Обновляем только после покупки.
+         */
+
+        inventoryLoaded =
+            false;
+
+
         await loadInventory();
+
 
         renderGiftShop();
 
@@ -3234,7 +3511,19 @@ async function buyGift(
    ИНВЕНТАРЬ
 ================================= */
 
-async function loadInventory() {
+async function loadInventory(
+    forceReload = false
+) {
+
+    if (
+        inventoryLoaded &&
+        !forceReload
+    ) {
+
+        return;
+
+    }
+
 
     const list =
         document.getElementById(
@@ -3244,15 +3533,19 @@ async function loadInventory() {
 
     try {
 
-        list.innerHTML = `
+        if (!inventory.length) {
 
-            <div class="empty-inventory">
+            list.innerHTML = `
 
-                🔄 Загружаем инвентарь...
+                <div class="empty-inventory">
 
-            </div>
+                    🔄 Загружаем инвентарь...
 
-        `;
+                </div>
+
+            `;
+
+        }
 
 
         const tgUser =
@@ -3291,6 +3584,10 @@ async function loadInventory() {
                 : [];
 
 
+        inventoryLoaded =
+            true;
+
+
         renderInventory();
 
 
@@ -3321,7 +3618,7 @@ async function loadInventory() {
 
 
 /* =================================
-   ОТРИСОВКА ИНВЕНТАРЯ
+   ИНВЕНТАРЬ
 ================================= */
 
 function renderInventory() {
@@ -3347,6 +3644,8 @@ function renderInventory() {
             </div>
 
         `;
+
+        setupGiftAnimationObserver();
 
         return;
 
@@ -3388,7 +3687,10 @@ function renderInventory() {
 
 
                                 <div
-                                    class="inventory-emoji ${animationClass}">
+                                    class="
+                                        inventory-emoji
+                                        ${animationClass}
+                                    ">
 
                                     ${escapeHtml(
                                         gift.emoji ||
@@ -3422,7 +3724,8 @@ function renderInventory() {
                                                 item.quantity ||
                                                 0
                                             )
-                                        } / 5
+                                        }
+                                        / 5
 
                                     </div>
 
@@ -3439,7 +3742,8 @@ function renderInventory() {
                                                 item.quantity ||
                                                 0
                                             )
-                                        } ⭐/час
+                                        }
+                                        ⭐/час
 
                                     </div>
 
@@ -3455,7 +3759,9 @@ function renderInventory() {
                                     ? `
 
                                         <div
-                                            class="inventory-purchases">
+                                            class="
+                                                inventory-purchases
+                                            ">
 
                                             ${purchases
                                                 .map(
@@ -3485,18 +3791,24 @@ function renderInventory() {
                                                         return `
 
                                                             <div
-                                                                class="purchase-row">
+                                                                class="
+                                                                    purchase-row
+                                                                ">
 
 
                                                                 <div>
 
                                                                     <div>
+
                                                                         🎁 Покупка
+
                                                                     </div>
 
 
                                                                     <div
-                                                                        class="purchase-time">
+                                                                        class="
+                                                                            purchase-time
+                                                                        ">
 
                                                                         ${
                                                                             purchasedAt.toLocaleString(
@@ -3537,29 +3849,38 @@ function renderInventory() {
                                                                               `
                                                                     }
 
-
                                                                 </div>
 
 
                                                                 <button
-                                                                    class="sell-button ${
-                                                                        ready
-                                                                            ? "ready"
-                                                                            : ""
-                                                                    }"
+                                                                    class="
+                                                                        sell-button
+                                                                        ${
+                                                                            ready
+                                                                                ? "ready"
+                                                                                : ""
+                                                                        }
+                                                                    "
+
                                                                     ${
                                                                         ready
                                                                             ? ""
                                                                             : "disabled"
                                                                     }
-                                                                    onclick="sellGift(${Number(
-                                                                        purchase.id
-                                                                    )})">
+
+                                                                    onclick="
+                                                                        sellGift(
+                                                                            ${Number(
+                                                                                purchase.id
+                                                                            )}
+                                                                        )
+                                                                    ">
 
                                                                     Продать
                                                                     ${Number(
                                                                         gift.price
-                                                                    )} ⭐
+                                                                    )}
+                                                                    ⭐
 
                                                                 </button>
 
@@ -3586,6 +3907,9 @@ function renderInventory() {
                 }
             )
             .join("");
+
+
+    setupGiftAnimationObserver();
 
 }
 
@@ -3656,7 +3980,12 @@ async function sellGift(
         );
 
 
+        inventoryLoaded =
+            false;
+
+
         await loadInventory();
+
 
         renderGiftShop();
 
@@ -3723,6 +4052,98 @@ function formatRemaining(ms) {
         String(seconds)
             .padStart(2, "0")
     );
+
+}
+
+
+/* =================================
+   ОПТИМИЗАЦИЯ АНИМАЦИЙ
+================================= */
+
+function setupGiftAnimationObserver() {
+
+    if (giftObserver) {
+
+        giftObserver.disconnect();
+
+    }
+
+
+    if (
+        !(
+            "IntersectionObserver"
+            in window
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    giftObserver =
+        new IntersectionObserver(
+            function(entries) {
+
+                entries.forEach(
+                    function(entry) {
+
+                        const element =
+                            entry.target;
+
+
+                        if (
+                            entry.isIntersecting
+                        ) {
+
+                            element.classList.remove(
+                                "gift-paused"
+                            );
+
+                            element.classList.remove(
+                                "inventory-paused"
+                            );
+
+                        } else {
+
+                            element.classList.add(
+                                "gift-paused"
+                            );
+
+                            element.classList.add(
+                                "inventory-paused"
+                            );
+
+                        }
+
+                    }
+                );
+
+            },
+            {
+                root: null,
+
+                rootMargin:
+                    "100px 0px 100px 0px",
+
+                threshold: 0.01
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            ".gift-card, .inventory-card"
+        )
+        .forEach(
+            function(element) {
+
+                giftObserver.observe(
+                    element
+                );
+
+            }
+        );
 
 }
 
@@ -3815,7 +4236,7 @@ function openRoulette() {
 
 
 /* =================================
-   СОЗДАНИЕ РУЛЕТКИ
+   РУЛЕТКА
 ================================= */
 
 function buildRoulette() {
@@ -3890,7 +4311,7 @@ function buildRoulette() {
 
 
 /* =================================
-   КРУТИТЬ РУЛЕТКУ
+   КРУТИТЬ
 ================================= */
 
 async function spinRoulette() {
@@ -4131,7 +4552,7 @@ function animateRoulette(
 
 
 /* =================================
-   КОНЕЦ РУЛЕТКИ
+   РУЛЕТКА РЕЗУЛЬТАТ
 ================================= */
 
 function finishRoulette() {
@@ -4180,7 +4601,7 @@ function finishRoulette() {
 
 
 /* =================================
-   ЗАБРАТЬ МНОЖИТЕЛЬ
+   ЗАБРАТЬ РУЛЕТКУ
 ================================= */
 
 async function claimRoulette() {
@@ -4269,16 +4690,11 @@ async function claimRoulette() {
             );
 
 
-        rouletteResult =
-            null;
+        rouletteResult = null;
 
+        rouletteIssuedAt = null;
 
-        rouletteIssuedAt =
-            null;
-
-
-        rouletteSignature =
-            null;
+        rouletteSignature = null;
 
 
         showToast(
@@ -4396,7 +4812,7 @@ async function collect() {
 
 
 /* =================================
-   ПРИГЛАСИТЬ ДРУГА
+   ПРИГЛАСИТЬ
 ================================= */
 
 function inviteFriend() {
@@ -4422,7 +4838,7 @@ function inviteFriend() {
             ) +
             "&text=" +
             encodeURIComponent(
-                "Залетай в RaneGame, по моей ссылке +100 звёзд на старте"
+                "Залетай в RaneGame!"
             );
 
 
@@ -4465,7 +4881,7 @@ function inviteFriend() {
 
 
 /* =================================
-   КОПИРОВАТЬ ССЫЛКУ
+   КОПИРОВАТЬ
 ================================= */
 
 function copyInviteLink() {
