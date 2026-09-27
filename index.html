@@ -16,10 +16,6 @@
 
 <style>
 
-/* =================================
-   ОСНОВА
-================================= */
-
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
@@ -607,11 +603,6 @@ button:disabled {
         scale(.97);
 }
 
-
-/* =================================
-   ОПТИМИЗИРОВАННАЯ АНИМАЦИЯ
-================================= */
-
 .gift-visual {
     position: relative;
 
@@ -829,8 +820,7 @@ button:disabled {
    АНИМАЦИИ ПОДАРКОВ
 ================================= */
 
-.gift-animation-bounce
-.gift-emoji {
+.gift-animation-bounce .gift-emoji {
     animation:
         normalGiftOptimized
         2.4s
@@ -841,8 +831,7 @@ button:disabled {
         transform;
 }
 
-.gift-animation-heart
-.gift-emoji {
+.gift-animation-heart .gift-emoji {
     animation:
         heartGiftOptimized
         1.5s
@@ -853,8 +842,7 @@ button:disabled {
         transform;
 }
 
-.gift-animation-shine
-.gift-emoji {
+.gift-animation-shine .gift-emoji {
     animation:
         diamondGiftOptimized
         2.2s
@@ -865,8 +853,7 @@ button:disabled {
         transform;
 }
 
-.gift-animation-rocket
-.gift-emoji {
+.gift-animation-rocket .gift-emoji {
     animation:
         rocketGiftOptimized
         1.7s
@@ -877,8 +864,7 @@ button:disabled {
         transform;
 }
 
-.gift-animation-magic
-.gift-emoji {
+.gift-animation-magic .gift-emoji {
     animation:
         magicGiftOptimized
         1.9s
@@ -896,14 +882,9 @@ button:disabled {
 
 @keyframes giftAuraOptimized {
 
-    0%,
-    100% {
+    0%, 100% {
         transform:
-            translate3d(
-                -50%,
-                -50%,
-                0
-            )
+            translate3d(-50%,-50%,0)
             scale(.78);
 
         opacity: .25;
@@ -911,11 +892,7 @@ button:disabled {
 
     50% {
         transform:
-            translate3d(
-                -50%,
-                -50%,
-                0
-            )
+            translate3d(-50%,-50%,0)
             scale(1.12);
 
         opacity: .65;
@@ -926,11 +903,7 @@ button:disabled {
 
     0% {
         transform:
-            translate3d(
-                -50%,
-                -50%,
-                0
-            )
+            translate3d(-50%,-50%,0)
             scale(.6);
 
         opacity: .45;
@@ -938,11 +911,7 @@ button:disabled {
 
     75% {
         transform:
-            translate3d(
-                -50%,
-                -50%,
-                0
-            )
+            translate3d(-50%,-50%,0)
             scale(1.35);
 
         opacity: 0;
@@ -955,16 +924,11 @@ button:disabled {
 
 @keyframes sparkOptimized {
 
-    0%,
-    100% {
+    0%, 100% {
         opacity: .15;
 
         transform:
-            translate3d(
-                0,
-                5px,
-                0
-            )
+            translate3d(0,5px,0)
             scale(.7)
             rotate(0deg);
     }
@@ -973,11 +937,7 @@ button:disabled {
         opacity: .9;
 
         transform:
-            translate3d(
-                0,
-                -7px,
-                0
-            )
+            translate3d(0,-7px,0)
             scale(1.08)
             rotate(35deg);
     }
@@ -985,25 +945,16 @@ button:disabled {
 
 @keyframes normalGiftOptimized {
 
-    0%,
-    100% {
+    0%, 100% {
         transform:
-            translate3d(
-                0,
-                0,
-                0
-            )
+            translate3d(0,0,0)
             rotate(-2deg)
             scale(1);
     }
 
     50% {
         transform:
-            translate3d(
-                0,
-                -7px,
-                0
-            )
+            translate3d(0,-7px,0)
             rotate(2deg)
             scale(1.06);
     }
@@ -1011,47 +962,30 @@ button:disabled {
 
 @keyframes heartGiftOptimized {
 
-    0%,
-    100% {
+    0%, 100% {
         transform:
-            translate3d(
-                0,
-                0,
-                0
-            )
+            translate3d(0,0,0)
             scale(1)
             rotate(-4deg);
     }
 
     25% {
         transform:
-            translate3d(
-                0,
-                -3px,
-                0
-            )
+            translate3d(0,-3px,0)
             scale(1.1)
             rotate(4deg);
     }
 
     50% {
         transform:
-            translate3d(
-                0,
-                -5px,
-                0
-            )
+            translate3d(0,-5px,0)
             scale(.97)
             rotate(-3deg);
     }
 
     75% {
         transform:
-            translate3d(
-                0,
-                -3px,
-                0
-            )
+            translate3d(0,-3px,0)
             scale(1.08)
             rotate(3deg);
     }
@@ -1059,25 +993,16 @@ button:disabled {
 
 @keyframes diamondGiftOptimized {
 
-    0%,
-    100% {
+    0%, 100% {
         transform:
-            translate3d(
-                0,
-                2px,
-                0
-            )
+            translate3d(0,2px,0)
             rotate(-5deg)
             scale(1);
     }
 
     50% {
         transform:
-            translate3d(
-                0,
-                -9px,
-                0
-            )
+            translate3d(0,-9px,0)
             rotate(5deg)
             scale(1.09);
     }
@@ -1085,36 +1010,23 @@ button:disabled {
 
 @keyframes rocketGiftOptimized {
 
-    0%,
-    100% {
+    0%, 100% {
         transform:
-            translate3d(
-                0,
-                6px,
-                0
-            )
+            translate3d(0,6px,0)
             rotate(-5deg)
             scale(1);
     }
 
     45% {
         transform:
-            translate3d(
-                0,
-                -14px,
-                0
-            )
+            translate3d(0,-14px,0)
             rotate(5deg)
             scale(1.08);
     }
 
     70% {
         transform:
-            translate3d(
-                0,
-                -7px,
-                0
-            )
+            translate3d(0,-7px,0)
             rotate(1deg)
             scale(1.04);
     }
@@ -1122,34 +1034,20 @@ button:disabled {
 
 @keyframes magicGiftOptimized {
 
-    0%,
-    100% {
+    0%, 100% {
         transform:
-            translate3d(
-                0,
-                2px,
-                0
-            )
+            translate3d(0,2px,0)
             rotate(-4deg)
             scale(1);
     }
 
     50% {
         transform:
-            translate3d(
-                0,
-                -9px,
-                0
-            )
+            translate3d(0,-9px,0)
             rotate(5deg)
             scale(1.1);
     }
 }
-
-
-/* =================================
-   ПАУЗА ДЛЯ НЕВИДИМЫХ ПОДАРКОВ
-================================= */
 
 .gift-paused *,
 .gift-paused::before,
@@ -1384,37 +1282,30 @@ button:disabled {
         infinite;
 }
 
-.inventory-paused
-.inventory-emoji {
+.inventory-paused .inventory-emoji {
     animation-play-state:
         paused !important;
 }
 
 .inventory-info {
     flex: 1;
-
     min-width: 0;
 }
 
 .inventory-name {
     font-weight: bold;
-
     font-size: 16px;
 }
 
 .inventory-count {
     color: #aaa;
-
     font-size: 13px;
-
     margin-top: 5px;
 }
 
 .inventory-income {
     color: #72ff72;
-
     font-size: 13px;
-
     margin-top: 4px;
 }
 
@@ -1485,10 +1376,6 @@ button:disabled {
 
 
 /* =================================
-   НИЖНЯЯ НАВИГАЦИЯ
-================================= */
-
-/* =================================
    АДМИН ПАНЕЛЬ
 ================================= */
 
@@ -1546,6 +1433,11 @@ button:disabled {
 
     background: #321010;
 }
+
+
+/* =================================
+   НАВИГАЦИЯ
+================================= */
 
 .nav {
     position: fixed;
@@ -1637,7 +1529,6 @@ button:disabled {
 
 .roulette-modal h2 {
     text-align: center;
-
     margin-top: 0;
 }
 
@@ -1665,14 +1556,14 @@ button:disabled {
 
 
 /* =================================
-   МОДАЛКА ПОКУПКИ ПОДАРКА
+   МОДАЛКА ПОКУПКИ
 ================================= */
 
 .buy-modal {
     position: fixed;
     inset: 0;
 
-    background: rgba(5, 1, 1, .82);
+    background: rgba(5,1,1,.82);
 
     z-index: 1500;
 
@@ -1714,22 +1605,18 @@ button:disabled {
 
 .buy-modal-gift {
     font-size: 60px;
-
     margin-bottom: 8px;
 }
 
 .buy-modal-title {
     font-size: 20px;
     font-weight: bold;
-
     margin-bottom: 6px;
 }
 
 .buy-modal-price {
     color: #ffd84d;
-
     font-size: 15px;
-
     margin-bottom: 20px;
 }
 
@@ -1780,7 +1667,6 @@ button:disabled {
 
 .buy-modal-actions {
     display: flex;
-
     gap: 8px;
 }
 
@@ -1858,7 +1744,6 @@ button:disabled {
 
 
 /* =================================
-   ЕСЛИ У ПОЛЬЗОВАТЕЛЯ
    ОТКЛЮЧЕНА АНИМАЦИЯ
 ================================= */
 
@@ -1911,33 +1796,35 @@ button:disabled {
 
 <div class="top">
 
-   <div>
+    <div>
 
-    <div
-        class="name"
-        id="username">
+        <div
+            class="name"
+            id="username">
 
-        Игрок
+            Игрок
+
+        </div>
+
+        <div
+            class="username"
+            id="tgusername">
+
+            @Telegram
+
+        </div>
+
+        <button
+            id="adminButton"
+            class="admin-button"
+            type="button"
+            onclick="openAdminPanel()">
+
+            ⚙️ Админ Панель
+
+        </button>
 
     </div>
-
-    <div
-        class="username"
-        id="tgusername">
-
-        @Telegram
-
-    </div>
-
-    <button
-        id="adminButton"
-        class="admin-button"
-        type="button"
-        onclick="openAdminPanel()">
-
-        ⚙️ Админ Панель
-
-    </button>
 
 </div>
 
@@ -1950,8 +1837,6 @@ button:disabled {
     id="home"
     class="page active">
 
-
-<!-- БАЛАНС -->
 
 <div class="balance-card">
 
@@ -1982,16 +1867,12 @@ button:disabled {
 </div>
 
 
-<!-- ЭКОНОМИКА -->
-
 <div class="economy-card">
 
     <div class="economy-header">
 
         <div class="economy-title">
-
             Крутим
-
         </div>
 
         <div
@@ -2004,7 +1885,6 @@ button:disabled {
 
     </div>
 
-
     <div
         class="current-multiplier"
         id="currentMultiplier">
@@ -2013,7 +1893,6 @@ button:disabled {
 
     </div>
 
-
     <div
         class="multiplier-time"
         id="multiplierTime">
@@ -2021,7 +1900,6 @@ button:disabled {
         Крути рулетку
 
     </div>
-
 
     <button
         id="openRouletteButton"
@@ -2034,8 +1912,6 @@ button:disabled {
 
 </div>
 
-
-<!-- РЕФЕРАЛКА -->
 
 <div class="card">
 
@@ -2057,14 +1933,12 @@ button:disabled {
 
     </div>
 
-
     <button
         onclick="inviteFriend()">
 
         Позови друга
 
     </button>
-
 
     <button
         onclick="copyInviteLink()"
@@ -2079,8 +1953,6 @@ button:disabled {
 
 </div>
 
-
-<!-- БОНУС -->
 
 <div class="card">
 
@@ -2103,16 +1975,11 @@ button:disabled {
 </div>
 
 
-<!-- =================================
-     ПОДАРКИ
-================================= -->
-
 <div class="card">
 
     <h2>
         🎁 Подарки
     </h2>
-
 
     <div class="shop-tabs">
 
@@ -2124,7 +1991,6 @@ button:disabled {
             🛒 Магазин
 
         </button>
-
 
         <button
             id="inventoryTab"
@@ -2138,11 +2004,7 @@ button:disabled {
     </div>
 
 
-    <!-- МАГАЗИН -->
-
-    <div
-        id="giftShop">
-
+    <div id="giftShop">
 
         <div class="shop-info">
 
@@ -2157,7 +2019,6 @@ button:disabled {
 
         </div>
 
-
         <button
             class="refresh-shop"
             onclick="loadGiftShop(true)">
@@ -2165,7 +2026,6 @@ button:disabled {
             🔄 Обновить магазин
 
         </button>
-
 
         <div
             id="shopGrid"
@@ -2181,16 +2041,12 @@ button:disabled {
 
         </div>
 
-
     </div>
 
-
-    <!-- ИНВЕНТАРЬ -->
 
     <div
         id="giftInventory"
         style="display:none;">
-
 
         <div class="shop-info">
 
@@ -2205,7 +2061,6 @@ button:disabled {
 
         </div>
 
-
         <div
             id="inventoryList"
             class="inventory-list">
@@ -2218,18 +2073,12 @@ button:disabled {
 
         </div>
 
-
     </div>
 
 </div>
 
-
 </section>
 
-
-<!-- =================================
-     АУКЦИОН
-================================= -->
 
 <!-- =================================
      АДМИН ПАНЕЛЬ
@@ -2248,7 +2097,6 @@ button:disabled {
 
     </button>
 
-
     <div class="admin-card">
 
         <h2>
@@ -2258,7 +2106,6 @@ button:disabled {
         <p>
             Панель доступна только владельцу.
         </p>
-
 
         <button
             type="button"
@@ -2273,46 +2120,51 @@ button:disabled {
 
 </section>
 
+
+<!-- =================================
+     АУКЦИОН
+================================= -->
+
 <section
     id="auction"
     class="page">
 
-<div class="card">
+    <div class="card">
 
-    <h2>
-        🔨 Аукцион
-    </h2>
+        <h2>
+            🔨 Аукцион
+        </h2>
 
-    <div class="auction-placeholder">
+        <div class="auction-placeholder">
 
-        <div
-            style="
-                font-size:55px;
-                margin-bottom:15px;
-            ">
+            <div
+                style="
+                    font-size:55px;
+                    margin-bottom:15px;
+                ">
 
-            🔨
+                🔨
+
+            </div>
+
+            <p>
+                Здесь скоро появится аукцион.
+            </p>
+
+            <button
+                onclick="
+                    showToast(
+                        '🔨 Аукцион скоро будет доступен'
+                    )
+                ">
+
+                Открыть
+
+            </button>
 
         </div>
 
-        <p>
-            Здесь скоро появится аукцион.
-        </p>
-
-        <button
-            onclick="
-                showToast(
-                    '🔨 Аукцион скоро будет доступен'
-                )
-            ">
-
-            Открыть
-
-        </button>
-
     </div>
-
-</div>
 
 </section>
 
@@ -2325,34 +2177,34 @@ button:disabled {
     id="top"
     class="page">
 
-<div class="card">
+    <div class="card">
 
-    <h2>
-        🏆 Топ игроков
-    </h2>
+        <h2>
+            🏆 Топ игроков
+        </h2>
 
-    <p>
-        Таблица лидеров появится здесь.
-    </p>
+        <p>
+            Таблица лидеров появится здесь.
+        </p>
 
-    <button
-        onclick="
-            showToast(
-                '🏆 Топ скоро появится'
-            )
-        ">
+        <button
+            onclick="
+                showToast(
+                    '🏆 Топ скоро появится'
+                )
+            ">
 
-        Обновить
+            Обновить
 
-    </button>
+        </button>
 
-</div>
+    </div>
 
 </section>
 
 
 <!-- =================================
-     НИЖНЯЯ НАВИГАЦИЯ
+     НАВИГАЦИЯ
 ================================= -->
 
 <div class="nav">
@@ -2367,7 +2219,6 @@ button:disabled {
 
     </button>
 
-
     <button
         data-page="auction">
 
@@ -2376,7 +2227,6 @@ button:disabled {
         Аукцион
 
     </button>
-
 
     <button
         data-page="top">
@@ -2389,7 +2239,6 @@ button:disabled {
 
 </div>
 
-
 </div>
 
 
@@ -2401,63 +2250,55 @@ button:disabled {
     id="rouletteLock"
     class="roulette-lock">
 
+    <div class="roulette-modal">
 
-<div class="roulette-modal">
+        <h2>
+            🎰 Экономика
+        </h2>
 
+        <div class="roulette-modal-text">
 
-<h2>
-    🎰 Экономика
-</h2>
+            Крути рулетку и получи множитель
+            на 4 часа.
 
+        </div>
 
-<div class="roulette-modal-text">
+        <div class="roulette-window">
 
-    Крути рулетку и получи множитель
-    на 4 часа.
+            <div
+                id="rouletteTrack"
+                class="roulette-track">
+            </div>
 
-</div>
+        </div>
 
+        <div
+            id="rouletteResult"
+            class="roulette-result">
 
-<div class="roulette-window">
+            Выбери свой множитель
 
-    <div
-        id="rouletteTrack"
-        class="roulette-track">
+        </div>
+
+        <button
+            id="rouletteSpinButton"
+            class="roulette-spin-button"
+            onclick="spinRoulette()">
+
+            🎰 Крутить
+
+        </button>
+
+        <button
+            id="rouletteClaimButton"
+            class="claim-button"
+            onclick="claimRoulette()">
+
+            Забрать
+
+        </button>
+
     </div>
-
-</div>
-
-
-<div
-    id="rouletteResult"
-    class="roulette-result">
-
-    Выбери свой множитель
-
-</div>
-
-
-<button
-    id="rouletteSpinButton"
-    class="roulette-spin-button"
-    onclick="spinRoulette()">
-
-    🎰 Крутить
-
-</button>
-
-
-<button
-    id="rouletteClaimButton"
-    class="claim-button"
-    onclick="claimRoulette()">
-
-    Забрать
-
-</button>
-
-
-</div>
 
 </div>
 
@@ -2589,11 +2430,9 @@ const tg =
     window.Telegram &&
     window.Telegram.WebApp;
 
-
 if (tg) {
 
     tg.ready();
-
     tg.expand();
 
 }
@@ -2667,7 +2506,6 @@ async function apiRequest(
     const tgUser =
         getTelegramUser();
 
-
     const response =
         await fetch(
             API + endpoint,
@@ -2688,7 +2526,6 @@ async function apiRequest(
 
 
     let data;
-
 
     try {
 
@@ -2732,72 +2569,53 @@ async function loadPlayer() {
                 "/api/player"
             );
 
-
         player =
             data.player;
 
-
         balance =
             Number(
-                player.balance
+                player.balance || 0
             );
-
 
         income =
             Number(
-                player.income
+                player.income || 0
             );
-
 
         economyMultiplier =
             Number(
-                player.economy_multiplier ||
-                1
+                player.economy_multiplier || 1
             );
-
 
         economyExpiresAt =
             player.economy_expires_at ||
             null;
 
-
         updateScreen();
 
+        showAdminButton();
 
         document
-            .getElementById(
-                "loading"
-            )
-            .style.display =
-            "none";
-
+            .getElementById("loading")
+            .style.display = "none";
 
         document
-            .getElementById(
-                "game"
-            )
-            .style.display =
-            "block";
-
+            .getElementById("game")
+            .style.display = "block";
 
         startMultiplierTimer();
-
 
         await Promise.all([
             loadGiftShop(),
             loadInventory()
         ]);
 
-
     } catch (error) {
 
         console.error(error);
 
-
         document
-            .getElementById(
-                "loading"
-            )
+            .getElementById("loading")
             .innerHTML = `
 
                 <div class="error">
@@ -2830,23 +2648,31 @@ async function loadPlayer() {
 
 function updateScreen() {
 
-    document
-        .getElementById(
+    const balanceElement =
+        document.getElementById(
             "balance"
-        )
-        .textContent =
-        Math.floor(balance)
-            .toLocaleString(
-                "ru-RU"
-            );
+        );
+
+    if (balanceElement) {
+
+        balanceElement.textContent =
+            Math.floor(balance)
+                .toLocaleString("ru-RU");
+
+    }
 
 
-    document
-        .getElementById(
+    const incomeElement =
+        document.getElementById(
             "income"
-        )
-        .textContent =
-        income;
+        );
+
+    if (incomeElement) {
+
+        incomeElement.textContent =
+            income;
+
+    }
 
 
     if (!player) {
@@ -2856,46 +2682,66 @@ function updateScreen() {
     }
 
 
-    document
-        .getElementById(
+    const usernameElement =
+        document.getElementById(
             "username"
-        )
-        .textContent =
-        player.first_name ||
-        "Игрок";
+        );
 
+    if (usernameElement) {
 
-    document
-        .getElementById(
-            "tgusername"
-        )
-        .textContent =
-        player.username
-            ? "@" +
-              player.username
-            : "Telegram";
-
-
-    document
-        .getElementById(
-            "avatar"
-        )
-        .textContent =
-        (
+        usernameElement.textContent =
             player.first_name ||
-            "R"
-        )
-        .charAt(0)
-        .toUpperCase();
+            "Игрок";
+
+    }
 
 
-    document
-        .getElementById(
+    const tgUsernameElement =
+        document.getElementById(
+            "tgusername"
+        );
+
+    if (tgUsernameElement) {
+
+        tgUsernameElement.textContent =
+            player.username
+                ? "@" +
+                  player.username
+                : "Telegram";
+
+    }
+
+
+    const avatar =
+        document.getElementById(
+            "avatar"
+        );
+
+    if (avatar) {
+
+        avatar.textContent =
+            (
+                player.first_name ||
+                "R"
+            )
+            .charAt(0)
+            .toUpperCase();
+
+    }
+
+
+    const refId =
+        document.getElementById(
             "refId"
-        )
-        .textContent =
-        player.telegram_id ||
-        "";
+        );
+
+    if (refId) {
+
+        refId.textContent =
+            player.telegram_id ||
+            "";
+
+    }
 
 
     updateEconomyScreen();
@@ -2914,12 +2760,10 @@ function updateEconomyScreen() {
             "currentMultiplier"
         );
 
-
     const statusElement =
         document.getElementById(
             "economyStatus"
         );
-
 
     const timeElement =
         document.getElementById(
@@ -2941,14 +2785,11 @@ function updateEconomyScreen() {
                 economyMultiplier
             ).toFixed(1);
 
-
         statusElement.textContent =
             "Активна";
 
-
         statusElement.className =
             "multiplier-active";
-
 
         timeElement.textContent =
             "Осталось: " +
@@ -2959,7 +2800,6 @@ function updateEconomyScreen() {
                 Date.now()
             );
 
-
         return;
 
     }
@@ -2969,18 +2809,14 @@ function updateEconomyScreen() {
 
     economyExpiresAt = null;
 
-
     multiplierElement.textContent =
         "x1.0";
-
 
     statusElement.textContent =
         "Не активна";
 
-
     statusElement.className =
         "multiplier-none";
-
 
     timeElement.textContent =
         "Крути рулетку";
@@ -2997,7 +2833,6 @@ function startMultiplierTimer() {
     clearInterval(
         window.multiplierTimer
     );
-
 
     window.multiplierTimer =
         setInterval(
@@ -3024,18 +2859,15 @@ function formatTime(ms) {
 
     }
 
-
     const totalSeconds =
         Math.floor(
             ms / 1000
         );
 
-
     const hours =
         Math.floor(
             totalSeconds / 3600
         );
-
 
     const minutes =
         Math.floor(
@@ -3044,10 +2876,8 @@ function formatTime(ms) {
             ) / 60
         );
 
-
     const seconds =
         totalSeconds % 60;
-
 
     return (
         String(hours)
@@ -3064,11 +2894,7 @@ function formatTime(ms) {
 
 
 /* =================================
-   НАВИГАЦИЯ
-================================= */
-
-/* =================================
-   АДМИН ПАНЕЛЬ
+   АДМИН
 ================================= */
 
 const DEV_TELEGRAM_ID =
@@ -3103,17 +2929,10 @@ function showAdminButton() {
 
     if (!button) return;
 
-    if (isAdmin()) {
-
-        button.style.display =
-            "block";
-
-    } else {
-
-        button.style.display =
-            "none";
-
-    }
+    button.style.display =
+        isAdmin()
+            ? "block"
+            : "none";
 
 }
 
@@ -3238,6 +3057,10 @@ function closeAdminPanel() {
 }
 
 
+/* =================================
+   СБРОС АККАУНТА
+================================= */
+
 async function resetMyAccount() {
 
     if (!isAdmin()) {
@@ -3286,34 +3109,28 @@ async function resetMyAccount() {
             player =
                 data.player;
 
-
             balance =
                 Number(
                     player.balance || 0
                 );
-
 
             income =
                 Number(
                     player.income || 0
                 );
 
-
             economyMultiplier =
                 Number(
                     player.economy_multiplier || 1
                 );
 
-
             economyExpiresAt =
                 player.economy_expires_at ||
                 null;
 
-
             inventory = [];
 
             inventoryLoaded = true;
-
 
             updateScreen();
 
@@ -3333,7 +3150,6 @@ async function resetMyAccount() {
 
         console.error(error);
 
-
         showToast(
             "❌ " +
             error.message
@@ -3342,6 +3158,11 @@ async function resetMyAccount() {
     }
 
 }
+
+
+/* =================================
+   НАВИГАЦИЯ
+================================= */
 
 const navButtons =
     document.querySelectorAll(
@@ -3362,15 +3183,16 @@ navButtons.forEach(
             "click",
             function() {
 
+                const roulette =
+                    document.getElementById(
+                        "rouletteLock"
+                    );
+
                 if (
-                    document
-                        .getElementById(
-                            "rouletteLock"
-                        )
-                        .classList
-                        .contains(
-                            "show"
-                        )
+                    roulette &&
+                    roulette.classList.contains(
+                        "show"
+                    )
                 ) {
 
                     return;
@@ -3451,18 +3273,15 @@ function showShopTab(tab) {
             "giftShop"
         );
 
-
     const inventoryElement =
         document.getElementById(
             "giftInventory"
         );
 
-
     const shopTab =
         document.getElementById(
             "shopTab"
         );
-
 
     const inventoryTab =
         document.getElementById(
@@ -3470,22 +3289,17 @@ function showShopTab(tab) {
         );
 
 
-    if (
-        tab === "shop"
-    ) {
+    if (tab === "shop") {
 
         shop.style.display =
             "block";
 
-
         inventoryElement.style.display =
             "none";
-
 
         shopTab.classList.add(
             "active"
         );
-
 
         inventoryTab.classList.remove(
             "active"
@@ -3503,15 +3317,12 @@ function showShopTab(tab) {
         shop.style.display =
             "none";
 
-
         inventoryElement.style.display =
             "block";
-
 
         shopTab.classList.remove(
             "active"
         );
-
 
         inventoryTab.classList.add(
             "active"
@@ -3601,8 +3412,7 @@ async function loadGiftShop(
                 : [];
 
 
-        shopLoaded =
-            true;
+        shopLoaded = true;
 
 
         renderGiftShop();
@@ -3724,7 +3534,7 @@ function getGiftAnimationClass(
 
 
 /* =================================
-   МАГАЗИН
+   РЕНДЕР МАГАЗИНА
 ================================= */
 
 function renderGiftShop() {
@@ -3733,6 +3543,9 @@ function renderGiftShop() {
         document.getElementById(
             "shopGrid"
         );
+
+
+    if (!grid) return;
 
 
     if (!giftShop.length) {
@@ -3779,8 +3592,7 @@ function renderGiftShop() {
                     const quantity =
                         owned
                             ? Number(
-                                owned.quantity ||
-                                0
+                                owned.quantity || 0
                             )
                             : 0;
 
@@ -3800,7 +3612,6 @@ function renderGiftShop() {
                         <div
                             class="gift-card">
 
-
                             ${
                                 quantity > 0
                                     ? `
@@ -3814,7 +3625,6 @@ function renderGiftShop() {
                                     : ""
                             }
 
-
                             <div
                                 class="gift-visual ${animationClass}">
 
@@ -3825,14 +3635,12 @@ function renderGiftShop() {
 
                                 </span>
 
-
                                 <span
                                     class="gift-spark gift-spark-2">
 
                                     ✧
 
                                 </span>
-
 
                                 <span
                                     class="gift-spark gift-spark-3">
@@ -3841,14 +3649,12 @@ function renderGiftShop() {
 
                                 </span>
 
-
                                 <span
                                     class="gift-spark gift-spark-4">
 
                                     ✦
 
                                 </span>
-
 
                                 <div
                                     class="gift-emoji">
@@ -3861,7 +3667,6 @@ function renderGiftShop() {
 
                             </div>
 
-
                             <div
                                 class="gift-name">
 
@@ -3870,7 +3675,6 @@ function renderGiftShop() {
                                 )}
 
                             </div>
-
 
                             <div
                                 class="gift-income">
@@ -3884,7 +3688,6 @@ function renderGiftShop() {
 
                             </div>
 
-
                             <div
                                 class="gift-price">
 
@@ -3893,7 +3696,6 @@ function renderGiftShop() {
                                 )} ⭐
 
                             </div>
-
 
                             <button
                                 class="gift-buy"
@@ -3919,7 +3721,6 @@ function renderGiftShop() {
                                 }
 
                             </button>
-
 
                         </div>
 
@@ -4263,18 +4064,15 @@ async function confirmBuyGift() {
             player =
                 data.player;
 
-
             balance =
                 Number(
                     player.balance
                 );
 
-
             income =
                 Number(
                     player.income
                 );
-
 
             updateScreen();
 
@@ -4292,7 +4090,6 @@ async function confirmBuyGift() {
 
         renderGiftShop();
 
-
         closeBuyModal();
 
 
@@ -4307,7 +4104,6 @@ async function confirmBuyGift() {
     } catch (error) {
 
         console.error(error);
-
 
         showToast(
             "❌ " +
@@ -4430,7 +4226,7 @@ async function loadInventory(
 
 
 /* =================================
-   ИНВЕНТАРЬ
+   РЕНДЕР ИНВЕНТАРЯ
 ================================= */
 
 function renderInventory() {
@@ -4439,6 +4235,9 @@ function renderInventory() {
         document.getElementById(
             "inventoryList"
         );
+
+
+    if (!list) return;
 
 
     if (!inventory.length) {
@@ -4493,10 +4292,8 @@ function renderInventory() {
                         <div
                             class="inventory-card">
 
-
                             <div
                                 class="inventory-top">
-
 
                                 <div
                                     class="
@@ -4511,10 +4308,8 @@ function renderInventory() {
 
                                 </div>
 
-
                                 <div
                                     class="inventory-info">
-
 
                                     <div
                                         class="inventory-name">
@@ -4525,7 +4320,6 @@ function renderInventory() {
                                         )}
 
                                     </div>
-
 
                                     <div
                                         class="inventory-count">
@@ -4540,7 +4334,6 @@ function renderInventory() {
                                         / 5
 
                                     </div>
-
 
                                     <div
                                         class="inventory-income">
@@ -4559,9 +4352,7 @@ function renderInventory() {
 
                                     </div>
 
-
                                 </div>
-
 
                             </div>
 
@@ -4586,7 +4377,6 @@ function renderInventory() {
                                                                 purchase.purchased_at
                                                             );
 
-
                                                         const canSellAt =
                                                             purchasedAt.getTime() +
                                                             5 *
@@ -4594,11 +4384,9 @@ function renderInventory() {
                                                             60 *
                                                             1000;
 
-
                                                         const ready =
                                                             Date.now() >=
                                                             canSellAt;
-
 
                                                         return `
 
@@ -4607,15 +4395,11 @@ function renderInventory() {
                                                                     purchase-row
                                                                 ">
 
-
                                                                 <div>
 
                                                                     <div>
-
                                                                         🎁 Покупка
-
                                                                     </div>
-
 
                                                                     <div
                                                                         class="
@@ -4630,7 +4414,6 @@ function renderInventory() {
 
                                                                     </div>
 
-
                                                                     ${
                                                                         ready
                                                                             ? `
@@ -4643,7 +4426,7 @@ function renderInventory() {
                                                                                     Можно продать
 
                                                                                 </div>
-                                                                              `
+                                                                            `
                                                                             : `
                                                                                 <div
                                                                                     style="
@@ -4658,11 +4441,10 @@ function renderInventory() {
                                                                                     )}
 
                                                                                 </div>
-                                                                              `
+                                                                            `
                                                                     }
 
                                                                 </div>
-
 
                                                                 <button
                                                                     class="
@@ -4696,7 +4478,6 @@ function renderInventory() {
 
                                                                 </button>
 
-
                                                             </div>
 
                                                         `;
@@ -4710,7 +4491,6 @@ function renderInventory() {
                                       `
                                     : ""
                             }
-
 
                         </div>
 
@@ -4769,18 +4549,15 @@ async function sellGift(
             player =
                 data.player;
 
-
             balance =
                 Number(
                     player.balance
                 );
 
-
             income =
                 Number(
                     player.income
                 );
-
 
             updateScreen();
 
@@ -4798,14 +4575,12 @@ async function sellGift(
 
         await loadInventory();
 
-
         renderGiftShop();
 
 
     } catch (error) {
 
         console.error(error);
-
 
         showToast(
             "❌ " +
@@ -4869,7 +4644,7 @@ function formatRemaining(ms) {
 
 
 /* =================================
-   ОПТИМИЗАЦИЯ АНИМАЦИЙ
+   ОПТИМИЗАЦИЯ
 ================================= */
 
 function setupGiftAnimationObserver() {
@@ -5019,10 +4794,8 @@ function openRoulette() {
     spinButton.disabled =
         false;
 
-
     spinButton.style.display =
         "block";
-
 
     spinButton.textContent =
         "🎰 Крутить";
@@ -5048,7 +4821,7 @@ function openRoulette() {
 
 
 /* =================================
-   РУЛЕТКА
+   ПОСТРОЕНИЕ РУЛЕТКИ
 ================================= */
 
 function buildRoulette() {
@@ -5364,7 +5137,7 @@ function animateRoulette(
 
 
 /* =================================
-   РУЛЕТКА РЕЗУЛЬТАТ
+   РЕЗУЛЬТАТ РУЛЕТКИ
 ================================= */
 
 function finishRoulette() {
@@ -5824,10 +5597,6 @@ function escapeHtml(text) {
 ================================= */
 
 loadPlayer();
-      
-      updateScreen();
-      
-      showAdminButton();
 
 </script>
 
