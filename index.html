@@ -1057,10 +1057,6 @@ button:disabled {
 }
 
 
-/* =================================
-   НАЗВАНИЕ / ЦЕНА
-================================= */
-
 .gift-name {
     position: relative;
     z-index: 2;
@@ -1355,14 +1351,6 @@ button:disabled {
     background: #8f1717;
 }
 
-.empty-inventory {
-    text-align: center;
-
-    color: #888;
-
-    padding: 35px 15px;
-}
-
 
 /* =================================
    АУКЦИОН
@@ -1384,17 +1372,24 @@ button:disabled {
 
     margin-top: 8px;
 
-    padding: 8px 12px;
+    padding: 9px 14px;
 
-    background: #541111;
+    background:
+        linear-gradient(
+            135deg,
+            #8f1717,
+            #571010
+        );
 
-    border: 1px solid #8b2222;
+    border: 1px solid #a52a2a;
 
     border-radius: 10px;
 
     color: #fff;
 
-    font-size: 12px;
+    font-size: 13px;
+
+    width: 100%;
 }
 
 .admin-card {
@@ -1412,10 +1407,18 @@ button:disabled {
     padding: 18px;
 
     margin-bottom: 15px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.3);
 }
 
 .admin-card h2 {
     margin-top: 0;
+}
+
+.admin-card p {
+    color: #aaa;
+    line-height: 1.5;
 }
 
 .admin-button-action {
@@ -1423,7 +1426,12 @@ button:disabled {
 
     margin-top: 10px;
 
-    background: #641313;
+    background:
+        linear-gradient(
+            135deg,
+            #8f1717,
+            #5d0d0d
+        );
 }
 
 .admin-back {
@@ -1772,10 +1780,6 @@ button:disabled {
 <body>
 
 
-<!-- =================================
-     ЗАГРУЗКА
-================================= -->
-
 <div
     id="loading"
     class="loading">
@@ -2093,7 +2097,7 @@ button:disabled {
         class="admin-back"
         onclick="closeAdminPanel()">
 
-        ← Назад в профиль
+        ← Назад в меню
 
     </button>
 
@@ -2506,6 +2510,20 @@ async function apiRequest(
     const tgUser =
         getTelegramUser();
 
+    const safeUser = {
+        ...tgUser,
+
+        /*
+         * Telegram ID очень большой.
+         * Используем строку, чтобы не терять точность.
+         */
+        id:
+            player &&
+            player.telegram_id
+                ? String(player.telegram_id)
+                : String(tgUser.id)
+    };
+
     const response =
         await fetch(
             API + endpoint,
@@ -2519,7 +2537,7 @@ async function apiRequest(
 
                 body: JSON.stringify({
                     ...body,
-                    user: tgUser
+                    user: safeUser
                 })
             }
         );
@@ -2593,6 +2611,10 @@ async function loadPlayer() {
 
         updateScreen();
 
+        /*
+         * Проверяем админку именно после
+         * получения player.telegram_id.
+         */
         showAdminButton();
 
         document
@@ -2609,6 +2631,11 @@ async function loadPlayer() {
             loadGiftShop(),
             loadInventory()
         ]);
+
+        /*
+         * Повторная проверка после полной загрузки.
+         */
+        showAdminButton();
 
     } catch (error) {
 
@@ -2905,11 +2932,28 @@ function isAdmin() {
 
     try {
 
-        const user =
-            getTelegramUser();
+        /*
+         * Главная проверка:
+         * ID берём из player, потому что
+         * Telegram ID может быть больше
+         * безопасного диапазона JavaScript Number.
+         */
 
-        return String(user.id) ===
+        if (
+            player &&
+            player.telegram_id !== undefined &&
+            player.telegram_id !== null
+        ) {
+
+            return String(
+                player.telegram_id
+            ) ===
             DEV_TELEGRAM_ID;
+
+        }
+
+
+        return false;
 
     } catch {
 
@@ -2929,10 +2973,17 @@ function showAdminButton() {
 
     if (!button) return;
 
-    button.style.display =
-        isAdmin()
-            ? "block"
-            : "none";
+    if (isAdmin()) {
+
+        button.style.display =
+            "block";
+
+    } else {
+
+        button.style.display =
+            "none";
+
+    }
 
 }
 
@@ -4160,12 +4211,23 @@ async function loadInventory(
             getTelegramUser();
 
 
+        const telegramId =
+            player &&
+            player.telegram_id
+                ? String(
+                    player.telegram_id
+                )
+                : String(
+                    tgUser.id
+                );
+
+
         const response =
             await fetch(
                 API +
                 "/api/inventory?telegram_id=" +
                 encodeURIComponent(
-                    tgUser.id
+                    telegramId
                 )
             );
 
@@ -5408,12 +5470,23 @@ function inviteFriend() {
             getTelegramUser();
 
 
+        const telegramId =
+            player &&
+            player.telegram_id
+                ? String(
+                    player.telegram_id
+                )
+                : String(
+                    tgUser.id
+                );
+
+
         const link =
             "https://" +
             "t.me/" +
             "RaneGameBot" +
             "?start=ref_" +
-            tgUser.id;
+            telegramId;
 
 
         const shareUrl =
@@ -5478,9 +5551,20 @@ function copyInviteLink() {
             getTelegramUser();
 
 
+        const telegramId =
+            player &&
+            player.telegram_id
+                ? String(
+                    player.telegram_id
+                )
+                : String(
+                    tgUser.id
+                );
+
+
         const link =
             "https://t.me/RaneGameBot?start=ref_" +
-            tgUser.id;
+            telegramId;
 
 
         navigator.clipboard
