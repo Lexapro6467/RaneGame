@@ -1488,6 +1488,65 @@ button:disabled {
    НИЖНЯЯ НАВИГАЦИЯ
 ================================= */
 
+/* =================================
+   АДМИН ПАНЕЛЬ
+================================= */
+
+.admin-button {
+    display: none;
+
+    margin-top: 8px;
+
+    padding: 8px 12px;
+
+    background: #541111;
+
+    border: 1px solid #8b2222;
+
+    border-radius: 10px;
+
+    color: #fff;
+
+    font-size: 12px;
+}
+
+.admin-card {
+    background:
+        linear-gradient(
+            145deg,
+            #2a0b0b,
+            #130505
+        );
+
+    border: 1px solid #651818;
+
+    border-radius: 20px;
+
+    padding: 18px;
+
+    margin-bottom: 15px;
+}
+
+.admin-card h2 {
+    margin-top: 0;
+}
+
+.admin-button-action {
+    width: 100%;
+
+    margin-top: 10px;
+
+    background: #641313;
+}
+
+.admin-back {
+    width: 100%;
+
+    margin-bottom: 14px;
+
+    background: #321010;
+}
+
 .nav {
     position: fixed;
 
@@ -1852,33 +1911,33 @@ button:disabled {
 
 <div class="top">
 
+   <div>
+
     <div
-        class="avatar"
-        id="avatar">
+        class="name"
+        id="username">
 
-        R
+        Игрок
+
+    </div>
+
+    <div
+        class="username"
+        id="tgusername">
+
+        @Telegram
 
     </div>
 
-    <div>
+    <button
+        id="adminButton"
+        class="admin-button"
+        type="button"
+        onclick="openAdminPanel()">
 
-        <div
-            class="name"
-            id="username">
+        ⚙️ Админ Панель
 
-            Игрок
-
-        </div>
-
-        <div
-            class="username"
-            id="tgusername">
-
-            @Telegram
-
-        </div>
-
-    </div>
+    </button>
 
 </div>
 
@@ -2171,6 +2230,48 @@ button:disabled {
 <!-- =================================
      АУКЦИОН
 ================================= -->
+
+<!-- =================================
+     АДМИН ПАНЕЛЬ
+================================= -->
+
+<section
+    id="admin"
+    class="page">
+
+    <button
+        type="button"
+        class="admin-back"
+        onclick="closeAdminPanel()">
+
+        ← Назад в профиль
+
+    </button>
+
+
+    <div class="admin-card">
+
+        <h2>
+            ⚙️ Админ Панель
+        </h2>
+
+        <p>
+            Панель доступна только владельцу.
+        </p>
+
+
+        <button
+            type="button"
+            class="admin-button-action"
+            onclick="resetMyAccount()">
+
+            🧹 Сбросить мой аккаунт
+
+        </button>
+
+    </div>
+
+</section>
 
 <section
     id="auction"
@@ -2965,6 +3066,282 @@ function formatTime(ms) {
 /* =================================
    НАВИГАЦИЯ
 ================================= */
+
+/* =================================
+   АДМИН ПАНЕЛЬ
+================================= */
+
+const DEV_TELEGRAM_ID =
+    "5370959021438146805";
+
+
+function isAdmin() {
+
+    try {
+
+        const user =
+            getTelegramUser();
+
+        return String(user.id) ===
+            DEV_TELEGRAM_ID;
+
+    } catch {
+
+        return false;
+
+    }
+
+}
+
+
+function showAdminButton() {
+
+    const button =
+        document.getElementById(
+            "adminButton"
+        );
+
+    if (!button) return;
+
+    if (isAdmin()) {
+
+        button.style.display =
+            "block";
+
+    } else {
+
+        button.style.display =
+            "none";
+
+    }
+
+}
+
+
+function openAdminPanel() {
+
+    if (!isAdmin()) {
+
+        showToast(
+            "❌ Доступ запрещён"
+        );
+
+        return;
+
+    }
+
+
+    pages.forEach(
+        function(page) {
+
+            page.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    const adminPage =
+        document.getElementById(
+            "admin"
+        );
+
+
+    if (adminPage) {
+
+        adminPage.classList.add(
+            "active"
+        );
+
+    }
+
+
+    navButtons.forEach(
+        function(button) {
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    window.scrollTo(
+        0,
+        0
+    );
+
+}
+
+
+function closeAdminPanel() {
+
+    pages.forEach(
+        function(page) {
+
+            page.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    const home =
+        document.getElementById(
+            "home"
+        );
+
+
+    if (home) {
+
+        home.classList.add(
+            "active"
+        );
+
+    }
+
+
+    navButtons.forEach(
+        function(button) {
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    const menuButton =
+        document.querySelector(
+            '.nav button[data-page="home"]'
+        );
+
+
+    if (menuButton) {
+
+        menuButton.classList.add(
+            "active"
+        );
+
+    }
+
+
+    window.scrollTo(
+        0,
+        0
+    );
+
+}
+
+
+async function resetMyAccount() {
+
+    if (!isAdmin()) {
+
+        showToast(
+            "❌ Доступ запрещён"
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            "⚠️ СБРОС АККАУНТА\n\n" +
+            "Удалятся все подарки и покупки.\n" +
+            "Баланс станет 0 ⭐.\n" +
+            "Доход станет 0 ⭐/час.\n\n" +
+            "Продолжить?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        showToast(
+            "⏳ Сбрасываем аккаунт..."
+        );
+
+
+        const data =
+            await apiRequest(
+                "/api/dev/reset-account"
+            );
+
+
+        if (data.player) {
+
+            player =
+                data.player;
+
+
+            balance =
+                Number(
+                    player.balance || 0
+                );
+
+
+            income =
+                Number(
+                    player.income || 0
+                );
+
+
+            economyMultiplier =
+                Number(
+                    player.economy_multiplier || 1
+                );
+
+
+            economyExpiresAt =
+                player.economy_expires_at ||
+                null;
+
+
+            inventory = [];
+
+            inventoryLoaded = true;
+
+
+            updateScreen();
+
+            renderInventory();
+
+            renderGiftShop();
+
+        }
+
+
+        showToast(
+            "✅ Аккаунт сброшен"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
 
 const navButtons =
     document.querySelectorAll(
@@ -5447,6 +5824,10 @@ function escapeHtml(text) {
 ================================= */
 
 loadPlayer();
+      
+      updateScreen();
+      
+      showAdminButton();
 
 </script>
 
