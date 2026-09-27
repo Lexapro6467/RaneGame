@@ -486,75 +486,83 @@ button:disabled {
 
     background:
         radial-gradient(
-            circle at 50% 35%,
+            circle at 50% 38%,
             rgba(255,255,255,.18),
-            rgba(255,80,80,.09) 38%,
-            rgba(255,30,30,.02) 68%,
-            transparent 75%
+            rgba(255,70,70,.14) 30%,
+            rgba(255,30,30,.04) 65%,
+            transparent 78%
         );
 
     box-shadow:
-        inset 0 1px 2px rgba(255,255,255,.12),
-        inset 0 -12px 25px rgba(0,0,0,.18),
-        0 12px 28px rgba(0,0,0,.35);
+        inset 0 1px 2px rgba(255,255,255,.15),
+        inset 0 -15px 25px rgba(0,0,0,.25),
+        0 12px 28px rgba(0,0,0,.35),
+        0 0 30px rgba(255,50,50,.12);
 
-    overflow: hidden;
+    overflow: visible;
+
+    isolation: isolate;
 }
-
-/* Свет вокруг подарка */
 
 .gift-visual::before {
     content: "";
 
     position: absolute;
 
-    width: 76px;
-    height: 76px;
+    width: 90px;
+    height: 90px;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
 
     border-radius: 50%;
 
     background:
         radial-gradient(
             circle,
-            rgba(255,90,90,.38),
-            transparent 70%
+            rgba(255,70,70,.48),
+            rgba(255,40,40,.18) 35%,
+            transparent 72%
         );
 
     filter: blur(12px);
 
-    animation: giftGlow 2.8s ease-in-out infinite;
+    animation:
+        giftAura 2.4s ease-in-out infinite;
 
-    pointer-events: none;
+    z-index: -1;
 }
-
-/* Двигающийся блик */
 
 .gift-visual::after {
     content: "";
 
     position: absolute;
 
-    top: -50%;
-    left: -80%;
+    top: -35%;
+    left: -100%;
 
     width: 42%;
-    height: 200%;
+    height: 170%;
 
     background:
         linear-gradient(
             90deg,
             transparent,
-            rgba(255,255,255,.32),
+            rgba(255,255,255,.55),
+            rgba(255,255,255,.12),
             transparent
         );
 
-    transform: rotate(20deg);
+    transform: rotate(22deg);
 
-    animation: giftShine 3.8s ease-in-out infinite;
+    animation:
+        giftLight 3.2s ease-in-out infinite;
+
+    z-index: 5;
 
     pointer-events: none;
-
-    z-index: 4;
 }
 
 .gift-emoji {
@@ -562,66 +570,160 @@ button:disabled {
 
     z-index: 3;
 
+    width: 100%;
+    height: 100%;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
-    width: 100%;
-    height: 100%;
-
     font-size: 66px;
     line-height: 1;
 
-    filter:
-        drop-shadow(0 8px 7px rgba(0,0,0,.45))
-        drop-shadow(0 0 10px rgba(255,70,70,.20));
+    user-select: none;
 
     transform-origin: center;
 
-    user-select: none;
+    filter:
+        drop-shadow(0 9px 7px rgba(0,0,0,.48))
+        drop-shadow(0 0 12px rgba(255,70,70,.25));
+
+    will-change: transform, filter;
 }
 
 /* =========================
-   ОБЩЕЕ СВЕЧЕНИЕ
+   ЧАСТИЦЫ
 ========================= */
 
-@keyframes giftGlow {
+.gift-spark {
+    position: absolute;
+
+    z-index: 4;
+
+    color: #fff;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    pointer-events: none;
+
+    text-shadow:
+        0 0 6px rgba(255,255,255,.9),
+        0 0 14px rgba(255,80,80,.8);
+
+    animation:
+        giftSpark 1.8s ease-in-out infinite;
+}
+
+.gift-spark-1 {
+    top: 13px;
+    left: 17px;
+
+    animation-delay: 0s;
+}
+
+.gift-spark-2 {
+    top: 27px;
+    right: 13px;
+
+    font-size: 9px;
+
+    animation-delay: .55s;
+}
+
+.gift-spark-3 {
+    bottom: 18px;
+    left: 14px;
+
+    font-size: 8px;
+
+    animation-delay: 1s;
+}
+
+.gift-spark-4 {
+    right: 20px;
+    bottom: 13px;
+
+    font-size: 10px;
+
+    animation-delay: 1.35s;
+}
+
+/* =========================
+   СВЕЧЕНИЕ
+========================= */
+
+@keyframes giftAura {
 
     0%, 100% {
-        opacity: .40;
-        transform: scale(.82);
+        opacity: .45;
+
+        transform:
+            translate(-50%, -50%)
+            scale(.82);
     }
 
     50% {
-        opacity: .95;
-        transform: scale(1.18);
+        opacity: 1;
+
+        transform:
+            translate(-50%, -50%)
+            scale(1.22);
     }
 
 }
 
-@keyframes giftShine {
+@keyframes giftLight {
 
     0% {
-        left: -80%;
+        left: -100%;
         opacity: 0;
     }
 
-    20% {
+    18% {
         opacity: 0;
     }
 
-    40% {
+    35% {
         opacity: .9;
     }
 
-    65% {
-        left: 140%;
+    58% {
+        left: 145%;
         opacity: 0;
     }
 
     100% {
-        left: 140%;
+        left: 145%;
         opacity: 0;
+    }
+
+}
+
+@keyframes giftSpark {
+
+    0%, 100% {
+        opacity: .15;
+
+        transform:
+            scale(.55)
+            rotate(0deg);
+    }
+
+    35% {
+        opacity: 1;
+
+        transform:
+            scale(1.15)
+            rotate(45deg);
+    }
+
+    65% {
+        opacity: .5;
+
+        transform:
+            scale(.8)
+            rotate(90deg);
     }
 
 }
@@ -631,21 +733,25 @@ button:disabled {
 ========================= */
 
 .gift-animation-heart .gift-emoji {
-    animation: giftHeart 1.55s ease-in-out infinite;
+
+    animation:
+        giftHeart 1.55s ease-in-out infinite;
 
     filter:
-        drop-shadow(0 8px 7px rgba(0,0,0,.45))
-        drop-shadow(0 0 17px rgba(255,50,100,.65));
+        drop-shadow(0 9px 7px rgba(0,0,0,.45))
+        drop-shadow(0 0 18px rgba(255,40,100,.75));
 }
 
 .gift-animation-heart {
+
     background:
         radial-gradient(
-            circle,
-            rgba(255,55,105,.22),
-            rgba(255,40,70,.04) 60%,
-            transparent 75%
+            circle at 50% 45%,
+            rgba(255,45,105,.30),
+            rgba(255,30,80,.07) 60%,
+            transparent 78%
         );
+
 }
 
 @keyframes giftHeart {
@@ -653,30 +759,30 @@ button:disabled {
     0%, 100% {
         transform:
             scale(1)
-            rotate(-2deg);
+            rotate(-3deg);
     }
 
     20% {
         transform:
-            scale(1.10)
-            rotate(2deg);
+            scale(1.11)
+            rotate(3deg);
     }
 
-    38% {
+    35% {
         transform:
             scale(.96)
-            rotate(-1deg);
+            rotate(-2deg);
     }
 
-    55% {
+    52% {
         transform:
-            scale(1.15)
-            rotate(2deg);
+            scale(1.17)
+            rotate(3deg);
     }
 
     72% {
         transform:
-            scale(1.02)
+            scale(1.03)
             rotate(-2deg);
     }
 
@@ -687,51 +793,55 @@ button:disabled {
 ========================= */
 
 .gift-animation-shine .gift-emoji {
-    animation: giftShineFloat 2.25s ease-in-out infinite;
+
+    animation:
+        giftDiamond 2.2s ease-in-out infinite;
 
     filter:
-        drop-shadow(0 8px 7px rgba(0,0,0,.45))
-        drop-shadow(0 0 16px rgba(255,210,70,.65));
+        drop-shadow(0 9px 7px rgba(0,0,0,.45))
+        drop-shadow(0 0 20px rgba(255,215,70,.85));
 }
 
 .gift-animation-shine {
+
     background:
         radial-gradient(
-            circle,
-            rgba(255,215,80,.20),
-            rgba(255,170,30,.04) 62%,
-            transparent 78%
+            circle at 50% 45%,
+            rgba(255,215,70,.28),
+            rgba(255,170,30,.06) 62%,
+            transparent 80%
         );
+
 }
 
-@keyframes giftShineFloat {
+@keyframes giftDiamond {
 
     0%, 100% {
         transform:
-            translateY(0)
-            rotate(-4deg)
+            translateY(2px)
+            rotate(-5deg)
             scale(1);
     }
 
     25% {
         transform:
-            translateY(-4px)
-            rotate(2deg)
-            scale(1.04);
+            translateY(-5px)
+            rotate(3deg)
+            scale(1.05);
     }
 
     50% {
         transform:
-            translateY(-9px)
-            rotate(5deg)
-            scale(1.11);
+            translateY(-10px)
+            rotate(6deg)
+            scale(1.12);
     }
 
     75% {
         transform:
-            translateY(-3px)
+            translateY(-4px)
             rotate(-2deg)
-            scale(1.04);
+            scale(1.05);
     }
 
 }
@@ -741,21 +851,25 @@ button:disabled {
 ========================= */
 
 .gift-animation-rocket .gift-emoji {
-    animation: giftRocket 1.8s ease-in-out infinite;
+
+    animation:
+        giftRocket 1.8s ease-in-out infinite;
 
     filter:
-        drop-shadow(0 8px 7px rgba(0,0,0,.45))
-        drop-shadow(0 0 17px rgba(70,170,255,.65));
+        drop-shadow(0 9px 7px rgba(0,0,0,.45))
+        drop-shadow(0 0 20px rgba(50,170,255,.85));
 }
 
 .gift-animation-rocket {
+
     background:
         radial-gradient(
-            circle,
-            rgba(50,150,255,.20),
-            rgba(30,100,255,.04) 62%,
-            transparent 78%
+            circle at 50% 45%,
+            rgba(50,160,255,.28),
+            rgba(30,100,255,.06) 62%,
+            transparent 80%
         );
+
 }
 
 @keyframes giftRocket {
@@ -763,22 +877,22 @@ button:disabled {
     0%, 100% {
         transform:
             translateY(5px)
-            rotate(-5deg)
+            rotate(-6deg)
             scale(1);
     }
 
-    20% {
+    25% {
         transform:
-            translateY(0)
+            translateY(-2px)
             rotate(-2deg)
-            scale(1.03);
+            scale(1.04);
     }
 
     50% {
         transform:
-            translateY(-13px)
+            translateY(-14px)
             rotate(5deg)
-            scale(1.09);
+            scale(1.1);
     }
 
     75% {
@@ -795,21 +909,25 @@ button:disabled {
 ========================= */
 
 .gift-animation-magic .gift-emoji {
-    animation: giftMagic 1.75s ease-in-out infinite;
+
+    animation:
+        giftMagic 1.7s ease-in-out infinite;
 
     filter:
-        drop-shadow(0 8px 7px rgba(0,0,0,.45))
-        drop-shadow(0 0 18px rgba(180,90,255,.70));
+        drop-shadow(0 9px 7px rgba(0,0,0,.45))
+        drop-shadow(0 0 21px rgba(180,80,255,.9));
 }
 
 .gift-animation-magic {
+
     background:
         radial-gradient(
-            circle,
-            rgba(170,80,255,.22),
-            rgba(100,50,255,.04) 62%,
-            transparent 78%
+            circle at 50% 45%,
+            rgba(175,80,255,.30),
+            rgba(100,40,255,.06) 62%,
+            transparent 80%
         );
+
 }
 
 @keyframes giftMagic {
@@ -822,20 +940,20 @@ button:disabled {
 
     25% {
         transform:
-            scale(1.06)
-            rotate(2deg);
+            scale(1.07)
+            rotate(3deg);
     }
 
     50% {
         transform:
-            scale(1.13)
-            rotate(4deg);
+            scale(1.14)
+            rotate(5deg);
     }
 
     75% {
         transform:
             scale(1.05)
-            rotate(-2deg);
+            rotate(-3deg);
     }
 
 }
@@ -845,7 +963,10 @@ button:disabled {
 ========================= */
 
 .gift-animation-bounce .gift-emoji {
-    animation: giftBounce 2.4s ease-in-out infinite;
+
+    animation:
+        giftBounce 2.3s ease-in-out infinite;
+
 }
 
 @keyframes giftBounce {
@@ -859,23 +980,23 @@ button:disabled {
 
     25% {
         transform:
-            translateY(-3px)
+            translateY(-4px)
             rotate(1deg)
-            scale(1.02);
+            scale(1.03);
     }
 
     50% {
         transform:
-            translateY(-8px)
+            translateY(-9px)
             rotate(2deg)
-            scale(1.055);
+            scale(1.07);
     }
 
     75% {
         transform:
-            translateY(-3px)
+            translateY(-4px)
             rotate(-1deg)
-            scale(1.02);
+            scale(1.03);
     }
 
 }
@@ -1052,6 +1173,26 @@ button:disabled {
         );
 
     animation: inventoryFloat 2.8s ease-in-out infinite;
+}
+
+.inventory-emoji.gift-animation-heart {
+    animation: giftHeart 1.55s ease-in-out infinite;
+}
+
+.inventory-emoji.gift-animation-shine {
+    animation: giftDiamond 2.2s ease-in-out infinite;
+}
+
+.inventory-emoji.gift-animation-rocket {
+    animation: giftRocket 1.8s ease-in-out infinite;
+}
+
+.inventory-emoji.gift-animation-magic {
+    animation: giftMagic 1.7s ease-in-out infinite;
+}
+
+.inventory-emoji.gift-animation-bounce {
+    animation: giftBounce 2.3s ease-in-out infinite;
 }
 
 @keyframes inventoryFloat {
@@ -2299,7 +2440,11 @@ function getGiftAnimationClass(gift) {
     if (
         [
             "💝",
-            "💗"
+            "💗",
+            "💖",
+            "💓",
+            "💞",
+            "💕"
         ].includes(emoji)
     ) {
 
@@ -2315,7 +2460,8 @@ function getGiftAnimationClass(gift) {
             "🌟",
             "✨",
             "🏆",
-            "🏅"
+            "🏅",
+            "💰"
         ].includes(emoji)
     ) {
 
@@ -2339,7 +2485,8 @@ function getGiftAnimationClass(gift) {
             "⚡",
             "🌈",
             "🎆",
-            "🌌"
+            "🌌",
+            "🪄"
         ].includes(emoji)
     ) {
 
@@ -2428,6 +2575,22 @@ function renderGiftShop() {
                             }
 
                             <div class="gift-visual ${animationClass}">
+
+                                <span class="gift-spark gift-spark-1">
+                                    ✦
+                                </span>
+
+                                <span class="gift-spark gift-spark-2">
+                                    ✧
+                                </span>
+
+                                <span class="gift-spark gift-spark-3">
+                                    ·
+                                </span>
+
+                                <span class="gift-spark gift-spark-4">
+                                    ✦
+                                </span>
 
                                 <div class="gift-emoji">
                                     ${escapeHtml(
@@ -2743,13 +2906,18 @@ function renderInventory() {
                             ? item.purchases
                             : [];
 
+                    const animationClass =
+                        getGiftAnimationClass(
+                            gift
+                        );
+
                     return `
 
                         <div class="inventory-card">
 
                             <div class="inventory-top">
 
-                                <div class="inventory-emoji">
+                                <div class="inventory-emoji ${animationClass}">
 
                                     ${escapeHtml(
                                         gift.emoji ||
