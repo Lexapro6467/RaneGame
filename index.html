@@ -631,12 +631,51 @@ button:disabled {
         Позови друга
     </button>
 
-    <button onclick="copyInviteLink()">
+    <button
+        onclick="copyInviteLink()"
+        style="
+            background: #555;
+            color: white;
+            margin-top: 8px;
+        "
+    >
         Копировать
     </button>
 
 </div>
 
+<script>
+
+function copyInviteLink() {
+
+    const telegramId =
+        player
+            ? player.telegram_id
+            : "";
+
+    const link =
+        "https://t.me/RaneGameBot?start=ref_" +
+        telegramId;
+
+    navigator.clipboard
+        .writeText(link)
+        .then(function() {
+
+            showToast(
+                "🔗 Ссылка скопирована"
+            );
+
+        })
+        .catch(function() {
+
+            showToast(
+                "❌ Не удалось скопировать"
+            );
+
+        });
+}
+
+</script>
 <!-- БОНУС -->
 
 <div class="card">
