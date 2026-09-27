@@ -47,8 +47,6 @@ button:disabled {
     opacity: .5;
 }
 
-/* ЗАГРУЗКА */
-
 .loading {
     min-height: 100vh;
     display: flex;
@@ -67,8 +65,6 @@ button:disabled {
     max-width: 400px;
 }
 
-/* ВЕРХ */
-
 .top {
     padding: 20px 18px;
     display: flex;
@@ -81,11 +77,9 @@ button:disabled {
     height: 52px;
     border-radius: 50%;
     background: #7b1111;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-size: 22px;
     font-weight: bold;
 }
@@ -101,8 +95,6 @@ button:disabled {
     margin-top: 4px;
 }
 
-/* СТРАНИЦЫ */
-
 .page {
     display: none;
     padding: 0 16px;
@@ -112,30 +104,20 @@ button:disabled {
     display: block;
 }
 
-/* БАЛАНС */
-
 .balance-card {
-    background:
-        linear-gradient(
-            135deg,
-            #7d1111,
-            #3b0808
-        );
+    background: linear-gradient(
+        135deg,
+        #7d1111,
+        #3b0808
+    );
 
     border-radius: 24px;
     padding: 28px 20px;
-
     text-align: center;
-
     margin-bottom: 15px;
 
     box-shadow:
         0 10px 30px rgba(0,0,0,.3);
-}
-
-.balance-title {
-    color: #ddd;
-    font-size: 14px;
 }
 
 .balance {
@@ -148,14 +130,10 @@ button:disabled {
     color: #72ff72;
 }
 
-/* КАРТОЧКИ */
-
 .card {
     background: #1c0b0b;
     border: 1px solid #351515;
-
     border-radius: 18px;
-
     padding: 18px;
     margin-bottom: 14px;
 }
@@ -170,24 +148,17 @@ button:disabled {
     line-height: 1.5;
 }
 
-/* =====================================================
-   РУЛЕТКА
-===================================================== */
-
 .economy-card {
-    background:
-        linear-gradient(
-            145deg,
-            #260909,
-            #140505
-        );
+    background: linear-gradient(
+        145deg,
+        #260909,
+        #140505
+    );
 
     border: 1px solid #4d1616;
     border-radius: 22px;
-
     padding: 20px;
     margin-bottom: 15px;
-
     overflow: hidden;
 }
 
@@ -206,10 +177,8 @@ button:disabled {
 .multiplier-active {
     background: #163516;
     color: #72ff72;
-
     padding: 7px 10px;
     border-radius: 10px;
-
     font-weight: bold;
     font-size: 13px;
 }
@@ -217,10 +186,8 @@ button:disabled {
 .multiplier-none {
     background: #321010;
     color: #ff7777;
-
     padding: 7px 10px;
     border-radius: 10px;
-
     font-weight: bold;
     font-size: 13px;
 }
@@ -229,7 +196,6 @@ button:disabled {
     text-align: center;
     font-size: 48px;
     font-weight: bold;
-
     margin: 12px 0 4px;
 }
 
@@ -237,25 +203,16 @@ button:disabled {
     text-align: center;
     color: #aaa;
     font-size: 14px;
-
     min-height: 20px;
 }
 
-/* РУЛЕТКА */
-
 .roulette-window {
     position: relative;
-
     height: 92px;
-
     margin: 18px 0;
-
     overflow: hidden;
-
     border-radius: 18px;
-
     background: #0d0404;
-
     border: 1px solid #421313;
 }
 
@@ -263,7 +220,6 @@ button:disabled {
     content: "";
 
     position: absolute;
-
     left: 50%;
     top: 0;
     bottom: 0;
@@ -282,14 +238,10 @@ button:disabled {
 
 .roulette-track {
     height: 100%;
-
     display: flex;
     align-items: center;
-
     gap: 10px;
-
     transform: translateX(0);
-
     will-change: transform;
 }
 
@@ -329,15 +281,13 @@ button:disabled {
 .claim-button {
     width: 100%;
 
-    background:
-        linear-gradient(
-            135deg,
-            #a91c1c,
-            #681010
-        );
+    background: linear-gradient(
+        135deg,
+        #a91c1c,
+        #681010
+    );
 
     font-size: 17px;
-
     padding: 15px;
 
     display: none;
@@ -349,17 +299,11 @@ button:disabled {
 
 .roulette-result {
     text-align: center;
-
     color: #ff8585;
-
     font-size: 14px;
-
     min-height: 20px;
-
     margin-bottom: 10px;
 }
-
-/* БЛОКИРОВКА РУЛЕТКИ */
 
 .roulette-lock {
     position: fixed;
@@ -405,21 +349,15 @@ button:disabled {
 
 .roulette-modal-text {
     text-align: center;
-
     color: #999;
-
     font-size: 14px;
-
     margin-bottom: 15px;
 }
-
-/* МАГАЗИН */
 
 .shop-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     gap: 12px;
 }
 
@@ -427,8 +365,6 @@ button:disabled {
     color: #ffd84d;
     margin-top: 6px;
 }
-
-/* НИЖНЕЕ МЕНЮ */
 
 .nav {
     position: fixed;
@@ -465,8 +401,6 @@ button:disabled {
     color: white;
 }
 
-/* УВЕДОМЛЕНИЕ */
-
 .toast {
     position: fixed;
 
@@ -494,24 +428,11 @@ button:disabled {
 
 <body>
 
-
-<!-- =========================
-     ЗАГРУЗКА
-========================= -->
-
 <div id="loading" class="loading">
     Загрузка RaneGame...
 </div>
 
-
-<!-- =========================
-     ИГРА
-========================= -->
-
 <div id="game" style="display:none;">
-
-
-<!-- ПРОФИЛЬ -->
 
 <div class="top">
 
@@ -534,19 +455,13 @@ button:disabled {
 </div>
 
 
-<!-- =========================
-     ГЛАВНАЯ
-========================= -->
-
 <section id="home" class="page active">
-
-<!-- БАЛАНС -->
 
 <div class="balance-card">
 
     <div class="balance">
-    ⭐ <span id="balance">0</span>
-</div>
+        ⭐ <span id="balance">0</span>
+    </div>
 
     <div>
         <span class="income">
@@ -557,16 +472,12 @@ button:disabled {
 </div>
 
 
-<!-- =========================
-     ЭКОНОМИКА
-========================= -->
-
 <div class="economy-card">
 
     <div class="economy-header">
 
         <div class="economy-title">
-           крутим 
+            крутим
         </div>
 
         <div
@@ -579,7 +490,6 @@ button:disabled {
 
     </div>
 
-
     <div
         class="current-multiplier"
         id="currentMultiplier">
@@ -588,7 +498,6 @@ button:disabled {
 
     </div>
 
-
     <div
         class="multiplier-time"
         id="multiplierTime">
@@ -596,7 +505,6 @@ button:disabled {
         Крути рулетку
 
     </div>
-
 
     <button
         id="openRouletteButton"
@@ -610,8 +518,6 @@ button:disabled {
 </div>
 
 
-<!-- ПРИГЛАСИТЬ -->
-
 <div class="card">
 
     <h3>
@@ -624,7 +530,9 @@ button:disabled {
         word-break: break-all;
         margin: 10px 0;
     ">
+
         https://t.me/RaneGameBot?start=ref_<span id="refId"></span>
+
     </div>
 
     <button onclick="inviteFriend()">
@@ -637,46 +545,14 @@ button:disabled {
             background: #555;
             color: white;
             margin-top: 8px;
-        "
-    >
+        ">
+
         Копировать
+
     </button>
 
 </div>
 
-<script>
-
-function copyInviteLink() {
-
-    const telegramId =
-        player
-            ? player.telegram_id
-            : "";
-
-    const link =
-        "https://t.me/RaneGameBot?start=ref_" +
-        telegramId;
-
-    navigator.clipboard
-        .writeText(link)
-        .then(function() {
-
-            showToast(
-                "🔗 Ссылка скопирована"
-            );
-
-        })
-        .catch(function() {
-
-            showToast(
-                "❌ Не удалось скопировать"
-            );
-
-        });
-}
-
-</script>
-<!-- БОНУС -->
 
 <div class="card">
 
@@ -685,7 +561,7 @@ function copyInviteLink() {
     </h3>
 
     <p>
-        Забери еженедеьную награду.
+        Забери еженедельную награду.
     </p>
 
     <button
@@ -698,13 +574,8 @@ function copyInviteLink() {
 
 </div>
 
-
 </section>
 
-
-<!-- =========================
-     АУКЦИОН
-========================= -->
 
 <section id="auction" class="page">
 
@@ -714,6 +585,8 @@ function copyInviteLink() {
         🔨 Аукцион
     </h2>
 
+    <p>
+        Здесь скоро появится аукцион.
     </p>
 
     <button
@@ -728,10 +601,6 @@ function copyInviteLink() {
 </section>
 
 
-<!-- =========================
-     МАГАЗИН
-========================= -->
-
 <section id="shop" class="page">
 
 <div class="card">
@@ -741,8 +610,7 @@ function copyInviteLink() {
     </h2>
 
     <p>
-        Покупай улучшения
-        за ⭐.
+        Покупай улучшения за ⭐.
     </p>
 
 </div>
@@ -822,10 +690,6 @@ function copyInviteLink() {
 </section>
 
 
-<!-- =========================
-     ТОП
-========================= -->
-
 <section id="top" class="page">
 
 <div class="card">
@@ -849,10 +713,6 @@ function copyInviteLink() {
 
 </section>
 
-
-<!-- =========================
-     НИЖНЕЕ МЕНЮ
-========================= -->
 
 <div class="nav">
 
@@ -898,10 +758,6 @@ function copyInviteLink() {
 </div>
 
 
-<!-- =====================================================
-     РУЛЕТКА — ПОЛНОЭКРАННОЕ ОКНО
-===================================================== -->
-
 <div
     id="rouletteLock"
     class="roulette-lock">
@@ -917,7 +773,6 @@ function copyInviteLink() {
         на 4 часа.
     </div>
 
-
     <div class="roulette-window">
 
         <div
@@ -928,7 +783,6 @@ function copyInviteLink() {
 
     </div>
 
-
     <div
         id="rouletteResult"
         class="roulette-result">
@@ -936,7 +790,6 @@ function copyInviteLink() {
         Выбери свой множитель
 
     </div>
-
 
     <button
         id="rouletteSpinButton"
@@ -946,7 +799,6 @@ function copyInviteLink() {
         🎰 Крутить
 
     </button>
-
 
     <button
         id="rouletteClaimButton"
@@ -962,22 +814,20 @@ function copyInviteLink() {
 </div>
 
 
-<!-- TOAST -->
-
 <div id="toast" class="toast"></div>
 
 
 <script>
 
+const API =
+    "https://ranegame.onrender.com";
 
-/* =====================================================
-   TELEGRAM
-===================================================== */
+
+/* TELEGRAM */
 
 const tg =
     window.Telegram &&
     window.Telegram.WebApp;
-
 
 if (tg) {
 
@@ -988,9 +838,7 @@ if (tg) {
 }
 
 
-/* =====================================================
-   ДАННЫЕ
-===================================================== */
+/* ДАННЫЕ */
 
 let player = null;
 
@@ -1002,9 +850,6 @@ let economyMultiplier = 1.0;
 
 let economyExpiresAt = null;
 
-
-/* Результат текущего вращения */
-
 let rouletteResult = null;
 
 let rouletteIssuedAt = null;
@@ -1014,9 +859,7 @@ let rouletteSignature = null;
 let rouletteSpinning = false;
 
 
-/* =====================================================
-   ЗАГРУЗКА ИГРОКА
-===================================================== */
+/* ЗАГРУЗКА ИГРОКА */
 
 async function loadPlayer() {
 
@@ -1030,10 +873,9 @@ async function loadPlayer() {
 
         }
 
-
         const response =
             await fetch(
-                "/api/player",
+                API + "/api/player",
                 {
                     method: "POST",
 
@@ -1069,21 +911,17 @@ async function loadPlayer() {
 
         player = data.player;
 
-
         balance =
             Number(player.balance);
 
-
         income =
             Number(player.income);
-
 
         economyMultiplier =
             Number(
                 player.economy_multiplier ||
                 1
             );
-
 
         economyExpiresAt =
             player.economy_expires_at ||
@@ -1139,9 +977,7 @@ async function loadPlayer() {
 }
 
 
-/* =====================================================
-   ЭКРАН
-===================================================== */
+/* ЭКРАН */
 
 function updateScreen() {
 
@@ -1173,19 +1009,14 @@ function updateScreen() {
     document
         .getElementById("tgusername")
         .textContent =
-
         player.username
-
-            ? "@" +
-              player.username
-
+            ? "@" + player.username
             : "Telegram";
 
 
     document
         .getElementById("avatar")
         .textContent =
-
         (
             player.first_name ||
             "R"
@@ -1194,14 +1025,18 @@ function updateScreen() {
         .toUpperCase();
 
 
+    document
+        .getElementById("refId")
+        .textContent =
+        player.telegram_id || "";
+
+
     updateEconomyScreen();
 
 }
 
 
-/* =====================================================
-   ЭКОНОМИКА НА ГЛАВНОЙ
-===================================================== */
+/* ЭКОНОМИКА */
 
 function updateEconomyScreen() {
 
@@ -1281,9 +1116,7 @@ function updateEconomyScreen() {
 }
 
 
-/* =====================================================
-   ТАЙМЕР
-===================================================== */
+/* ТАЙМЕР */
 
 function startMultiplierTimer() {
 
@@ -1305,9 +1138,7 @@ function startMultiplierTimer() {
 }
 
 
-/* =====================================================
-   ФОРМАТ ВРЕМЕНИ
-===================================================== */
+/* ВРЕМЯ */
 
 function formatTime(ms) {
 
@@ -1349,15 +1180,12 @@ function formatTime(ms) {
 }
 
 
-/* =====================================================
-   НАВИГАЦИЯ
-===================================================== */
+/* НАВИГАЦИЯ */
 
 const navButtons =
     document.querySelectorAll(
         ".nav button"
     );
-
 
 const pages =
     document.querySelectorAll(
@@ -1371,11 +1199,6 @@ navButtons.forEach(
         button.addEventListener(
             "click",
             function() {
-
-                /*
-                 * Если рулетка открыта —
-                 * меню заблокировано.
-                 */
 
                 if (
                     document
@@ -1451,9 +1274,7 @@ navButtons.forEach(
 );
 
 
-/* =====================================================
-   ОТКРЫТЬ РУЛЕТКУ
-===================================================== */
+/* ОТКРЫТЬ РУЛЕТКУ */
 
 function openRoulette() {
 
@@ -1534,9 +1355,7 @@ function openRoulette() {
 }
 
 
-/* =====================================================
-   СОЗДАТЬ РУЛЕТКУ
-===================================================== */
+/* СОЗДАТЬ РУЛЕТКУ */
 
 function buildRoulette() {
 
@@ -1548,11 +1367,6 @@ function buildRoulette() {
 
     track.innerHTML = "";
 
-
-    /*
-     * Делаем много значений,
-     * чтобы была длинная прокрутка.
-     */
 
     const values = [];
 
@@ -1613,9 +1427,7 @@ function buildRoulette() {
 }
 
 
-/* =====================================================
-   КРУТИТЬ РУЛЕТКУ
-===================================================== */
+/* КРУТИТЬ */
 
 async function spinRoulette() {
 
@@ -1664,14 +1476,9 @@ async function spinRoulette() {
 
     try {
 
-        /*
-         * Сервер выбирает настоящий
-         * результат.
-         */
-
         const response =
             await fetch(
-                "/api/roulette/spin",
+                API + "/api/roulette/spin",
                 {
                     method: "POST",
 
@@ -1721,11 +1528,6 @@ async function spinRoulette() {
             data.signature;
 
 
-        /*
-         * Запускаем красивую
-         * анимацию.
-         */
-
         animateRoulette(
             rouletteResult
         );
@@ -1762,13 +1564,9 @@ async function spinRoulette() {
 }
 
 
-/* =====================================================
-   АНИМАЦИЯ
-===================================================== */
+/* АНИМАЦИЯ */
 
-function animateRoulette(
-    result
-) {
+function animateRoulette(result) {
 
     const track =
         document.getElementById(
@@ -1782,23 +1580,12 @@ function animateRoulette(
         );
 
 
-    /*
-     * Последняя серия.
-     * Ставим результат примерно
-     * в середину видимой области.
-     */
-
     const resultIndex =
         120 +
         Math.floor(
             Math.random() * 8
         );
 
-
-    /*
-     * Находим ближайший элемент
-     * с нужным множителем.
-     */
 
     let targetIndex =
         resultIndex;
@@ -1898,9 +1685,7 @@ function animateRoulette(
 }
 
 
-/* =====================================================
-   КОНЕЦ ВРАЩЕНИЯ
-===================================================== */
+/* КОНЕЦ РУЛЕТКИ */
 
 function finishRoulette() {
 
@@ -1947,9 +1732,7 @@ function finishRoulette() {
 }
 
 
-/* =====================================================
-   ЗАБРАТЬ РЕЗУЛЬТАТ
-===================================================== */
+/* ЗАБРАТЬ РУЛЕТКУ */
 
 async function claimRoulette() {
 
@@ -1982,7 +1765,7 @@ async function claimRoulette() {
 
         const response =
             await fetch(
-                "/api/roulette/claim",
+                API + "/api/roulette/claim",
                 {
                     method: "POST",
 
@@ -2054,11 +1837,6 @@ async function claimRoulette() {
         updateScreen();
 
 
-        /*
-         * Закрываем рулетку только
-         * после успешного получения.
-         */
-
         document
             .getElementById(
                 "rouletteLock"
@@ -2108,9 +1886,7 @@ async function claimRoulette() {
 }
 
 
-/* =====================================================
-   ПОКУПКА
-===================================================== */
+/* ПОКУПКА */
 
 async function buy(price, name) {
 
@@ -2134,7 +1910,7 @@ async function buy(price, name) {
 
         const response =
             await fetch(
-                "/api/buy",
+                API + "/api/buy",
                 {
                     method: "POST",
 
@@ -2215,9 +1991,7 @@ async function buy(price, name) {
 }
 
 
-/* =====================================================
-   БОНУС
-===================================================== */
+/* БОНУС */
 
 async function collect() {
 
@@ -2250,7 +2024,7 @@ async function collect() {
 
         const response =
             await fetch(
-                "/api/collect",
+                API + "/api/collect",
                 {
                     method: "POST",
 
@@ -2347,16 +2121,14 @@ async function collect() {
 
 
         button.textContent =
-            "только через 7 дней"
+            "только через 7 дней";
 
     }
 
 }
 
 
-/* =====================================================
-   ПРИГЛАСИТЬ
-===================================================== */
+/* ПРИГЛАСИТЬ */
 
 function inviteFriend() {
 
@@ -2417,9 +2189,46 @@ function inviteFriend() {
 }
 
 
-/* =====================================================
-   TOAST
-===================================================== */
+/* КОПИРОВАТЬ ССЫЛКУ */
+
+function copyInviteLink() {
+
+    const telegramId =
+        player
+            ? player.telegram_id
+            : "";
+
+
+    const link =
+        "https://t.me/RaneGameBot?start=ref_" +
+        telegramId;
+
+
+    navigator.clipboard
+        .writeText(link)
+        .then(
+            function() {
+
+                showToast(
+                    "🔗 Ссылка скопирована"
+                );
+
+            }
+        )
+        .catch(
+            function() {
+
+                showToast(
+                    "❌ Не удалось скопировать"
+                );
+
+            }
+        );
+
+}
+
+
+/* TOAST */
 
 function showToast(text) {
 
@@ -2456,9 +2265,7 @@ function showToast(text) {
 }
 
 
-/* =====================================================
-   ESCAPE
-===================================================== */
+/* ESCAPE */
 
 function escapeHtml(text) {
 
@@ -2487,9 +2294,7 @@ function escapeHtml(text) {
 }
 
 
-/* =====================================================
-   ЗАПУСК
-===================================================== */
+/* ЗАПУСК */
 
 loadPlayer();
 
