@@ -45,24 +45,18 @@ body {
         sans-serif;
 
     min-height: 100vh;
-
     overflow-x: hidden;
 }
 
 button {
     border: 0;
     outline: none;
-
     border-radius: 14px;
-
     padding: 13px 18px;
-
     background: #8f1717;
     color: #fff;
-
     font-weight: bold;
     font-size: 15px;
-
     cursor: pointer;
 
     transition:
@@ -92,23 +86,16 @@ button:disabled {
     justify-content: center;
 
     text-align: center;
-
     color: #aaa;
-
     padding: 20px;
 }
 
 .error {
     background: #350b0b;
-
     border: 1px solid #761717;
-
     padding: 18px;
-
     border-radius: 16px;
-
     max-width: 400px;
-
     line-height: 1.5;
 }
 
@@ -478,9 +465,7 @@ button:disabled {
 
 .shop-tabs {
     display: flex;
-
     gap: 8px;
-
     margin-bottom: 14px;
 }
 
@@ -784,34 +769,27 @@ button:disabled {
 .gift-spark-1 {
     top: 9px;
     left: 12px;
-
     font-size: 17px;
 }
 
 .gift-spark-2 {
     top: 18px;
     right: 10px;
-
     font-size: 10px;
-
     animation-delay: .5s;
 }
 
 .gift-spark-3 {
     left: 9px;
     bottom: 17px;
-
     font-size: 9px;
-
     animation-delay: 1s;
 }
 
 .gift-spark-4 {
     right: 14px;
     bottom: 11px;
-
     font-size: 14px;
-
     animation-delay: 1.5s;
 }
 
@@ -826,9 +804,6 @@ button:disabled {
         2.4s
         ease-in-out
         infinite;
-
-    will-change:
-        transform;
 }
 
 .gift-animation-heart .gift-emoji {
@@ -837,9 +812,6 @@ button:disabled {
         1.5s
         ease-in-out
         infinite;
-
-    will-change:
-        transform;
 }
 
 .gift-animation-shine .gift-emoji {
@@ -848,9 +820,6 @@ button:disabled {
         2.2s
         ease-in-out
         infinite;
-
-    will-change:
-        transform;
 }
 
 .gift-animation-rocket .gift-emoji {
@@ -859,9 +828,6 @@ button:disabled {
         1.7s
         ease-in-out
         infinite;
-
-    will-change:
-        transform;
 }
 
 .gift-animation-magic .gift-emoji {
@@ -870,9 +836,6 @@ button:disabled {
         1.9s
         ease-in-out
         infinite;
-
-    will-change:
-        transform;
 }
 
 
@@ -1056,7 +1019,6 @@ button:disabled {
         paused !important;
 }
 
-
 .gift-name {
     position: relative;
     z-index: 2;
@@ -1170,9 +1132,7 @@ button:disabled {
 
 .inventory-list {
     display: flex;
-
     flex-direction: column;
-
     gap: 10px;
 }
 
@@ -1200,9 +1160,7 @@ button:disabled {
 
 .inventory-top {
     display: flex;
-
     align-items: center;
-
     gap: 12px;
 }
 
@@ -1309,9 +1267,7 @@ button:disabled {
     margin-top: 12px;
 
     display: flex;
-
     flex-direction: column;
-
     gap: 7px;
 }
 
@@ -1323,9 +1279,7 @@ button:disabled {
     padding: 9px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     gap: 8px;
@@ -1358,185 +1312,191 @@ button:disabled {
 
 .auction-placeholder {
     text-align: center;
-
     padding: 30px 10px;
 }
+
 
 /* =================================
    АДМИН
 ================================= */
 
-const DEV_TELEGRAM_ID =
-    "5370959021438146805";
+.admin-button {
+    display: block;
 
+    margin-top: 8px;
 
-function isAdmin() {
+    padding: 9px 14px;
 
-    try {
+    background:
+        linear-gradient(
+            135deg,
+            #8f1717,
+            #571010
+        );
 
-        const user =
-            getTelegramUser();
+    border: 1px solid #a52a2a;
 
-        return String(user.id) ===
-            DEV_TELEGRAM_ID;
+    border-radius: 10px;
 
-    } catch (error) {
+    color: #fff;
 
-        return false;
+    font-size: 13px;
 
-    }
+    width: 100%;
+}
 
+.admin-card {
+    background:
+        linear-gradient(
+            145deg,
+            #2a0b0b,
+            #130505
+        );
+
+    border: 1px solid #651818;
+
+    border-radius: 20px;
+
+    padding: 18px;
+
+    margin-bottom: 15px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.3);
+}
+
+.admin-card h2 {
+    margin-top: 0;
+}
+
+.admin-card p {
+    color: #aaa;
+    line-height: 1.5;
+}
+
+.admin-button-action {
+    width: 100%;
+
+    margin-top: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8f1717,
+            #5d0d0d
+        );
+}
+
+.admin-back {
+    width: 100%;
+
+    margin-bottom: 14px;
+
+    background: #321010;
 }
 
 
-function showAdminButton() {
+/* =================================
+   МОДАЛКА АДМИНА
+================================= */
 
-    const button =
-        document.getElementById(
-            "adminButton"
-        );
+.admin-login-modal {
+    position: fixed;
 
-    if (!button) {
-        return;
-    }
+    inset: 0;
 
-    try {
+    background:
+        rgba(5,1,1,.88);
 
-        const user =
-            getTelegramUser();
+    z-index: 3000;
 
-        if (
-            String(user.id) ===
-            DEV_TELEGRAM_ID
-        ) {
+    display: none;
 
-            button.style.display =
-                "block";
+    align-items: center;
+    justify-content: center;
 
-        } else {
-
-            button.style.display =
-                "none";
-
-        }
-
-    } catch (error) {
-
-        button.style.display =
-            "none";
-
-    }
-
+    padding: 20px;
 }
 
-
-function openAdminPanel() {
-
-    if (!isAdmin()) {
-
-        showToast(
-            "❌ Доступ запрещён"
-        );
-
-        return;
-
-    }
-
-    pages.forEach(
-        function(page) {
-
-            page.classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-    const adminPage =
-        document.getElementById(
-            "admin"
-        );
-
-    if (adminPage) {
-
-        adminPage.classList.add(
-            "active"
-        );
-
-    }
-
-    navButtons.forEach(
-        function(button) {
-
-            button.classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-    window.scrollTo(
-        0,
-        0
-    );
-
+.admin-login-modal.show {
+    display: flex;
 }
 
+.admin-login-box {
+    width: 100%;
 
-function closeAdminPanel() {
+    max-width: 360px;
 
-    pages.forEach(
-        function(page) {
-
-            page.classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-    const home =
-        document.getElementById(
-            "home"
+    background:
+        linear-gradient(
+            145deg,
+            #2a0b0b,
+            #130505
         );
 
-    if (home) {
+    border: 1px solid #651818;
 
-        home.classList.add(
-            "active"
-        );
+    border-radius: 22px;
 
-    }
+    padding: 22px;
 
-    navButtons.forEach(
-        function(button) {
-
-            button.classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-    const menuButton =
-        document.querySelector(
-            '.nav button[data-page="home"]'
-        );
-
-    if (menuButton) {
-
-        menuButton.classList.add(
-            "active"
-        );
-
-    }
-
-    window.scrollTo(
-        0,
-        0
-    );
-
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.7);
 }
+
+.admin-login-box h2 {
+    margin-top: 0;
+
+    text-align: center;
+}
+
+.admin-login-box p {
+    color: #999;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+.admin-password {
+    width: 100%;
+
+    padding: 14px;
+
+    margin: 12px 0;
+
+    background: #120606;
+
+    border: 1px solid #4d1616;
+
+    border-radius: 12px;
+
+    color: white;
+
+    font-size: 16px;
+
+    outline: none;
+}
+
+.admin-password:focus {
+    border-color: #a52a2a;
+}
+
+.admin-login-actions {
+    display: flex;
+
+    gap: 8px;
+}
+
+.admin-login-actions button {
+    flex: 1;
+}
+
+.admin-cancel {
+    background: #321010;
+}
+
 
 /* =================================
    НАВИГАЦИЯ
@@ -1806,7 +1766,7 @@ function closeAdminPanel() {
 
     display: none;
 
-    z-index: 2000;
+    z-index: 4000;
 
     white-space: nowrap;
 
@@ -1917,9 +1877,9 @@ function closeAdminPanel() {
             id="adminButton"
             class="admin-button"
             type="button"
-            onclick="openAdminPanel()">
+            onclick="openAdminLogin()">
 
-            ⚙️ Админ Панель
+            ⚙️ Админ
 
         </button>
 
@@ -2203,7 +2163,7 @@ function closeAdminPanel() {
         </h2>
 
         <p>
-            Панель доступна только владельцу.
+            Панель администратора.
         </p>
 
         <button
@@ -2337,6 +2297,57 @@ function closeAdminPanel() {
     </button>
 
 </div>
+
+</div>
+
+
+<!-- =================================
+     АДМИН — ПАРОЛЬ
+================================= -->
+
+<div
+    id="adminLoginModal"
+    class="admin-login-modal">
+
+    <div class="admin-login-box">
+
+        <h2>
+            ⚙️ Админ
+        </h2>
+
+        <p>
+            Введите пароль администратора
+        </p>
+
+        <input
+            id="adminPassword"
+            class="admin-password"
+            type="password"
+            placeholder="Пароль"
+            autocomplete="off">
+
+        <div class="admin-login-actions">
+
+            <button
+                type="button"
+                class="admin-cancel"
+                onclick="closeAdminLogin()">
+
+                Отмена
+
+            </button>
+
+            <button
+                type="button"
+                onclick="loginAdmin()">
+
+                🔓 Войти
+
+            </button>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -2608,10 +2619,6 @@ async function apiRequest(
     const safeUser = {
         ...tgUser,
 
-        /*
-         * Telegram ID очень большой.
-         * Используем строку, чтобы не терять точность.
-         */
         id:
             player &&
             player.telegram_id
@@ -2706,10 +2713,6 @@ async function loadPlayer() {
 
         updateScreen();
 
-        /*
-         * Проверяем админку именно после
-         * получения player.telegram_id.
-         */
         showAdminButton();
 
         document
@@ -2727,9 +2730,6 @@ async function loadPlayer() {
             loadInventory()
         ]);
 
-        /*
-         * Повторная проверка после полной загрузки.
-         */
         showAdminButton();
 
     } catch (error) {
@@ -2830,24 +2830,6 @@ function updateScreen() {
                 ? "@" +
                   player.username
                 : "Telegram";
-
-    }
-
-
-    const avatar =
-        document.getElementById(
-            "avatar"
-        );
-
-    if (avatar) {
-
-        avatar.textContent =
-            (
-                player.first_name ||
-                "R"
-            )
-            .charAt(0)
-            .toUpperCase();
 
     }
 
@@ -3022,33 +3004,31 @@ function formatTime(ms) {
 const DEV_TELEGRAM_ID =
     "5370959021438146805";
 
+const ADMIN_PASSWORD =
+    "LexaJordon1122";
+
+
+let adminLoggedIn = false;
+
 
 function isAdmin() {
 
     try {
 
-        /*
-         * Главная проверка:
-         * ID берём из player, потому что
-         * Telegram ID может быть больше
-         * безопасного диапазона JavaScript Number.
-         */
-
-        if (
-            player &&
-            player.telegram_id !== undefined &&
-            player.telegram_id !== null
-        ) {
-
-            return String(
-                player.telegram_id
-            ) ===
-            DEV_TELEGRAM_ID;
-
+        if (!player) {
+            return false;
         }
 
+        if (
+            player.telegram_id === undefined ||
+            player.telegram_id === null
+        ) {
+            return false;
+        }
 
-        return false;
+        return String(
+            player.telegram_id
+        ) === DEV_TELEGRAM_ID;
 
     } catch {
 
@@ -3059,6 +3039,10 @@ function isAdmin() {
 }
 
 
+/*
+ * Кнопка админа показывается владельцу.
+ */
+
 function showAdminButton() {
 
     const button =
@@ -3066,7 +3050,13 @@ function showAdminButton() {
             "adminButton"
         );
 
-    if (!button) return;
+    if (!button) {
+        return;
+    }
+
+    /*
+     * Только твой Telegram ID.
+     */
 
     if (isAdmin()) {
 
@@ -3083,6 +3073,155 @@ function showAdminButton() {
 }
 
 
+/*
+ * Открыть окно пароля.
+ */
+
+function openAdminLogin() {
+
+    if (!isAdmin()) {
+
+        showToast(
+            "❌ Доступ запрещён"
+        );
+
+        return;
+
+    }
+
+
+    const modal =
+        document.getElementById(
+            "adminLoginModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+
+    modal.classList.add(
+        "show"
+    );
+
+
+    const input =
+        document.getElementById(
+            "adminPassword"
+        );
+
+    if (input) {
+
+        input.value = "";
+
+        setTimeout(
+            function() {
+
+                input.focus();
+
+            },
+            100
+        );
+
+    }
+
+}
+
+
+/*
+ * Закрыть окно пароля.
+ */
+
+function closeAdminLogin() {
+
+    const modal =
+        document.getElementById(
+            "adminLoginModal"
+        );
+
+    if (modal) {
+
+        modal.classList.remove(
+            "show"
+        );
+
+    }
+
+}
+
+
+/*
+ * Проверка пароля.
+ */
+
+function loginAdmin() {
+
+    if (!isAdmin()) {
+
+        showToast(
+            "❌ Доступ запрещён"
+        );
+
+        closeAdminLogin();
+
+        return;
+
+    }
+
+
+    const input =
+        document.getElementById(
+            "adminPassword"
+        );
+
+
+    const password =
+        input
+            ? input.value
+            : "";
+
+
+    if (
+        password !==
+        ADMIN_PASSWORD
+    ) {
+
+        showToast(
+            "❌ Неверный пароль"
+        );
+
+        if (input) {
+
+            input.value = "";
+
+            input.focus();
+
+        }
+
+        return;
+
+    }
+
+
+    adminLoggedIn =
+        true;
+
+
+    closeAdminLogin();
+
+    openAdminPanel();
+
+    showToast(
+        "✅ Админ-панель открыта"
+    );
+
+}
+
+
+/*
+ * Открыть админ-панель.
+ */
+
 function openAdminPanel() {
 
     if (!isAdmin()) {
@@ -3090,6 +3229,15 @@ function openAdminPanel() {
         showToast(
             "❌ Доступ запрещён"
         );
+
+        return;
+
+    }
+
+
+    if (!adminLoggedIn) {
+
+        openAdminLogin();
 
         return;
 
@@ -3141,7 +3289,15 @@ function openAdminPanel() {
 }
 
 
+/*
+ * Назад из админки.
+ */
+
 function closeAdminPanel() {
+
+    adminLoggedIn =
+        false;
+
 
     pages.forEach(
         function(page) {
@@ -3203,6 +3359,65 @@ function closeAdminPanel() {
 }
 
 
+/*
+ * Enter в поле пароля.
+ */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            const modal =
+                document.getElementById(
+                    "adminLoginModal"
+                );
+
+
+            if (
+                modal &&
+                modal.classList.contains(
+                    "show"
+                )
+            ) {
+
+                loginAdmin();
+
+            }
+
+        }
+
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            const modal =
+                document.getElementById(
+                    "adminLoginModal"
+                );
+
+
+            if (
+                modal &&
+                modal.classList.contains(
+                    "show"
+                )
+            ) {
+
+                closeAdminLogin();
+
+            }
+
+        }
+
+    }
+);
+
+
 /* =================================
    СБРОС АККАУНТА
 ================================= */
@@ -3219,6 +3434,16 @@ async function resetMyAccount() {
 
     }
 
+
+    if (!adminLoggedIn) {
+
+        openAdminLogin();
+
+        return;
+
+    }
+
+
     const confirmed =
         confirm(
             "⚠️ СБРОС АККАУНТА\n\n" +
@@ -3232,9 +3457,11 @@ async function resetMyAccount() {
             "Продолжить?"
         );
 
+
     if (!confirmed) {
         return;
     }
+
 
     try {
 
@@ -3242,10 +3469,12 @@ async function resetMyAccount() {
             "⏳ Сбрасываем аккаунт..."
         );
 
+
         const data =
             await apiRequest(
                 "/api/dev/reset-account"
             );
+
 
         if (data.player) {
 
@@ -3273,9 +3502,11 @@ async function resetMyAccount() {
 
         }
 
+
         inventory = [];
 
         inventoryLoaded = true;
+
 
         updateScreen();
 
@@ -3283,9 +3514,11 @@ async function resetMyAccount() {
 
         renderGiftShop();
 
+
         showToast(
             "✅ Аккаунт полностью сброшен"
         );
+
 
     } catch (error) {
 
@@ -3331,6 +3564,7 @@ navButtons.forEach(
                     document.getElementById(
                         "rouletteLock"
                     );
+
 
                 if (
                     roulette &&
@@ -4019,9 +4253,7 @@ function changeBuyQuantity(
 ) {
 
     if (!selectedBuyGift) {
-
         return;
-
     }
 
 
@@ -4099,9 +4331,7 @@ function changeBuyQuantity(
 function updateBuyTotal() {
 
     if (!selectedBuyGift) {
-
         return;
-
     }
 
 
@@ -4146,9 +4376,7 @@ function closeBuyModal() {
 async function confirmBuyGift() {
 
     if (!selectedBuyGift) {
-
         return;
-
     }
 
 
