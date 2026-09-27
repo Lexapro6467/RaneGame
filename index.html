@@ -4,98 +4,883 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>RaneGame</title>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;background:#24090b;color:#f7eeee;font-family:Arial,sans-serif}
+
+html,body{
+    margin:0;
+    min-height:100%;
+    background:#24090b;
+    color:#f7eeee;
+    font-family:Arial,sans-serif;
+}
+
 body{min-height:100vh}
-.app{width:min(470px,100%);margin:auto;padding:14px 12px 80px}
-.top{display:flex;align-items:center;gap:10px;margin:4px 2px 18px}
-.avatar{width:38px;height:38px;border-radius:50%;background:#ef6b00;display:grid;place-items:center;font-size:20px}
-.user{font-weight:700}.user small{display:block;color:#a98e8e;font-weight:400;margin-top:2px}
-.points{text-align:center;margin:8px 0 18px}
-.points .big{font-size:52px;font-weight:800}
-.points .rate{color:#9f8585;margin-top:5px}
-.mult{display:inline-block;border:1px solid #9b5900;color:#ffad00;border-radius:18px;padding:7px 13px;font-weight:700;margin-top:16px;background:#32130e}
-.invite{margin:14px 0 22px;padding:15px 17px;border-radius:13px;background:#3b1719;border-left:5px solid #ffad00}
+
+.app{
+    width:min(470px,100%);
+    margin:auto;
+    padding:14px 12px 100px;
+}
+
+.top{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:4px 2px 18px;
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#ef6b00;
+    display:grid;
+    place-items:center;
+    font-size:21px;
+}
+
+.user{font-weight:700}
+.user small{
+    display:block;
+    color:#a98e8e;
+    font-weight:400;
+    margin-top:2px;
+}
+
+.page{
+    display:none;
+    animation:pageIn .22s ease;
+}
+
+.page.active{display:block}
+
+@keyframes pageIn{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+.points{
+    text-align:center;
+    margin:8px 0 18px;
+}
+
+.points .big{
+    font-size:48px;
+    font-weight:800;
+}
+
+.rate{
+    color:#9f8585;
+    margin-top:5px;
+}
+
+.mult{
+    display:inline-block;
+    border:1px solid #9b5900;
+    color:#ffad00;
+    border-radius:18px;
+    padding:8px 14px;
+    font-weight:700;
+    margin-top:16px;
+    background:#32130e;
+    cursor:pointer;
+}
+
+.invite{
+    margin:14px 0 22px;
+    padding:15px 17px;
+    border-radius:13px;
+    background:#3b1719;
+    border-left:5px solid #ffad00;
+}
+
 .invite b{color:#ffad00}
-.section{margin-top:20px}.head{display:flex;justify-content:space-between;align-items:center;margin:0 2px 10px;font-size:17px;font-weight:700}.head span{color:#ff6256;font-size:13px}
-.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.card{height:80px;border-radius:13px;background:linear-gradient(145deg,#4b7b3e,#253b26);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:12px;box-shadow:inset 0 0 0 1px #ffffff18}
-.card:nth-child(2){background:linear-gradient(145deg,#31477b,#24284f)}
-.card:nth-child(3){background:linear-gradient(145deg,#7b4a34,#3c241c)}
-.card:nth-child(4){background:linear-gradient(145deg,#9b691f,#49300d)}
-.card:nth-child(5){background:linear-gradient(145deg,#7a4b89,#302044)}
-.card .emoji{font-size:25px}.card b{font-size:11px;margin-top:5px}
-.boiler{margin-top:28px;background:#3a181a;border:1px solid #633335;border-radius:18px;padding:14px}
-.boiler h3{margin:0}.timer{float:right;color:#ffad00;font-weight:700}
-.boilnum{text-align:center;font-size:32px;font-weight:800;margin-top:8px}.sub{text-align:center;color:#9f8585;font-size:12px}
-.bar{height:9px;background:#543a3a;border-radius:8px;margin:12px 0;overflow:hidden}.bar i{display:block;width:64%;height:100%;background:#ff9e00}
-.nav{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);width:min(470px,calc(100% - 24px));background:#351517;border:1px solid #5b2a2b;border-radius:18px;padding:8px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 8px 30px #0008}
-.nav button{border:0;background:none;color:#9d8989;padding:8px 2px;border-radius:13px;font-weight:700}.nav button.active{background:#5a2020;color:#ff6d5e}
-.footer{text-align:center;color:#b29a9a;font-size:11px;margin-top:30px}
+
+.section{margin-top:20px}
+
+.head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:0 2px 10px;
+    font-size:17px;
+    font-weight:700;
+}
+
+.head span{
+    color:#ff6256;
+    font-size:13px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:6px;
+}
+
+.card{
+    min-height:84px;
+    border-radius:13px;
+    background:linear-gradient(145deg,#4b7b3e,#253b26);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-size:12px;
+    box-shadow:inset 0 0 0 1px #ffffff18;
+}
+
+.card:nth-child(2){
+    background:linear-gradient(145deg,#31477b,#24284f)
+}
+
+.card:nth-child(3){
+    background:linear-gradient(145deg,#7b4a34,#3c241c)
+}
+
+.card:nth-child(4){
+    background:linear-gradient(145deg,#9b691f,#49300d)
+}
+
+.card:nth-child(5){
+    background:linear-gradient(145deg,#7a4b89,#302044)
+}
+
+.card .emoji{font-size:25px}
+
+.card b{
+    font-size:11px;
+    margin-top:5px;
+}
+
+.card small{
+    color:#d9caca;
+    margin-top:2px;
+}
+
+.boiler{
+    margin-top:28px;
+    background:#3a181a;
+    border:1px solid #633335;
+    border-radius:18px;
+    padding:14px;
+}
+
+.timer{
+    float:right;
+    color:#ffad00;
+    font-weight:700;
+}
+
+.boilnum{
+    text-align:center;
+    font-size:32px;
+    font-weight:800;
+    margin-top:8px;
+}
+
+.sub{
+    text-align:center;
+    color:#9f8585;
+    font-size:12px;
+}
+
+.bar{
+    height:9px;
+    background:#543a3a;
+    border-radius:8px;
+    margin:12px 0;
+    overflow:hidden;
+}
+
+.bar i{
+    display:block;
+    width:64%;
+    height:100%;
+    background:#ff9e00;
+}
+
+.action{
+    width:100%;
+    border:0;
+    border-radius:13px;
+    padding:13px;
+    margin-top:10px;
+    background:#ff6d00;
+    color:white;
+    font-weight:800;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.action:active,
+.mult:active,
+.nav button:active{
+    transform:scale(.97);
+}
+
+.panel{
+    background:#351517;
+    border:1px solid #5b2a2b;
+    border-radius:18px;
+    padding:16px;
+    margin-top:14px;
+}
+
+.panel h2{
+    margin:0 0 6px;
+}
+
+.panel p{
+    color:#bdaaaa;
+    font-size:13px;
+}
+
+.auction{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:#421b1d;
+    border-radius:15px;
+    padding:12px;
+    margin-top:10px;
+}
+
+.auction .icon{
+    font-size:34px;
+}
+
+.auction-info{
+    flex:1;
+}
+
+.auction-info b{
+    display:block;
+}
+
+.price{
+    color:#ffad00;
+    font-weight:700;
+    margin-top:4px;
+}
+
+.rank{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#421b1d;
+    padding:13px;
+    border-radius:14px;
+    margin-top:8px;
+}
+
+.rank-number{
+    width:30px;
+    font-weight:800;
+    color:#ffad00;
+}
+
+.rank-name{
+    flex:1;
+}
+
+.rank-score{
+    font-weight:800;
+}
+
+.nav{
+    position:fixed;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(470px,calc(100% - 24px));
+    background:#351517;
+    border:1px solid #5b2a2b;
+    border-radius:18px;
+    padding:8px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    box-shadow:0 8px 30px #0008;
+    z-index:100;
+}
+
+.nav button{
+    border:0;
+    background:none;
+    color:#9d8989;
+    padding:8px 2px;
+    border-radius:13px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.nav button.active{
+    background:#5a2020;
+    color:#ff6d5e;
+}
+
+.footer{
+    text-align:center;
+    color:#b29a9a;
+    font-size:11px;
+    margin-top:30px;
+}
+
+.toast{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%) translateY(-20px);
+    background:#4b2022;
+    border:1px solid #7b3639;
+    padding:12px 18px;
+    border-radius:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+    z-index:999;
+    font-weight:700;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
 </style>
 </head>
+
 <body>
+
+<div class="toast" id="toast"></div>
+
 <div class="app">
-  <div class="top">
-    <div class="avatar">🎮</div>
-    <div class="user">RaneGame<small>@RaneGame</small></div>
-  </div>
 
-  <div class="points">
-    <div class="big">⭐ 3 918</div>
-    <div class="rate">+201 в час</div>
-    <div class="mult">×1.00 &nbsp; Крутить</div>
-  </div>
-
-  <div class="invite">🤝 &nbsp; <b>Позови 2 друзей</b><br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 из 2. Награда: 500 звёзд и доход ×1.15
-  </div>
-
-  <div class="section">
-    <div class="head">Инвентарь <span>154 шт.</span><span>Все ›</span></div>
-    <div class="cards">
-      <div class="card"><div class="emoji">🦌</div><b>№3</b><small>+6/ч</small></div>
-      <div class="card"><div class="emoji">🦐</div><b>Продаётся</b></div>
-      <div class="card"><div class="emoji">🦐</div><b>Продаётся</b></div>
-      <div class="card"><div class="emoji">🍵</div><b>Продаётся</b></div>
-      <div class="card"><div class="emoji">🫙</div><b>№453</b></div>
+    <div class="top">
+        <div class="avatar">🎮</div>
+        <div class="user">
+            <span id="username">RaneGame</span>
+            <small id="tgusername">@RaneGame</small>
+        </div>
     </div>
-  </div>
 
-  <div class="section">
-    <div class="head">Магазин <span>34 шт.</span><span>Все ›</span></div>
-    <div class="cards">
-      <div class="card"><div class="emoji">🐋</div><b>⭐15</b><small>+1/ч</small></div>
-      <div class="card"><div class="emoji">🦀</div><b>⭐15</b><small>+1/ч</small></div>
-      <div class="card"><div class="emoji">🦏</div><b>⭐15</b><small>+1/ч</small></div>
-      <div class="card"><div class="emoji">🐍</div><b>⭐15</b><small>+1/ч</small></div>
-      <div class="card"><div class="emoji">🔵</div><b>⭐15</b><small>+1/ч</small></div>
+
+    <!-- ДОМ -->
+    <div class="page active" id="home">
+
+        <div class="points">
+            <div class="big">⭐ <span id="balance">3918</span></div>
+            <div class="rate">+<span id="income">201</span> в час</div>
+
+            <div class="mult" id="spinBtn">
+                ×1.00 &nbsp; Крутить
+            </div>
+        </div>
+
+        <div class="invite">
+            🤝 &nbsp; <b>Позови 2 друзей</b><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 из 2.
+            Награда: 500 звёзд и доход ×1.15
+        </div>
+
+        <div class="section">
+
+            <div class="head">
+                <span style="color:#fff;font-size:17px">Инвентарь</span>
+                <span>154 шт.</span>
+            </div>
+
+            <div class="cards">
+
+                <div class="card">
+                    <div class="emoji">🦌</div>
+                    <b>№3</b>
+                    <small>+6/ч</small>
+                </div>
+
+                <div class="card">
+                    <div class="emoji">🦐</div>
+                    <b>Продаётся</b>
+                </div>
+
+                <div class="card">
+                    <div class="emoji">🦐</div>
+                    <b>Продаётся</b>
+                </div>
+
+                <div class="card">
+                    <div class="emoji">🍵</div>
+                    <b>Продаётся</b>
+                </div>
+
+                <div class="card">
+                    <div class="emoji">🫙</div>
+                    <b>№453</b>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="boiler">
+
+            <span class="timer" id="timer">6:24</span>
+
+            <h3>Котёл</h3>
+
+            <div class="boilnum">557</div>
+
+            <div class="sub">
+                забирает один: 446
+            </div>
+
+            <div class="bar">
+                <i id="progress"></i>
+            </div>
+
+            <div class="sub">
+                64.1% &nbsp;&nbsp;&nbsp; 357
+            </div>
+
+            <button class="action" onclick="collectBoiler()">
+                🔥 Забрать
+            </button>
+
+        </div>
+
     </div>
-  </div>
 
-  <div class="boiler">
-    <span class="timer">6:24</span><h3>Котёл</h3>
-    <div class="boilnum">557</div>
-    <div class="sub">забирает один: 446</div>
-    <div class="bar"><i></i></div>
-    <div class="sub">64.1% &nbsp;&nbsp;&nbsp; 357</div>
-  </div>
 
-  <div class="footer">@RaneGameBot</div>
+    <!-- АУКЦИОН -->
+    <div class="page" id="auction">
+
+        <div class="panel">
+
+            <h2>🎰 Аукцион</h2>
+
+            <p>
+                Здесь можно покупать редкие предметы
+                за звёзды.
+            </p>
+
+            <div class="auction">
+                <div class="icon">🐉</div>
+
+                <div class="auction-info">
+                    <b>Дракон</b>
+                    <div class="price">⭐ 500</div>
+                </div>
+
+                <button class="action"
+                        style="width:auto;margin:0"
+                        onclick="buyItem('Дракон',500)">
+                    Купить
+                </button>
+            </div>
+
+
+            <div class="auction">
+                <div class="icon">🦈</div>
+
+                <div class="auction-info">
+                    <b>Акула</b>
+                    <div class="price">⭐ 750</div>
+                </div>
+
+                <button class="action"
+                        style="width:auto;margin:0"
+                        onclick="buyItem('Акула',750)">
+                    Купить
+                </button>
+            </div>
+
+
+            <div class="auction">
+                <div class="icon">👑</div>
+
+                <div class="auction-info">
+                    <b>Корона</b>
+                    <div class="price">⭐ 1500</div>
+                </div>
+
+                <button class="action"
+                        style="width:auto;margin:0"
+                        onclick="buyItem('Корона',1500)">
+                    Купить
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ТОВАРЫ -->
+    <div class="page" id="shop">
+
+        <div class="panel">
+
+            <h2>🛒 Товары</h2>
+
+            <p>
+                Покупай предметы и увеличивай свой доход.
+            </p>
+
+            <div class="cards">
+
+                <div class="card">
+                    <div class="emoji">🐋</div>
+                    <b>⭐15</b>
+                    <small>+1/ч</small>
+                </div>
+
+                <div class="card">
+                    <div class="emoji">🦀</div>
+                    <b>⭐15</b>
+                    <small>+1/ч</small>
+                </div>
+
+                <div class="card">
+                    <div class="emoji">🦏</div>
+                    <b>⭐15</b>
+                    <small>+1/ч</small>
+                </div>
+
+                <div class="card">
+                    <div class="emoji">🐍</div>
+                    <b>⭐15</b>
+                    <small>+1/ч</small>
+                </div>
+
+                <div class="card">
+                    <div class="emoji">🔵</div>
+                    <b>⭐15</b>
+                    <small>+1/ч</small>
+                </div>
+
+            </div>
+
+            <button class="action" onclick="buyItem('Предмет',15)">
+                🛒 Купить предмет за ⭐15
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ТОП -->
+    <div class="page" id="top">
+
+        <div class="panel">
+
+            <h2>🏆 Топ игроков</h2>
+
+            <p>
+                Лучшие игроки RaneGame.
+            </p>
+
+            <div class="rank">
+                <div class="rank-number">1</div>
+                <div class="rank-name">🔥 Rane</div>
+                <div class="rank-score">⭐ 98231</div>
+            </div>
+
+            <div class="rank">
+                <div class="rank-number">2</div>
+                <div class="rank-name">🎮 Player</div>
+                <div class="rank-score">⭐ 72140</div>
+            </div>
+
+            <div class="rank">
+                <div class="rank-number">3</div>
+                <div class="rank-name">🐉 Dragon</div>
+                <div class="rank-score">⭐ 61420</div>
+            </div>
+
+            <div class="rank">
+                <div class="rank-number">4</div>
+                <div class="rank-name">⚡ Max</div>
+                <div class="rank-score">⭐ 50120</div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        @RaneGameBot
+    </div>
+
 </div>
+
+
+<!-- НИЖНЕЕ МЕНЮ -->
 
 <div class="nav">
-  <button class="active">⌂<br>Дом</button>
-  <button>🎰<br>Аукцион</button>
-  <button>🛒<br>Товары</button>
-  <button>▥<br>Топ</button>
+
+    <button class="active" data-page="home">
+        🏠<br>Дом
+    </button>
+
+    <button data-page="auction">
+        🎰<br>Аукцион
+    </button>
+
+    <button data-page="shop">
+        🛒<br>Товары
+    </button>
+
+    <button data-page="top">
+        🏆<br>Топ
+    </button>
+
 </div>
 
+
 <script>
+
 const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
+
+if(tg){
+    tg.ready();
+    tg.expand();
+
+    if(tg.initDataUnsafe?.user){
+
+        const user = tg.initDataUnsafe.user;
+
+        const name =
+            user.first_name ||
+            user.username ||
+            "Игрок";
+
+        document.getElementById("username").textContent = name;
+
+        document.getElementById("tgusername").textContent =
+            user.username ? "@" + user.username : "Telegram";
+    }
+}
+
+
+/* =========================
+   ДАННЫЕ ИГРОКА
+========================= */
+
+let balance =
+    Number(localStorage.getItem("rane_balance")) || 3918;
+
+let income =
+    Number(localStorage.getItem("rane_income")) || 201;
+
+
+function save(){
+
+    localStorage.setItem(
+        "rane_balance",
+        balance
+    );
+
+    localStorage.setItem(
+        "rane_income",
+        income
+    );
+}
+
+
+function update(){
+
+    document.getElementById("balance")
+        .textContent =
+        Math.floor(balance).toLocaleString("ru-RU");
+
+    document.getElementById("income")
+        .textContent = income;
+
+    save();
+}
+
+
+update();
+
+
+/* =========================
+   АВТОДОХОД
+========================= */
+
+setInterval(function(){
+
+    balance += income / 3600;
+
+    update();
+
+},1000);
+
+
+/* =========================
+   НАВИГАЦИЯ
+========================= */
+
+const buttons =
+    document.querySelectorAll(".nav button");
+
+const pages =
+    document.querySelectorAll(".page");
+
+
+buttons.forEach(button => {
+
+    button.addEventListener("click",function(){
+
+        const page =
+            this.dataset.page;
+
+        pages.forEach(p =>
+            p.classList.remove("active")
+        );
+
+        buttons.forEach(b =>
+            b.classList.remove("active")
+        );
+
+        document.getElementById(page)
+            .classList.add("active");
+
+        this.classList.add("active");
+
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+
+    });
+
+});
+
+
+/* =========================
+   УВЕДОМЛЕНИЕ
+========================= */
+
+function toast(text){
+
+    const el =
+        document.getElementById("toast");
+
+    el.textContent = text;
+
+    el.classList.add("show");
+
+    setTimeout(() => {
+
+        el.classList.remove("show");
+
+    },1800);
+}
+
+
+/* =========================
+   КРУТИТЬ
+========================= */
+
+document.getElementById("spinBtn")
+.addEventListener("click",function(){
+
+    const reward =
+        Math.floor(Math.random()*100)+10;
+
+    balance += reward;
+
+    update();
+
+    toast("🎉 Ты получил +" + reward + " ⭐");
+
+});
+
+
+/* =========================
+   ПОКУПКА
+========================= */
+
+function buyItem(name,price){
+
+    if(balance < price){
+
+        toast("❌ Не хватает ⭐");
+
+        return;
+    }
+
+    balance -= price;
+
+    income += 1;
+
+    update();
+
+    toast(
+        "✅ Куплено: " +
+        name +
+        " (+1/ч)"
+    );
+}
+
+
+/* =========================
+   КОТЁЛ
+========================= */
+
+function collectBoiler(){
+
+    const reward = 446;
+
+    balance += reward;
+
+    update();
+
+    toast(
+        "🔥 Забрано +" +
+        reward +
+        " ⭐"
+    );
+}
+
+
+/* =========================
+   ТАЙМЕР
+========================= */
+
+let seconds = 6*60+24;
+
+setInterval(function(){
+
+    seconds--;
+
+    if(seconds <= 0){
+
+        seconds = 6*60+24;
+
+    }
+
+    const min =
+        Math.floor(seconds/60);
+
+    const sec =
+        seconds%60;
+
+    document.getElementById("timer")
+        .textContent =
+        min + ":" +
+        String(sec).padStart(2,"0");
+
+},1000);
+
 </script>
+
 </body>
 </html>
