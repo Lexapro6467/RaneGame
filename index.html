@@ -1849,10 +1849,6 @@ button:disabled {
     style="display:none;">
 
 
-<!-- =================================
-     ПРОФИЛЬ
-================================= -->
-
 <div class="top">
 
     <div>
@@ -1877,7 +1873,8 @@ button:disabled {
             id="adminButton"
             class="admin-button"
             type="button"
-            onclick="openAdminLogin()">
+            onclick="openAdminLogin()"
+            style="display:none;">
 
             ⚙️ Админ
 
@@ -1887,10 +1884,6 @@ button:disabled {
 
 </div>
 
-
-<!-- =================================
-     МЕНЮ
-================================= -->
 
 <section
     id="home"
@@ -2139,10 +2132,6 @@ button:disabled {
 </section>
 
 
-<!-- =================================
-     АДМИН ПАНЕЛЬ
-================================= -->
-
 <section
     id="admin"
     class="page">
@@ -2179,10 +2168,6 @@ button:disabled {
 
 </section>
 
-
-<!-- =================================
-     АУКЦИОН
-================================= -->
 
 <section
     id="auction"
@@ -2228,10 +2213,6 @@ button:disabled {
 </section>
 
 
-<!-- =================================
-     ТОП
-================================= -->
-
 <section
     id="top"
     class="page">
@@ -2261,10 +2242,6 @@ button:disabled {
 
 </section>
 
-
-<!-- =================================
-     НАВИГАЦИЯ
-================================= -->
 
 <div class="nav">
 
@@ -2300,10 +2277,6 @@ button:disabled {
 
 </div>
 
-
-<!-- =================================
-     АДМИН — ПАРОЛЬ
-================================= -->
 
 <div
     id="adminLoginModal"
@@ -2351,10 +2324,6 @@ button:disabled {
 
 </div>
 
-
-<!-- =================================
-     РУЛЕТКА
-================================= -->
 
 <div
     id="rouletteLock"
@@ -2412,10 +2381,6 @@ button:disabled {
 
 </div>
 
-
-<!-- =================================
-     МОДАЛКА ПОКУПКИ
-================================= -->
 
 <div
     id="buyModal"
@@ -2511,10 +2476,6 @@ button:disabled {
 
 </div>
 
-
-<!-- =================================
-     TOAST
-================================= -->
 
 <div
     id="toast"
@@ -2616,14 +2577,16 @@ async function apiRequest(
     const tgUser =
         getTelegramUser();
 
+    /*
+     * ВАЖНО:
+     * ID берём напрямую из Telegram.
+     * player.telegram_id больше не может
+     * подменить настоящий Telegram ID.
+     */
+
     const safeUser = {
         ...tgUser,
-
-        id:
-            player &&
-            player.telegram_id
-                ? String(player.telegram_id)
-                : String(tgUser.id)
+        id: String(tgUser.id)
     };
 
     const response =
@@ -3001,8 +2964,17 @@ function formatTime(ms) {
    АДМИН
 ================================= */
 
+/*
+ * ТВОЙ TELEGRAM ID
+ */
+
 const DEV_TELEGRAM_ID =
-    "5370959021438146805";
+    "8791077915";
+
+
+/*
+ * Пароль админки
+ */
 
 const ADMIN_PASSWORD =
     "LexaJordon1122";
@@ -3011,23 +2983,22 @@ const ADMIN_PASSWORD =
 let adminLoggedIn = false;
 
 
+/*
+ * Проверка администратора.
+ *
+ * ID берём напрямую из Telegram,
+ * а не из player.
+ */
+
 function isAdmin() {
 
     try {
 
-        if (!player) {
-            return false;
-        }
-
-        if (
-            player.telegram_id === undefined ||
-            player.telegram_id === null
-        ) {
-            return false;
-        }
+        const tgUser =
+            getTelegramUser();
 
         return String(
-            player.telegram_id
+            tgUser.id
         ) === DEV_TELEGRAM_ID;
 
     } catch {
@@ -3040,7 +3011,7 @@ function isAdmin() {
 
 
 /*
- * Кнопка админа показывается владельцу.
+ * Показать кнопку администратора.
  */
 
 function showAdminButton() {
@@ -3053,10 +3024,6 @@ function showAdminButton() {
     if (!button) {
         return;
     }
-
-    /*
-     * Только твой Telegram ID.
-     */
 
     if (isAdmin()) {
 
@@ -3151,7 +3118,7 @@ function closeAdminLogin() {
 
 
 /*
- * Проверка пароля.
+ * Вход администратора.
  */
 
 function loginAdmin() {
@@ -3360,7 +3327,7 @@ function closeAdminPanel() {
 
 
 /*
- * Enter в поле пароля.
+ * Enter / Escape
  */
 
 document.addEventListener(
@@ -4533,14 +4500,9 @@ async function loadInventory(
 
 
         const telegramId =
-            player &&
-            player.telegram_id
-                ? String(
-                    player.telegram_id
-                )
-                : String(
-                    tgUser.id
-                );
+            String(
+                tgUser.id
+            );
 
 
         const response =
@@ -5792,14 +5754,9 @@ function inviteFriend() {
 
 
         const telegramId =
-            player &&
-            player.telegram_id
-                ? String(
-                    player.telegram_id
-                )
-                : String(
-                    tgUser.id
-                );
+            String(
+                tgUser.id
+            );
 
 
         const link =
@@ -5873,14 +5830,9 @@ function copyInviteLink() {
 
 
         const telegramId =
-            player &&
-            player.telegram_id
-                ? String(
-                    player.telegram_id
-                )
-                : String(
-                    tgUser.id
-                );
+            String(
+                tgUser.id
+            );
 
 
         const link =
