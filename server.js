@@ -1,61 +1,54 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 const crypto = require("crypto");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(__dirname));
+
+const PORT = process.env.PORT || 3000;
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const BOT_TOKEN = process.env.BOT_TOKEN;
 
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    console.error("❌ Нет SUPABASE_URL или SUPABASE_SERVICE_ROLE_KEY");
+    process.exit(1);
+}
 
-/* =====================================================
+if (!BOT_TOKEN) {
+    console.error("❌ Нет BOT_TOKEN");
+    process.exit(1);
+}
+
+const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY
+);
+
+/* =========================================================
    TELEGRAM WEB APP AUTH
-===================================================== */
+========================================================= */
 
-function validateTelegramInitData(initData) {
-
-    if (!initData) {
-        return {
-            ok: false,
-            error: "initData отсутствует"
-        };
-    }
-
-    if (!BOT_TOKEN) {
-        return {
-            ok: false,
-            error: "BOT_TOKEN отсутствует в Render"
-        };
+function validateTelegramWebApp(initData) {
+    if (!initData || typeof initData !== "string") {
+        return null;
     }
 
     const params = new URLSearchParams(initData);
+    const hash = params.get("hash");
 
-    const receivedHash = params.get("hash");
-    const authDate = params.get("auth_date");
-
-    if (!receivedHash) {
-        return {
-            ok: false,
-            error: "hash отсутствует"
-        };
+    if (!hash) {
+        return null;
     }
 
-    if (!authDate) {
-        return {
-            ok: false,
-            error: "auth_date отсутствует"
-        };
-    }
+    params.delete("hash");
 
     const dataCheckString = [...params.entries()]
-        .filter(([key]) => key !== "hash")
         .sort(([a], [b]) => a.localeCompare(b))
         .map(([key, value]) => `${key}=${value}`)
         .join("\n");
@@ -70,1358 +63,983 @@ function validateTelegramInitData(initData) {
         .update(dataCheckString)
         .digest("hex");
 
-    const receivedBuffer =
-        Buffer.from(receivedHash, "hex");
-
-    const calculatedBuffer =
-        Buffer.from(calculatedHash, "hex");
-
-    if (
-        receivedBuffer.length !==
-        calculatedBuffer.length
-    ) {
-        return {
-            ok: false,
-            error:
-                "HASH не совпал — проверь BOT_TOKEN в Render"
-        };
+    if (calculatedHash !== hash) {
+        return null;
     }
 
-    if (
-        !crypto.timingSafeEqual(
-            receivedBuffer,
-            calculatedBuffer
-        )
-    ) {
-        return {
-            ok: false,
-            error:
-                "HASH не совпал — проверь BOT_TOKEN в Render"
-        };
+    const authDate = Number(params.get("auth_date"));
+
+    if (!authDate) {
+        return null;
     }
 
-    const userData = params.get("user");
-
-    if (!userData) {
-        return {
-            ok: false,
-            error: "Данные пользователя отсутствуют"
-        };
+    // Данные старше 24 часов считаем недействительными
+    if (Math.floor(Date.now() / 1000) - authDate > 86400) {
+        return null;
     }
-
-    let user;
 
     try {
-        user = JSON.parse(userData);
+        return JSON.parse(params.get("user"));
     } catch {
-        return {
-            ok: false,
-            error:
-                "Не удалось прочитать данные Telegram"
-        };
+        return null;
     }
-
-    if (!user.id) {
-        return {
-            ok: false,
-            error:
-                "Telegram ID отсутствует"
-        };
-    }
-
-    return {
-        ok: true,
-        user
-    };
 }
 
-
-/* =====================================================
-   SUPABASE
-===================================================== */
+/* =========================================================
+   SUPABASE HELPERS
+========================================================= */
 
 async function getPlayer(telegramId) {
+    const { data, error } = await supabase
+        .from("players")
+        .select("*")
+        .eq("telegram_id", telegramId)
+        .maybeSingle();
 
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/players?telegram_id=eq.${telegramId}&select=*`,
-        {
-            headers: {
-                apikey: SUPABASE_KEY,
-                Authorization:
-                    `Bearer ${SUPABASE_KEY}`
-            }
-        }
-    );
-
-    if (!response.ok) {
-
-        console.error(
-            await response.text()
-        );
-
-        throw new Error(
-            "Ошибка получения игрока"
-        );
+    if (error) {
+        console.error("getPlayer:", error);
+        throw error;
     }
 
-    const players =
-        await response.json();
-
-    if (!players.length) {
-        return null;
-    }
-
-    return players[0];
+    return data;
 }
-
-
-/* =====================================================
-   СОЗДАНИЕ ИГРОКА
-===================================================== */
 
 async function createPlayer(user) {
+    const { data, error } = await supabase
+        .from("players")
+        .insert({
+            telegram_id: user.id,
+            username: user.username || null,
+            first_name: user.first_name || "",
+            balance: 3918,
+            income: 201
+        })
+        .select()
+        .single();
 
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/players`,
-        {
-            method: "POST",
-
-            headers: {
-                apikey: SUPABASE_KEY,
-
-                Authorization:
-                    `Bearer ${SUPABASE_KEY}`,
-
-                "Content-Type":
-                    "application/json",
-
-                Prefer:
-                    "return=representation"
-            },
-
-            body: JSON.stringify({
-                telegram_id: user.id,
-
-                username:
-                    user.username || null,
-
-                first_name:
-                    user.first_name || "Игрок"
-            })
+    if (error) {
+        // Если игрок уже существует — просто возвращаем его
+        if (error.code === "23505") {
+            return await getPlayer(user.id);
         }
-    );
 
-    if (!response.ok) {
-
-        console.error(
-            await response.text()
-        );
-
-        throw new Error(
-            "Ошибка создания игрока"
-        );
+        console.error("createPlayer:", error);
+        throw error;
     }
 
-    const players =
-        await response.json();
-
-    return players[0];
+    return data;
 }
 
-
-/* =====================================================
-   ОБНОВЛЕНИЕ ИГРОКА
-===================================================== */
-
-async function updatePlayer(
-    telegramId,
-    data
-) {
-
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/players?telegram_id=eq.${telegramId}`,
-        {
-            method: "PATCH",
-
-            headers: {
-                apikey: SUPABASE_KEY,
-
-                Authorization:
-                    `Bearer ${SUPABASE_KEY}`,
-
-                "Content-Type":
-                    "application/json",
-
-                Prefer:
-                    "return=representation"
-            },
-
-            body:
-                JSON.stringify(data)
-        }
-    );
-
-    if (!response.ok) {
-
-        console.error(
-            await response.text()
-        );
-
-        throw new Error(
-            "Ошибка обновления игрока"
-        );
-    }
-
-    const players =
-        await response.json();
-
-    return players[0];
-}
-
-
-/* =====================================================
-   РЕФЕРАЛЫ
-===================================================== */
-
-async function addBalance(
-    telegramId,
-    amount
-) {
-
-    const player =
-        await getPlayer(
-            telegramId
-        );
+async function getOrCreatePlayer(user) {
+    let player = await getPlayer(user.id);
 
     if (!player) {
-        return null;
+        player = await createPlayer(user);
     }
 
-    return await updatePlayer(
-        telegramId,
-        {
-            balance:
-                Number(player.balance) +
-                amount
-        }
-    );
+    return player;
 }
 
+async function updatePlayer(telegramId, updates) {
+    const { data, error } = await supabase
+        .from("players")
+        .update(updates)
+        .eq("telegram_id", telegramId)
+        .select()
+        .single();
 
-async function getReferral(
-    invitedTelegramId
-) {
+    if (error) {
+        console.error("updatePlayer:", error);
+        throw error;
+    }
 
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/referrals?invited_telegram_id=eq.${invitedTelegramId}&select=*`,
-        {
-            headers: {
-                apikey: SUPABASE_KEY,
-                Authorization:
-                    `Bearer ${SUPABASE_KEY}`
+    return data;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+app.get("/api/status", (req, res) => {
+    res.json({
+        ok: true,
+        server: "RaneGame",
+        time: new Date().toISOString()
+    });
+});
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+app.post("/api/player", async (req, res) => {
+    try {
+        const initData = req.body?.initData;
+
+        const user = validateTelegramWebApp(initData);
+
+        if (!user) {
+            return res.status(401).json({
+                ok: false,
+                error: "Неверные данные Telegram"
+            });
+        }
+
+        const player = await getOrCreatePlayer(user);
+
+        res.json({
+            ok: true,
+            player
+        });
+
+    } catch (error) {
+        console.error("/api/player:", error);
+
+        res.status(500).json({
+            ok: false,
+            error: "Ошибка сервера"
+        });
+    }
+});
+
+/* =========================================================
+   GET PLAYER
+========================================================= */
+
+app.post("/api/me", async (req, res) => {
+    try {
+        const user = validateTelegramWebApp(req.body?.initData);
+
+        if (!user) {
+            return res.status(401).json({
+                ok: false,
+                error: "Неверные данные Telegram"
+            });
+        }
+
+        const player = await getOrCreatePlayer(user);
+
+        res.json({
+            ok: true,
+            player
+        });
+
+    } catch (error) {
+        console.error("/api/me:", error);
+
+        res.status(500).json({
+            ok: false,
+            error: "Ошибка сервера"
+        });
+    }
+});
+
+/* =========================================================
+   WEEKLY BONUS +1000
+   РАЗ В 7 ДНЕЙ
+========================================================= */
+
+app.post("/api/collect", async (req, res) => {
+    try {
+        const user = validateTelegramWebApp(req.body?.initData);
+
+        if (!user) {
+            return res.status(401).json({
+                ok: false,
+                error: "Неверные данные Telegram"
+            });
+        }
+
+        const player = await getOrCreatePlayer(user);
+
+        const now = Date.now();
+        const WEEK = 7 * 24 * 60 * 60 * 1000;
+
+        if (player.bonus_claimed_at) {
+            const lastClaim =
+                new Date(player.bonus_claimed_at).getTime();
+
+            const difference = now - lastClaim;
+
+            if (difference < WEEK) {
+                const nextClaim =
+                    new Date(lastClaim + WEEK).toISOString();
+
+                return res.status(400).json({
+                    ok: false,
+                    error: "Бонус ещё недоступен",
+                    nextClaimAt: nextClaim,
+                    reward: 1000
+                });
             }
         }
+
+        const newBalance =
+            Number(player.balance || 0) + 1000;
+
+        const claimedAt =
+            new Date().toISOString();
+
+        const updated = await updatePlayer(user.id, {
+            balance: newBalance,
+            bonus_claimed_at: claimedAt
+        });
+
+        res.json({
+            ok: true,
+            player: updated,
+            reward: 1000,
+            nextClaimAt:
+                new Date(Date.now() + WEEK).toISOString()
+        });
+
+    } catch (error) {
+        console.error("/api/collect:", error);
+
+        res.status(500).json({
+            ok: false,
+            error: "Ошибка выдачи бонуса"
+        });
+    }
+});
+
+/* =========================================================
+   ROULETTE
+========================================================= */
+
+const ROULETTE_MULTIPLIERS = [
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.7,
+    1.0,
+    1.2,
+    1.5,
+    1.8,
+    2.0
+];
+
+function getRandomMultiplier() {
+    const index = Math.floor(
+        Math.random() * ROULETTE_MULTIPLIERS.length
     );
 
-    if (!response.ok) {
-
-        throw new Error(
-            "Ошибка проверки реферала"
-        );
-    }
-
-    const referrals =
-        await response.json();
-
-    return referrals.length
-        ? referrals[0]
-        : null;
+    return ROULETTE_MULTIPLIERS[index];
 }
 
+function signRouletteResult(data) {
+    return crypto
+        .createHmac("sha256", BOT_TOKEN)
+        .update(JSON.stringify(data))
+        .digest("hex");
+}
 
-async function getInviterReferralCount(
-    inviterTelegramId
-) {
+/* -------------------------
+   SPIN
+------------------------- */
 
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/referrals?inviter_telegram_id=eq.${inviterTelegramId}&select=id`,
-        {
-            headers: {
-                apikey: SUPABASE_KEY,
-                Authorization:
-                    `Bearer ${SUPABASE_KEY}`
-            }
+app.post("/api/roulette/spin", async (req, res) => {
+    try {
+        const user = validateTelegramWebApp(req.body?.initData);
+
+        if (!user) {
+            return res.status(401).json({
+                ok: false,
+                error: "Неверные данные Telegram"
+            });
         }
-    );
 
-    if (!response.ok) {
+        const player = await getOrCreatePlayer(user);
 
-        throw new Error(
-            "Ошибка подсчёта рефералов"
+        if (
+            player.economy_expires_at &&
+            new Date(player.economy_expires_at).getTime() >
+                Date.now()
+        ) {
+            return res.status(400).json({
+                ok: false,
+                error: "Множитель уже активен",
+                expiresAt: player.economy_expires_at
+            });
+        }
+
+        const multiplier = getRandomMultiplier();
+
+        const result = {
+            multiplier,
+            createdAt: Date.now()
+        };
+
+        const signature =
+            signRouletteResult(result);
+
+        res.json({
+            ok: true,
+            multiplier,
+            signature
+        });
+
+    } catch (error) {
+        console.error("/api/roulette/spin:", error);
+
+        res.status(500).json({
+            ok: false,
+            error: "Ошибка рулетки"
+        });
+    }
+});
+
+/* -------------------------
+   CLAIM ROULETTE
+------------------------- */
+
+app.post("/api/roulette/claim", async (req, res) => {
+    try {
+        const user = validateTelegramWebApp(req.body?.initData);
+
+        if (!user) {
+            return res.status(401).json({
+                ok: false,
+                error: "Неверные данные Telegram"
+            });
+        }
+
+        const {
+            multiplier,
+            signature
+        } = req.body;
+
+        const result = {
+            multiplier: Number(multiplier),
+            createdAt: Number(req.body?.createdAt)
+        };
+
+        const expectedSignature =
+            signRouletteResult(result);
+
+        /*
+         Если фронтенд не передаёт createdAt,
+         поддерживаем старый вариант подписи.
+        */
+        let validSignature = false;
+
+        if (req.body?.createdAt) {
+            validSignature =
+                signature === expectedSignature;
+        } else {
+            const simpleResult = {
+                multiplier: Number(multiplier)
+            };
+
+            const simpleSignature =
+                signRouletteResult(simpleResult);
+
+            validSignature =
+                signature === simpleSignature;
+        }
+
+        if (!validSignature) {
+            return res.status(400).json({
+                ok: false,
+                error: "Неверная подпись рулетки"
+            });
+        }
+
+        if (
+            !ROULETTE_MULTIPLIERS.includes(
+                Number(multiplier)
+            )
+        ) {
+            return res.status(400).json({
+                ok: false,
+                error: "Неверный множитель"
+            });
+        }
+
+        const player = await getOrCreatePlayer(user);
+
+        if (
+            player.economy_expires_at &&
+            new Date(player.economy_expires_at).getTime() >
+                Date.now()
+        ) {
+            return res.status(400).json({
+                ok: false,
+                error: "Множитель уже активен"
+            });
+        }
+
+        const expiresAt =
+            new Date(
+                Date.now() + 4 * 60 * 60 * 1000
+            ).toISOString();
+
+        const updated =
+            await updatePlayer(user.id, {
+                economy_multiplier: Number(multiplier),
+                economy_expires_at: expiresAt
+            });
+
+        res.json({
+            ok: true,
+            player: updated,
+            multiplier: Number(multiplier),
+            expiresAt
+        });
+
+    } catch (error) {
+        console.error("/api/roulette/claim:", error);
+
+        res.status(500).json({
+            ok: false,
+            error: "Ошибка активации множителя"
+        });
+    }
+});
+
+/* =========================================================
+   BUY
+========================================================= */
+
+app.post("/api/buy", async (req, res) => {
+    try {
+        const user = validateTelegramWebApp(req.body?.initData);
+
+        if (!user) {
+            return res.status(401).json({
+                ok: false,
+                error: "Неверные данные Telegram"
+            });
+        }
+
+        const player = await getOrCreatePlayer(user);
+
+        const price = Number(
+            req.body?.price ??
+            req.body?.cost ??
+            0
         );
+
+        const incomeAdd = Number(
+            req.body?.income ??
+            req.body?.incomeAdd ??
+            0
+        );
+
+        if (!Number.isFinite(price) || price <= 0) {
+            return res.status(400).json({
+                ok: false,
+                error: "Неверная цена"
+            });
+        }
+
+        if (!Number.isFinite(incomeAdd) || incomeAdd < 0) {
+            return res.status(400).json({
+                ok: false,
+                error: "Неверный доход"
+            });
+        }
+
+        const balance =
+            Number(player.balance || 0);
+
+        if (balance < price) {
+            return res.status(400).json({
+                ok: false,
+                error: "Недостаточно ⭐"
+            });
+        }
+
+        const updated =
+            await updatePlayer(user.id, {
+                balance: balance - price,
+                income:
+                    Number(player.income || 0) +
+                    incomeAdd
+            });
+
+        res.json({
+            ok: true,
+            player: updated
+        });
+
+    } catch (error) {
+        console.error("/api/buy:", error);
+
+        res.status(500).json({
+            ok: false,
+            error: "Ошибка покупки"
+        });
+    }
+});
+
+/* =========================================================
+   REFERRALS
+========================================================= */
+
+/*
+   Награды пригласившему:
+
+   1  -> 0
+   2  -> 500
+   3  -> 0
+   4  -> 1000
+   5  -> 0
+   6  -> 4000
+   7  -> 0
+   8  -> 7000
+   9  -> 0
+   10 -> 1000
+
+   После 10 -> 0
+
+   Новый игрок:
+   +100 ⭐
+*/
+
+const REFERRAL_REWARDS = {
+    1: 0,
+    2: 500,
+    3: 0,
+    4: 1000,
+    5: 0,
+    6: 4000,
+    7: 0,
+    8: 7000,
+    9: 0,
+    10: 1000
+};
+
+async function getReferralCount(inviterTelegramId) {
+    const { count, error } = await supabase
+        .from("referrals")
+        .select("id", {
+            count: "exact",
+            head: true
+        })
+        .eq(
+            "inviter_telegram_id",
+            inviterTelegramId
+        );
+
+    if (error) {
+        console.error(
+            "getReferralCount:",
+            error
+        );
+        throw error;
     }
 
-    const referrals =
-        await response.json();
-
-    return referrals.length;
+    return count || 0;
 }
-
 
 async function addReferral(
     inviterTelegramId,
     invitedTelegramId
 ) {
-
+    // Сам себя пригласить нельзя
     if (
         String(inviterTelegramId) ===
         String(invitedTelegramId)
     ) {
         return {
             ok: false,
-            error: "Нельзя пригласить себя"
+            reason: "self"
         };
     }
 
+    // Проверяем пригласившего
     const inviter =
-        await getPlayer(
-            inviterTelegramId
-        );
+        await getPlayer(inviterTelegramId);
 
-    const invited =
-        await getPlayer(
-            invitedTelegramId
-        );
-
-    if (!inviter || !invited) {
+    if (!inviter) {
         return {
             ok: false,
-            error: "Игрок не найден"
+            reason: "inviter_not_found"
         };
     }
 
-    const existing =
-        await getReferral(
-            invitedTelegramId
+    // Проверяем, не был ли этот игрок
+    // уже приглашён кем-то
+    const { data: existing, error: existingError } =
+        await supabase
+            .from("referrals")
+            .select("*")
+            .eq(
+                "invited_telegram_id",
+                invitedTelegramId
+            )
+            .maybeSingle();
+
+    if (existingError) {
+        console.error(
+            "check referral:",
+            existingError
         );
+
+        return {
+            ok: false,
+            reason: "database_error"
+        };
+    }
 
     if (existing) {
         return {
             ok: false,
-            error:
-                "Этот пользователь уже был приглашён"
+            reason: "already_referred"
         };
     }
 
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/referrals`,
-        {
-            method: "POST",
+    /*
+       Игрок должен существовать.
+       Если он пришёл через Telegram /start раньше,
+       чем открыл Mini App — создаём его здесь.
+    */
 
-            headers: {
-                apikey: SUPABASE_KEY,
+    let invited =
+        await getPlayer(invitedTelegramId);
 
-                Authorization:
-                    `Bearer ${SUPABASE_KEY}`,
+    if (!invited) {
+        return {
+            ok: false,
+            reason: "invited_player_not_found"
+        };
+    }
 
-                "Content-Type":
-                    "application/json",
+    // Считаем номер приглашения
+    const referralNumber =
+        (await getReferralCount(
+            inviterTelegramId
+        )) + 1;
 
-                Prefer:
-                    "return=representation"
-            },
+    // После 10-го больше ничего не выдаём,
+    // но сам реферал всё равно записывается.
+    const reward =
+        REFERRAL_REWARDS[referralNumber] || 0;
 
-            body: JSON.stringify({
+    // Записываем реферала
+    const { data: referral, error: insertError } =
+        await supabase
+            .from("referrals")
+            .insert({
                 inviter_telegram_id:
                     inviterTelegramId,
 
                 invited_telegram_id:
-                    invitedTelegramId
-            })
-        }
-    );
+                    invitedTelegramId,
 
-    if (!response.ok) {
+                reward_paid: true
+            })
+            .select()
+            .single();
+
+    if (insertError) {
+        /*
+           Если другой запрос успел записать
+           этого человека раньше — повторно
+           ничего не выдаём.
+        */
+        if (insertError.code === "23505") {
+            return {
+                ok: false,
+                reason: "already_referred"
+            };
+        }
 
         console.error(
-            await response.text()
+            "insert referral:",
+            insertError
         );
 
         return {
             ok: false,
-            error:
-                "Не удалось сохранить реферала"
+            reason: "database_error"
         };
     }
 
-    await addBalance(
+    // +100 ⭐ НОВОМУ ИГРОКУ
+    const invitedBalance =
+        Number(invited.balance || 0) + 100;
+
+    await updatePlayer(
         invitedTelegramId,
-        200
+        {
+            balance: invitedBalance
+        }
     );
 
-    const count =
-        await getInviterReferralCount(
-            inviterTelegramId
-        );
+    // Награда пригласившему
+    if (reward > 0) {
+        const inviterBalance =
+            Number(inviter.balance || 0) +
+            reward;
 
-    if (
-        count >= 2 &&
-        count % 2 === 0
-    ) {
-
-        await addBalance(
+        await updatePlayer(
             inviterTelegramId,
-            500
+            {
+                balance: inviterBalance
+            }
         );
-
     }
-
-    console.log(
-        `РЕФЕРАЛ: ${inviterTelegramId} -> ${invitedTelegramId}`
-    );
 
     return {
         ok: true,
-        count
+        referral,
+        referralNumber,
+        invitedReward: 100,
+        inviterReward: reward
     };
 }
 
-
-/* =====================================================
-   TELEGRAM BOT — REFERRAL /START
-===================================================== */
+/* =========================================================
+   TELEGRAM BOT POLLING
+========================================================= */
 
 let telegramOffset = 0;
+let telegramPolling = false;
 
-
-async function telegramApi(
+async function telegramRequest(
     method,
-    body
+    body = {}
 ) {
-
     const response = await fetch(
         `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
         {
             method: "POST",
-
             headers: {
                 "Content-Type":
                     "application/json"
             },
-
-            body:
-                JSON.stringify(body)
+            body: JSON.stringify(body)
         }
     );
 
     return await response.json();
 }
 
+async function processTelegramUpdate(update) {
+    const message = update?.message;
 
-async function processTelegramUpdates() {
-
-    if (!BOT_TOKEN) {
+    if (!message) {
         return;
     }
 
-    try {
+    const text =
+        typeof message.text === "string"
+            ? message.text.trim()
+            : "";
 
-        const result =
-            await telegramApi(
-                "getUpdates",
-                {
-                    offset:
-                        telegramOffset,
-
-                    timeout: 0,
-
-                    allowed_updates:
-                        ["message"]
-                }
-            );
-
-        if (
-            !result ||
-            !result.ok ||
-            !Array.isArray(result.result)
-        ) {
-            return;
-        }
-
-        for (
-            const update of result.result
-        ) {
-
-            telegramOffset =
-                update.update_id + 1;
-
-            const message =
-                update.message;
-
-            if (!message) {
-                continue;
-            }
-
-            const text =
-                message.text || "";
-
-            if (
-                !text.startsWith("/start")
-            ) {
-                continue;
-            }
-
-            const parts =
-                text.trim().split(/\s+/);
-
-            if (
-                parts.length < 2
-            ) {
-                continue;
-            }
-
-            const startParam =
-                parts[1];
-
-            if (
-                !startParam.startsWith("ref_")
-            ) {
-                continue;
-            }
-
-            const inviterTelegramId =
-                startParam.substring(4);
-
-            if (
-                !/^\d+$/.test(
-                    inviterTelegramId
-                )
-            ) {
-                continue;
-            }
-
-            const invitedTelegramId =
-                message.from &&
-                message.from.id;
-
-            if (!invitedTelegramId) {
-                continue;
-            }
-
-            await addReferral(
-                inviterTelegramId,
-                invitedTelegramId
-            );
-        }
-
-    } catch (error) {
-
-        console.error(
-            "TELEGRAM REFERRAL ERROR:",
-            error
-        );
-
-    }
-}
-
-
-async function startTelegramPolling() {
-
-    if (!BOT_TOKEN) {
-
-        console.log(
-            "BOT_TOKEN не найден — Telegram polling отключён"
-        );
-
+    if (!text) {
         return;
     }
 
-    try {
+    /*
+       Обрабатываем:
 
-        await telegramApi(
-            "deleteWebhook",
-            {
-                drop_pending_updates:
-                    false
-            }
-        );
+       /start
+       /start ref_123456
+    */
 
-    } catch (error) {
-
-        console.error(
-            "Ошибка удаления webhook:",
-            error
-        );
-
+    if (!text.startsWith("/start")) {
+        return;
     }
+
+    const parts = text.split(/\s+/);
+
+    const startParameter =
+        parts[1] || "";
+
+    if (
+        !startParameter.startsWith("ref_")
+    ) {
+        return;
+    }
+
+    const inviterTelegramId =
+        Number(
+            startParameter.substring(4)
+        );
+
+    const invitedTelegramId =
+        Number(message.from?.id);
+
+    if (
+        !Number.isFinite(
+            inviterTelegramId
+        ) ||
+        !Number.isFinite(
+            invitedTelegramId
+        )
+    ) {
+        return;
+    }
+
+    if (
+        inviterTelegramId ===
+        invitedTelegramId
+    ) {
+        return;
+    }
+
+    /*
+       ВАЖНО:
+       Если человек ещё не открывал Mini App,
+       его player может ещё не существовать.
+
+       Поэтому создаём его прямо из Telegram.
+    */
+
+    const telegramUser =
+        message.from;
+
+    if (telegramUser) {
+        await getOrCreatePlayer(
+            telegramUser
+        );
+    }
+
+    const result =
+        await addReferral(
+            inviterTelegramId,
+            invitedTelegramId
+        );
 
     console.log(
-        "Telegram referral polling запущен"
+        "REFERRAL:",
+        {
+            inviter:
+                inviterTelegramId,
+
+            invited:
+                invitedTelegramId,
+
+            result
+        }
     );
-
-    setInterval(
-        processTelegramUpdates,
-        3000
-    );
 }
 
-
-/* =====================================================
-   ПОДПИСЬ РУЛЕТКИ
-===================================================== */
-
-function getRouletteSecret() {
-
-    return crypto
-        .createHash("sha256")
-        .update(
-            BOT_TOKEN +
-            "|" +
-            SUPABASE_KEY
-        )
-        .digest("hex");
-
-}
-
-
-function signRouletteResult(
-    telegramId,
-    multiplier,
-    issuedAt
-) {
-
-    const payload =
-        `${telegramId}:${multiplier}:${issuedAt}`;
-
-    return crypto
-        .createHmac(
-            "sha256",
-            getRouletteSecret()
-        )
-        .update(payload)
-        .digest("hex");
-
-}
-
-
-function verifyRouletteResult(
-    telegramId,
-    multiplier,
-    issuedAt,
-    signature
-) {
-
-    const expected =
-        signRouletteResult(
-            telegramId,
-            multiplier,
-            issuedAt
-        );
-
-    const a =
-        Buffer.from(
-            String(signature),
-            "hex"
-        );
-
-    const b =
-        Buffer.from(
-            expected,
-            "hex"
-        );
-
-    if (a.length !== b.length) {
-        return false;
+async function startTelegramPolling() {
+    if (telegramPolling) {
+        return;
     }
 
-    return crypto.timingSafeEqual(
-        a,
-        b
-    );
-}
+    telegramPolling = true;
 
-
-/* =====================================================
-   ГЛАВНАЯ
-===================================================== */
-
-app.get("/", (req, res) => {
-
-    res.sendFile(
-        path.join(
-            __dirname,
-            "index.html"
-        )
+    console.log(
+        "🤖 Telegram referral polling запущен"
     );
 
-});
+    /*
+       Переключаем бота на polling.
+    */
 
+    try {
+        await telegramRequest(
+            "deleteWebhook",
+            {
+                drop_pending_updates: false
+            }
+        );
+    } catch (error) {
+        console.error(
+            "deleteWebhook:",
+            error
+        );
+    }
 
-/* =====================================================
-   STATUS
-===================================================== */
-
-app.get("/api/status", (req, res) => {
-
-    res.json({
-        ok: true,
-        message:
-            "RaneGame server работает!"
-    });
-
-});
-
-
-/* =====================================================
-   PLAYER
-===================================================== */
-
-app.post(
-    "/api/player",
-    async (req, res) => {
-
+    while (telegramPolling) {
         try {
-
-            const auth =
-                validateTelegramInitData(
-                    req.body.initData
+            const result =
+                await telegramRequest(
+                    "getUpdates",
+                    {
+                        offset:
+                            telegramOffset,
+                        timeout: 20,
+                        allowed_updates: [
+                            "message"
+                        ]
+                    }
                 );
 
-            if (!auth.ok) {
+            if (
+                !result ||
+                !result.ok
+            ) {
+                console.error(
+                    "Telegram getUpdates:",
+                    result
+                );
 
-                return res.status(401).json({
-                    ok: false,
-                    error: auth.error
-                });
+                await new Promise(
+                    resolve =>
+                        setTimeout(
+                            resolve,
+                            5000
+                        )
+                );
 
+                continue;
             }
 
-            const user =
-                auth.user;
+            const updates =
+                result.result || [];
 
-            let player =
-                await getPlayer(
-                    user.id
-                );
+            for (const update of updates) {
+                telegramOffset =
+                    update.update_id + 1;
 
-            if (!player) {
-
-                player =
-                    await createPlayer(
-                        user
+                try {
+                    await processTelegramUpdate(
+                        update
                     );
-
-            }
-
-            res.json({
-                ok: true,
-                player
-            });
-
-        } catch (error) {
-
-            console.error(
-                "PLAYER ERROR:",
-                error
-            );
-
-            res.status(500).json({
-                ok: false,
-                error:
-                    "Ошибка сервера"
-            });
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   РУЛЕТКА — КРУТИТЬ
-===================================================== */
-
-app.post(
-    "/api/roulette/spin",
-    async (req, res) => {
-
-        try {
-
-            const auth =
-                validateTelegramInitData(
-                    req.body.initData
-                );
-
-            if (!auth.ok) {
-
-                return res.status(401).json({
-                    ok: false,
-                    error: auth.error
-                });
-
-            }
-
-            const user =
-                auth.user;
-
-            const player =
-                await getPlayer(
-                    user.id
-                );
-
-            if (!player) {
-
-                return res.status(404).json({
-                    ok: false,
-                    error:
-                        "Игрок не найден"
-                });
-
-            }
-
-            if (
-                player.economy_expires_at &&
-                new Date(
-                    player.economy_expires_at
-                ).getTime() > Date.now()
-            ) {
-
-                return res.status(400).json({
-                    ok: false,
-                    error:
-                        "Множитель уже активен"
-                });
-
-            }
-
-            const multiplier =
-                Number(
-                    (
-                        0.1 +
-                        Math.floor(
-                            Math.random() * 20
-                        ) * 0.1
-                    ).toFixed(2)
-                );
-
-            const issuedAt =
-                Date.now();
-
-            const signature =
-                signRouletteResult(
-                    user.id,
-                    multiplier,
-                    issuedAt
-                );
-
-            res.json({
-                ok: true,
-                multiplier,
-                issuedAt,
-                signature
-            });
-
-        } catch (error) {
-
-            console.error(
-                "ROULETTE SPIN ERROR:",
-                error
-            );
-
-            res.status(500).json({
-                ok: false,
-                error:
-                    "Ошибка рулетки"
-            });
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   РУЛЕТКА — ЗАБРАТЬ
-===================================================== */
-
-app.post(
-    "/api/roulette/claim",
-    async (req, res) => {
-
-        try {
-
-            const auth =
-                validateTelegramInitData(
-                    req.body.initData
-                );
-
-            if (!auth.ok) {
-
-                return res.status(401).json({
-                    ok: false,
-                    error: auth.error
-                });
-
-            }
-
-            const user =
-                auth.user;
-
-            const multiplier =
-                Number(
-                    req.body.multiplier
-                );
-
-            const issuedAt =
-                Number(
-                    req.body.issuedAt
-                );
-
-            const signature =
-                req.body.signature;
-
-            if (
-                !Number.isFinite(multiplier) ||
-                multiplier < 0.1 ||
-                multiplier > 2.0
-            ) {
-
-                return res.status(400).json({
-                    ok: false,
-                    error:
-                        "Неверный множитель"
-                });
-
-            }
-
-            const tenth =
-                Math.round(
-                    multiplier * 10
-                );
-
-            if (
-                Math.abs(
-                    multiplier -
-                    tenth / 10
-                ) > 0.0001
-            ) {
-
-                return res.status(400).json({
-                    ok: false,
-                    error:
-                        "Неверное значение множителя"
-                });
-
-            }
-
-            if (
-                !Number.isFinite(issuedAt) ||
-                Date.now() - issuedAt >
-                    10 * 60 * 1000 ||
-                issuedAt - Date.now() >
-                    60 * 1000
-            ) {
-
-                return res.status(400).json({
-                    ok: false,
-                    error:
-                        "Результат рулетки устарел"
-                });
-
-            }
-
-            if (
-                !verifyRouletteResult(
-                    user.id,
-                    multiplier,
-                    issuedAt,
-                    signature
-                )
-            ) {
-
-                return res.status(400).json({
-                    ok: false,
-                    error:
-                        "Недействительный результат рулетки"
-                });
-
-            }
-
-            const player =
-                await getPlayer(
-                    user.id
-                );
-
-            if (!player) {
-
-                return res.status(404).json({
-                    ok: false,
-                    error:
-                        "Игрок не найден"
-                });
-
-            }
-
-            if (
-                player.economy_expires_at &&
-                new Date(
-                    player.economy_expires_at
-                ).getTime() > Date.now()
-            ) {
-
-                return res.status(400).json({
-                    ok: false,
-                    error:
-                        "У тебя уже есть активный множитель"
-                });
-
-            }
-
-            const expiresAt =
-                new Date(
-                    Date.now() +
-                    4 * 60 * 60 * 1000
-                ).toISOString();
-
-            const updated =
-                await updatePlayer(
-                    user.id,
-                    {
-                        economy_multiplier:
-                            multiplier,
-
-                        economy_expires_at:
-                            expiresAt
-                    }
-                );
-
-            res.json({
-                ok: true,
-                player: updated,
-                multiplier,
-                expiresAt
-            });
-
-        } catch (error) {
-
-            console.error(
-                "ROULETTE CLAIM ERROR:",
-                error
-            );
-
-            res.status(500).json({
-                ok: false,
-                error:
-                    "Ошибка получения множителя"
-            });
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   BONUS — РАЗ В 7 ДНЕЙ
-===================================================== */
-
-app.post(
-    "/api/collect",
-    async (req, res) => {
-
-        try {
-
-            const auth =
-                validateTelegramInitData(
-                    req.body.initData
-                );
-
-            if (!auth.ok) {
-
-                return res.status(401).json({
-                    ok: false,
-                    error: auth.error
-                });
-
-            }
-
-            const user =
-                auth.user;
-
-            const player =
-                await getPlayer(
-                    user.id
-                );
-
-            if (!player) {
-
-                return res.status(404).json({
-                    ok: false,
-                    error:
-                        "Игрок не найден"
-                });
-
-            }
-
-
-            /* =========================================
-               ПРОВЕРЯЕМ 7 ДНЕЙ
-            ========================================= */
-
-            const now =
-                Date.now();
-
-            const week =
-                7 * 24 * 60 * 60 * 1000;
-
-
-            if (
-                player.bonus_claimed_at
-            ) {
-
-                const lastClaim =
-                    new Date(
-                        player.bonus_claimed_at
-                    ).getTime();
-
-                const difference =
-                    now - lastClaim;
-
-
-                if (
-                    difference < week
-                ) {
-
-                    const nextClaim =
-                        new Date(
-                            lastClaim + week
-                        ).toISOString();
-
-                    return res.status(400).json({
-                        ok: false,
-
-                        error:
-                            "Бонус ещё недоступен",
-
-                        nextClaimAt:
-                            nextClaim
-                    });
-
+                } catch (error) {
+                    console.error(
+                        "processTelegramUpdate:",
+                        error
+                    );
                 }
-
             }
 
-
-            /* =========================================
-               ВЫДАЁМ 1000 ⭐
-            ========================================= */
-
-            const balance =
-                Number(
-                    player.balance
-                );
-
-            const claimedAt =
-                new Date().toISOString();
-
-
-            const updated =
-                await updatePlayer(
-                    user.id,
-                    {
-
-                        balance:
-                            balance + 1000,
-
-                        bonus_claimed_at:
-                            claimedAt
-
-                    }
-                );
-
-
-            res.json({
-                ok: true,
-
-                player:
-                    updated,
-
-                reward:
-                    1000,
-
-                nextClaimAt:
-                    new Date(
-                        Date.now() + week
-                    ).toISOString()
-            });
-
-
         } catch (error) {
-
             console.error(
-                "COLLECT ERROR:",
+                "Telegram polling:",
                 error
             );
 
-            res.status(500).json({
-                ok: false,
-                error:
-                    "Ошибка бонуса"
-            });
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   BUY
-===================================================== */
-
-app.post(
-    "/api/buy",
-    async (req, res) => {
-
-        try {
-
-            const auth =
-                validateTelegramInitData(
-                    req.body.initData
-                );
-
-            if (!auth.ok) {
-
-                return res.status(401).json({
-                    ok: false,
-                    error: auth.error
-                });
-
-            }
-
-            const user =
-                auth.user;
-
-            const price =
-                Number(req.body.price);
-
-            if (
-                !Number.isInteger(price) ||
-                price <= 0
-            ) {
-
-                return res.status(400).json({
-                    ok: false,
-                    error:
-                        "Неверная цена"
-                });
-
-            }
-
-            const player =
-                await getPlayer(
-                    user.id
-                );
-
-            if (!player) {
-
-                return res.status(404).json({
-                    ok: false,
-                    error:
-                        "Игрок не найден"
-                });
-
-            }
-
-            const balance =
-                Number(
-                    player.balance
-                );
-
-            if (
-                balance < price
-            ) {
-
-                return res.status(400).json({
-                    ok: false,
-                    error:
-                        "Недостаточно ⭐"
-                });
-
-            }
-
-            const income =
-                Number(
-                    player.income
-                );
-
-            const updated =
-                await updatePlayer(
-                    user.id,
-                    {
-
-                        balance:
-                            balance - price,
-
-                        income:
-                            income + 1
-
-                    }
-                );
-
-            res.json({
-                ok: true,
-                player: updated
-            });
-
-        } catch (error) {
-
-            console.error(
-                "BUY ERROR:",
-                error
+            await new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        5000
+                    )
             );
-
-            res.status(500).json({
-                ok: false,
-                error:
-                    "Ошибка покупки"
-            });
-
         }
-
     }
-);
+}
 
-
-/* =====================================================
+/* =========================================================
    FALLBACK
-===================================================== */
+========================================================= */
 
 app.get("*", (req, res) => {
-
     res.sendFile(
-        path.join(
+        require("path").join(
             __dirname,
             "index.html"
         )
     );
-
 });
 
+/* =========================================================
+   START SERVER
+========================================================= */
 
-/* =====================================================
-   START
-===================================================== */
+app.listen(PORT, () => {
+    console.log(
+        `🚀 RaneGame запущен на порту ${PORT}`
+    );
 
-app.listen(
-    PORT,
-    () => {
-
-        console.log(
-            `RaneGame запущен на порту ${PORT}`
-        );
-
-        startTelegramPolling();
-
-    }
-);
+    startTelegramPolling();
+});
