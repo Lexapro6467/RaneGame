@@ -1693,8 +1693,135 @@ button:disabled {
 }
 
 </style>
-</head>
+</html>      
+      
+/* =================================
+   МОДАЛКА ПОКУПКИ ПОДАРКА
+================================= */
 
+.buy-modal {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(5, 1, 1, .82);
+
+    z-index: 1500;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.buy-modal.show {
+    display: flex;
+}
+
+.buy-modal-box {
+    width: 100%;
+    max-width: 360px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #2a0b0b,
+            #130505
+        );
+
+    border: 1px solid #551717;
+
+    border-radius: 22px;
+
+    padding: 22px;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.7);
+}
+
+.buy-modal-gift {
+    font-size: 60px;
+
+    margin-bottom: 8px;
+}
+
+.buy-modal-title {
+    font-size: 20px;
+    font-weight: bold;
+
+    margin-bottom: 6px;
+}
+
+.buy-modal-price {
+    color: #ffd84d;
+
+    font-size: 15px;
+
+    margin-bottom: 20px;
+}
+
+.buy-quantity {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    margin: 18px 0;
+}
+
+.quantity-button {
+    width: 46px;
+    height: 46px;
+
+    padding: 0;
+
+    font-size: 24px;
+
+    background: #541111;
+
+    border: 1px solid #751919;
+}
+
+.quantity-value {
+    min-width: 45px;
+
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.buy-total {
+    color: #aaa;
+
+    font-size: 14px;
+
+    margin-bottom: 16px;
+}
+
+.buy-total strong {
+    color: #ffd84d;
+
+    font-size: 18px;
+}
+
+.buy-modal-actions {
+    display: flex;
+
+    gap: 8px;
+}
+
+.buy-modal-actions button {
+    flex: 1;
+}
+
+.buy-cancel {
+    background: #3a1717;
+}
 
 <body>
 
@@ -3343,93 +3470,302 @@ function renderGiftShop() {
 
 }
 
-
 /* =================================
    ПОКУПКА
 ================================= */
 
-async function buyGift(
-    giftId
+let selectedBuyGift = null;
+
+let selectedBuyQuantity = 1;
+
+function buyGift(giftId) {
+
+    const gift =
+        giftShop.find(
+            function(item) {
+
+                return Number(
+                    item.id
+                ) ===
+                Number(
+                    giftId
+                );
+
+            }
+        );
+
+
+    if (!gift) {
+
+        showToast(
+            "❌ Подарок не найден"
+        );
+
+        return;
+
+    }
+
+
+    const owned =
+        inventory.find(
+            function(item) {
+
+                return Number(
+                    item.gift_id
+                ) ===
+                Number(
+                    giftId
+                );
+
+            }
+        );
+
+
+    const ownedQuantity =
+        owned
+            ? Number(
+                owned.quantity || 0
+            )
+            : 0;
+
+
+    const remaining =
+        Math.max(
+            0,
+            5 - ownedQuantity
+        );
+
+
+    if (remaining <= 0) {
+
+        showToast(
+            "❌ Максимум 5 одинаковых подарков"
+        );
+
+        return;
+
+    }
+
+
+    selectedBuyGift = gift;
+
+    selectedBuyQuantity = 1;
+
+
+    const modal =
+        document.getElementById(
+            "buyModal"
+        );
+
+
+    document
+        .getElementById(
+            "buyModalGift"
+        )
+        .textContent =
+        gift.emoji || "🎁";
+
+
+    document
+        .getElementById(
+            "buyModalTitle"
+        )
+        .textContent =
+        gift.name;
+
+
+    document
+        .getElementById(
+            "buyModalPrice"
+        )
+        .textContent =
+        Number(gift.price) +
+        " ⭐ за 1 шт.";
+
+
+    document
+        .getElementById(
+            "buyQuantity"
+        )
+        .textContent =
+        "1";
+
+
+    updateBuyTotal();
+
+
+    modal.classList.add(
+        "show"
+    );
+
+}
+
+
+function changeBuyQuantity(
+    change
 ) {
 
-    try {
+    if (!selectedBuyGift) {
 
-        const gift =
-            giftShop.find(
-                function(item) {
+        return;
 
-                    return Number(
-                        item.id
-                    ) ===
-                    Number(
-                        giftId
-                    );
-
-                }
-            );
+    }
 
 
-        if (!gift) {
+    const owned =
+        inventory.find(
+            function(item) {
 
-            showToast(
-                "❌ Подарок не найден"
-            );
+                return Number(
+                    item.gift_id
+                ) ===
+                Number(
+                    selectedBuyGift.id
+                );
 
-            return;
-
-        }
-
-
-        const owned =
-            inventory.find(
-                function(item) {
-
-                    return Number(
-                        item.gift_id
-                    ) ===
-                    Number(
-                        giftId
-                    );
-
-                }
-            );
+            }
+        );
 
 
-        const quantity =
-            owned
-                ? Number(
-                    owned.quantity ||
-                    0
-                )
-                : 0;
-
-
-        if (quantity >= 5) {
-
-            showToast(
-                "❌ Максимум 5 одинаковых подарков"
-            );
-
-            return;
-
-        }
-
-
-        if (
-            balance <
-            Number(
-                gift.price
+    const ownedQuantity =
+        owned
+            ? Number(
+                owned.quantity || 0
             )
-        ) {
+            : 0;
 
-            showToast(
-                "❌ Недостаточно ⭐"
-            );
 
-            return;
+    const maxQuantity =
+        Math.min(
+            5,
+            Math.max(
+                1,
+                5 - ownedQuantity
+            )
+        );
 
-        }
 
+    selectedBuyQuantity +=
+        Number(change);
+
+
+    if (
+        selectedBuyQuantity < 1
+    ) {
+
+        selectedBuyQuantity = 1;
+
+    }
+
+
+    if (
+        selectedBuyQuantity >
+        maxQuantity
+    ) {
+
+        selectedBuyQuantity =
+            maxQuantity;
+
+    }
+
+
+    document
+        .getElementById(
+            "buyQuantity"
+        )
+        .textContent =
+        selectedBuyQuantity;
+
+
+    updateBuyTotal();
+
+}
+
+
+function updateBuyTotal() {
+
+    if (!selectedBuyGift) {
+
+        return;
+
+    }
+
+
+    const total =
+        Number(
+            selectedBuyGift.price
+        ) *
+        selectedBuyQuantity;
+
+
+    document
+        .getElementById(
+            "buyTotal"
+        )
+        .textContent =
+        total +
+        " ⭐";
+
+}
+
+
+function closeBuyModal() {
+
+    document
+        .getElementById(
+            "buyModal"
+        )
+        .classList.remove(
+            "show"
+        );
+
+
+    selectedBuyGift = null;
+
+    selectedBuyQuantity = 1;
+
+}
+
+
+async function confirmBuyGift() {
+
+    if (!selectedBuyGift) {
+
+        return;
+
+    }
+
+
+    const gift =
+        selectedBuyGift;
+
+
+    const quantity =
+        selectedBuyQuantity;
+
+
+    const totalPrice =
+        Number(
+            gift.price
+        ) *
+        quantity;
+
+
+    if (
+        balance <
+        totalPrice
+    ) {
+
+        showToast(
+            "❌ Недостаточно ⭐"
+        );
+
+        return;
+
+    }
+
+
+    try {
 
         showToast(
             "⏳ Покупаем..."
@@ -3442,8 +3778,11 @@ async function buyGift(
                 {
                     gift_id:
                         Number(
-                            giftId
-                        )
+                            gift.id
+                        ),
+
+                    quantity:
+                        quantity
                 }
             );
 
@@ -3471,25 +3810,27 @@ async function buyGift(
         }
 
 
-        showToast(
-            "🎁 " +
-            gift.name +
-            " куплен!"
-        );
-
-
-        /*
-         * Обновляем только после покупки.
-         */
-
         inventoryLoaded =
             false;
 
 
-        await loadInventory();
+        await loadInventory(
+            true
+        );
 
 
         renderGiftShop();
+
+
+        closeBuyModal();
+
+
+        showToast(
+            "🎁 Куплено: " +
+            quantity +
+            " × " +
+            gift.name
+        );
 
 
     } catch (error) {
@@ -3505,7 +3846,6 @@ async function buyGift(
     }
 
 }
-
 
 /* =================================
    ИНВЕНТАРЬ
@@ -5016,3 +5356,101 @@ loadPlayer();
 
 </body>
 </html>
+
+<!-- =================================
+     МОДАЛКА ПОКУПКИ
+================================= -->
+
+<div
+    id="buyModal"
+    class="buy-modal">
+
+    <div class="buy-modal-box">
+
+        <div
+            id="buyModalGift"
+            class="buy-modal-gift">
+
+            🎁
+
+        </div>
+
+        <div
+            id="buyModalTitle"
+            class="buy-modal-title">
+
+            Подарок
+
+        </div>
+
+        <div
+            id="buyModalPrice"
+            class="buy-modal-price">
+
+            0 ⭐ за 1 шт.
+
+        </div>
+
+        <div class="buy-quantity">
+
+            <button
+                type="button"
+                class="quantity-button"
+                onclick="changeBuyQuantity(-1)">
+
+                −
+
+            </button>
+
+            <div
+                id="buyQuantity"
+                class="quantity-value">
+
+                1
+
+            </div>
+
+            <button
+                type="button"
+                class="quantity-button"
+                onclick="changeBuyQuantity(1)">
+
+                +
+
+            </button>
+
+        </div>
+
+        <div class="buy-total">
+
+            Итого:
+            <strong id="buyTotal">
+                0 ⭐
+            </strong>
+
+        </div>
+
+        <div class="buy-modal-actions">
+
+            <button
+                type="button"
+                class="buy-cancel"
+                onclick="closeBuyModal()">
+
+                Отмена
+
+            </button>
+
+            <button
+                type="button"
+                onclick="confirmBuyGift()">
+
+                Купить
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
