@@ -1,2537 +1,5017 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RaneGame</title>
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
-            background: #080303;
-            color: #fff;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            overflow-x: hidden;
-        }
-
-        button {
-            border: 0;
-            color: #fff;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        button:disabled {
-            cursor: default;
-            opacity: .55;
-        }
-
-        .loading-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #080303;
-        }
-
-        .loading-logo {
-            font-size: 42px;
-            font-weight: 900;
-            color: #ff3344;
-            animation: loadingPulse 1.2s infinite;
-        }
-
-        @keyframes loadingPulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: .65;
-            }
-            50% {
-                transform: scale(1.08);
-                opacity: 1;
-            }
-        }
-
-        .app {
-            width: 100%;
-            max-width: 600px;
-            min-height: 100vh;
-            margin: 0 auto;
-            padding-bottom: 90px;
-        }
-
-        .page {
-            display: none;
-            padding: 18px 14px;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(145deg, #a51b2b, #421016);
-            font-size: 23px;
-            font-weight: 900;
-            overflow: hidden;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .profile-name {
-            font-size: 18px;
-            font-weight: 800;
-        }
-
-        .profile-id {
-            margin-top: 3px;
-            color: #777;
-            font-size: 12px;
-        }
-
-        .balance-card {
-            position: relative;
-            overflow: hidden;
-            padding: 22px;
-            border-radius: 24px;
-            background:
-                radial-gradient(circle at 80% 0%, rgba(255, 50, 70, .2), transparent 38%),
-                linear-gradient(145deg, #291010, #110606);
-            border: 1px solid #48171b;
-            margin-bottom: 14px;
-        }
-
-        .balance-label {
-            color: #999;
-            font-size: 13px;
-        }
-
-        .balance {
-            margin-top: 5px;
-            font-size: 34px;
-            font-weight: 900;
-        }
-
-        .balance-star {
-            color: #ffd84d;
-        }
-
-        .income {
-            margin-top: 6px;
-            color: #73e693;
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .section-title {
-            margin: 22px 2px 12px;
-            font-size: 21px;
-            font-weight: 900;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .menu-card {
-            min-height: 100px;
-            padding: 16px;
-            border-radius: 19px;
-            background: linear-gradient(145deg, #211010, #110707);
-            border: 1px solid #351315;
-        }
-
-        .menu-card-icon {
-            font-size: 27px;
-            margin-bottom: 9px;
-        }
-
-        .menu-card-title {
-            font-size: 15px;
-            font-weight: 800;
-        }
-
-        .menu-card-value {
-            margin-top: 5px;
-            color: #999;
-            font-size: 12px;
-        }
-
-        .action-button {
-            width: 100%;
-            padding: 13px 16px;
-            margin-top: 10px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #a91f2b, #74111a);
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .secondary-button {
-            width: 100%;
-            padding: 13px 16px;
-            margin-top: 10px;
-            border-radius: 14px;
-            background: #2c1012;
-            color: #ccc;
-            font-weight: 700;
-        }
-
-        .referral-card,
-        .bonus-card,
-        .economy-card,
-        .auction-card,
-        .top-card {
-            padding: 18px;
-            border-radius: 20px;
-            background: linear-gradient(145deg, #211010, #100606);
-            border: 1px solid #361417;
-            margin-bottom: 12px;
-        }
-
-        .referral-link {
-            margin-top: 10px;
-            padding: 12px;
-            border-radius: 12px;
-            background: #0b0404;
-            color: #aaa;
-            font-size: 12px;
-            word-break: break-all;
-        }
-
-        .tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 13px;
-        }
-
-        .tab {
-            padding: 12px;
-            border-radius: 13px;
-            background: #1d0b0c;
-            color: #888;
-            font-weight: 800;
-        }
-
-        .tab.active {
-            background: linear-gradient(135deg, #8d1a25, #581017);
-            color: #fff;
-        }
-
-        .gift-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        /*
-         * ВАЖНО:
-         * Карточка подарка сама НЕ переливается.
-         * Анимируется только подарок внутри.
-         */
-        .gift-card {
-            position: relative;
-            min-width: 0;
-            overflow: hidden;
-            padding: 12px;
-            border-radius: 19px;
-            background: linear-gradient(145deg, #241010, #100606);
-            border: 1px solid #351416;
-            contain: layout paint;
-        }
-
-        .gift-visual {
-            width: 100%;
-            height: 112px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            background: radial-gradient(
-                circle,
-                rgba(255, 60, 70, .11),
-                transparent 70%
-            );
-            overflow: hidden;
-            contain: layout paint;
-        }
-
-        .gift-emoji {
-            display: block;
-            font-size: 65px;
-            line-height: 1;
-            transform-origin: center;
-            will-change: transform, opacity;
-        }
-
-        .gift-animation-bounce .gift-emoji {
-            animation: giftBounce 2.2s ease-in-out infinite;
-        }
-
-        .gift-animation-heart .gift-emoji {
-            animation: giftHeart 1.35s ease-in-out infinite;
-        }
-
-        .gift-animation-shine .gift-emoji {
-            animation: giftShine 2.8s ease-in-out infinite;
-        }
-
-        .gift-animation-rocket .gift-emoji {
-            animation: giftRocket 2.1s ease-in-out infinite;
-        }
-
-        .gift-animation-magic .gift-emoji {
-            animation: giftMagic 2.4s ease-in-out infinite;
-        }
-
-        @keyframes giftBounce {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-7px) rotate(2deg);
-            }
-        }
-
-        @keyframes giftHeart {
-            0%, 100% {
-                transform: scale(1) rotate(0deg);
-            }
-            25% {
-                transform: scale(1.08) rotate(-3deg);
-            }
-            50% {
-                transform: scale(1.16) rotate(3deg);
-            }
-            75% {
-                transform: scale(1.06) rotate(-2deg);
-            }
-        }
-
-        @keyframes giftShine {
-            0%, 100% {
-                transform: translateY(0) rotate(-3deg) scale(1);
-            }
-            35% {
-                transform: translateY(-6px) rotate(3deg) scale(1.04);
-            }
-            70% {
-                transform: translateY(2px) rotate(-2deg) scale(1.08);
-            }
-        }
-
-        @keyframes giftRocket {
-            0%, 100% {
-                transform: translateY(5px) rotate(-4deg);
-            }
-            35% {
-                transform: translateY(-10px) rotate(4deg);
-            }
-            70% {
-                transform: translateY(4px) rotate(-2deg);
-            }
-        }
-
-        @keyframes giftMagic {
-            0%, 100% {
-                transform: rotate(0deg) scale(1);
-            }
-            25% {
-                transform: rotate(-7deg) scale(1.04);
-            }
-            50% {
-                transform: rotate(7deg) scale(1.1);
-            }
-            75% {
-                transform: rotate(-4deg) scale(1.04);
-            }
-        }
-
-        .gift-paused .gift-emoji,
-        .inventory-paused .inventory-emoji {
-            animation-play-state: paused !important;
-        }
-
-        .gift-name {
-            margin-top: 10px;
-            min-height: 34px;
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .gift-price {
-            margin-top: 5px;
-            color: #ffd84d;
-            font-size: 13px;
-            font-weight: 800;
-        }
-
-        .gift-owned {
-            margin-top: 4px;
-            color: #777;
-            font-size: 11px;
-        }
-
-        .gift-buy {
-            width: 100%;
-            margin-top: 9px;
-            padding: 10px 7px;
-            border-radius: 11px;
-            background: linear-gradient(135deg, #a91f2b, #72131c);
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .gift-sold-out {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            width: 100%;
-            margin-top: 9px;
-            padding: 10px 5px;
-            border-radius: 11px;
-            background: #1b0a0b;
-            border: 1px solid #351315;
-            color: #777;
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .inventory-list {
-            display: grid;
-            gap: 10px;
-        }
-
-        .inventory-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-            padding: 12px;
-            border-radius: 17px;
-            background: linear-gradient(145deg, #241010, #100606);
-            border: 1px solid #351416;
-            contain: layout paint;
-        }
-
-        .inventory-visual {
-            width: 75px;
-            height: 75px;
-            flex: 0 0 75px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 15px;
-            background: #170909;
-            overflow: hidden;
-        }
-
-        .inventory-emoji {
-            font-size: 43px;
-            line-height: 1;
-            transform-origin: center;
-            will-change: transform, opacity;
-        }
-
-        .inventory-emoji.gift-animation-bounce {
-            animation: giftBounce 2.2s ease-in-out infinite;
-        }
-
-        .inventory-emoji.gift-animation-heart {
-            animation: giftHeart 1.35s ease-in-out infinite;
-        }
-
-        .inventory-emoji.gift-animation-shine {
-            animation: giftShine 2.8s ease-in-out infinite;
-        }
-
-        .inventory-emoji.gift-animation-rocket {
-            animation: giftRocket 2.1s ease-in-out infinite;
-        }
-
-        .inventory-emoji.gift-animation-magic {
-            animation: giftMagic 2.4s ease-in-out infinite;
-        }
-
-        .inventory-info {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .inventory-name {
-            font-size: 15px;
-            font-weight: 800;
-        }
-
-        .inventory-date {
-            margin-top: 4px;
-            color: #777;
-            font-size: 11px;
-        }
-
-        .inventory-income {
-            margin-top: 4px;
-            color: #72df90;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .inventory-sell {
-            margin-top: 8px;
-            padding: 8px 11px;
-            border-radius: 9px;
-            background: #351012;
-            color: #ddd;
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .inventory-wait {
-            margin-top: 8px;
-            color: #777;
-            font-size: 10px;
-        }
-
-        .empty {
-            padding: 30px 15px;
-            text-align: center;
-            color: #666;
-        }
-
-        .auction-placeholder,
-        .top-placeholder {
-            padding: 45px 20px;
-            text-align: center;
-            border-radius: 22px;
-            background: linear-gradient(145deg, #211010, #100606);
-            border: 1px solid #351416;
-        }
-
-        .placeholder-icon {
-            font-size: 55px;
-            margin-bottom: 12px;
-        }
-
-        .placeholder-title {
-            font-size: 20px;
-            font-weight: 900;
-        }
-
-        .placeholder-text {
-            margin-top: 7px;
-            color: #777;
-            font-size: 13px;
-        }
-
-        .bottom-nav {
-            position: fixed;
-            left: 50%;
-            bottom: 10px;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: min(570px, calc(100% - 20px));
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            padding: 7px;
-            border-radius: 19px;
-            background: rgba(25, 8, 9, .96);
-            border: 1px solid #3b1316;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, .45);
-            backdrop-filter: blur(12px);
-        }
-
-        .nav-button {
-            min-height: 52px;
-            border-radius: 14px;
-            background: transparent;
-            color: #777;
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .nav-icon {
-            display: block;
-            margin-bottom: 3px;
-            font-size: 20px;
-        }
-
-        .nav-button.active {
-            background: #351012;
-            color: #fff;
-        }
-
-        /* BUY MODAL */
-
-        .buy-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 1500;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(5, 0, 0, .78);
-            backdrop-filter: blur(5px);
-        }
-
-        .buy-modal.show {
-            display: flex;
-        }
-
-        .buy-modal-box {
-            position: relative;
-            width: 100%;
-            max-width: 360px;
-            padding: 22px;
-            text-align: center;
-            border: 1px solid #5a1a1a;
-            border-radius: 24px;
-            background: linear-gradient(145deg, #2a1010, #130606);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
-        }
-
-        .buy-modal-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            border-radius: 50%;
-            background: #321010;
-            color: #aaa;
-            font-size: 18px;
-        }
-
-        .buy-modal-emoji {
-            width: 100px;
-            height: 100px;
-            margin: 8px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 28px;
-            background: radial-gradient(
-                circle,
-                rgba(255, 70, 70, .16),
-                transparent 72%
-            );
-            font-size: 64px;
-        }
-
-        .buy-modal-name {
-            font-size: 20px;
-            font-weight: 900;
-        }
-
-        .buy-modal-price {
-            margin-top: 5px;
-            color: #ffd84d;
-            font-size: 13px;
-        }
-
-        .buy-quantity-title {
-            margin: 20px 0 10px;
-            color: #aaa;
-            font-size: 13px;
-        }
-
-        .buy-quantity {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 18px;
-        }
-
-        .buy-quantity button {
-            width: 48px;
-            height: 48px;
-            padding: 0;
-            border-radius: 14px;
-            background: #4a1212;
-            font-size: 28px;
-        }
-
-        #buyQuantity {
-            min-width: 55px;
-            font-size: 27px;
-            font-weight: 900;
-        }
-
-        .buy-total {
-            margin: 18px 0;
-            color: #aaa;
-            font-size: 14px;
-        }
-
-        .buy-total b {
-            color: #ffd84d;
-            font-size: 19px;
-        }
-
-        .buy-confirm-button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 13px;
-            background: linear-gradient(135deg, #a91f2b, #74111a);
-            font-weight: 900;
-        }
-
-        .buy-cancel-button {
-            width: 100%;
-            margin-top: 8px;
-            padding: 12px;
-            border-radius: 13px;
-            background: #321010;
-            color: #aaa;
-            font-weight: 700;
-        }
-
-        /* ROULETTE */
-
-        .roulette-modal {
-            position: fixed;
-            inset: 0;
-            z-index: 1400;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(4, 0, 0, .82);
-            backdrop-filter: blur(6px);
-        }
-
-        .roulette-modal.show {
-            display: flex;
-        }
-
-        .roulette-box {
-            width: 100%;
-            max-width: 360px;
-            padding: 24px;
-            text-align: center;
-            border-radius: 24px;
-            background: linear-gradient(145deg, #281010, #120606);
-            border: 1px solid #4a1619;
-        }
-
-        .roulette-title {
-            font-size: 23px;
-            font-weight: 900;
-        }
-
-        .roulette-wheel {
-            width: 190px;
-            height: 190px;
-            margin: 22px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background:
-                conic-gradient(
-                    #7c1721 0deg 45deg,
-                    #321015 45deg 90deg,
-                    #a21d2a 90deg 135deg,
-                    #321015 135deg 180deg,
-                    #7c1721 180deg 225deg,
-                    #321015 225deg 270deg,
-                    #a21d2a 270deg 315deg,
-                    #321015 315deg 360deg
-                );
-            border: 7px solid #21090b;
-            box-shadow: 0 0 35px rgba(180, 20, 40, .25);
-        }
-
-        .roulette-wheel span {
-            font-size: 38px;
-        }
-
-        .roulette-result {
-            min-height: 24px;
-            color: #ffd84d;
-            font-weight: 800;
-        }
-
-        /* TOAST */
-
-        .toast {
-            position: fixed;
-            left: 50%;
-            bottom: 83px;
-            z-index: 3000;
-            transform: translate(-50%, 20px);
-            width: max-content;
-            max-width: calc(100% - 30px);
-            padding: 12px 17px;
-            border-radius: 13px;
-            background: #291010;
-            border: 1px solid #4b171a;
-            color: #fff;
-            font-size: 13px;
-            font-weight: 700;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .2s ease, transform .2s ease;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
-
-        @media (max-width: 380px) {
-            .gift-grid {
-                gap: 8px;
-            }
-
-            .gift-card {
-                padding: 9px;
-            }
-
-            .gift-visual {
-                height: 100px;
-            }
-
-            .gift-emoji {
-                font-size: 56px;
-            }
-        }
-    </style>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>RaneGame</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+
+/* =================================
+   ОСНОВА
+================================= */
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0 0 90px;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #210909 0%,
+            #100606 42%,
+            #080303 100%
+        );
+
+    color: #fff;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    min-height: 100vh;
+
+    overflow-x: hidden;
+}
+
+button {
+    border: 0;
+    outline: none;
+
+    border-radius: 14px;
+
+    padding: 13px 18px;
+
+    background: #8f1717;
+    color: #fff;
+
+    font-weight: bold;
+    font-size: 15px;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        filter .15s ease,
+        opacity .15s ease;
+}
+
+button:active {
+    transform: scale(.96);
+}
+
+button:hover {
+    filter: brightness(1.08);
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: default;
+}
+
+.loading {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color: #aaa;
+
+    padding: 20px;
+}
+
+.error {
+    background: #350b0b;
+
+    border: 1px solid #761717;
+
+    padding: 18px;
+
+    border-radius: 16px;
+
+    max-width: 400px;
+
+    line-height: 1.5;
+}
+
+
+/* =================================
+   ВЕРХНИЙ ПРОФИЛЬ
+================================= */
+
+.top {
+    padding: 20px 18px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.avatar {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #a51d1d,
+            #510909
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    font-weight: bold;
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,.35);
+}
+
+.name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.username {
+    color: #999;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+
+/* =================================
+   СТРАНИЦЫ
+================================= */
+
+.page {
+    display: none;
+
+    padding: 0 16px;
+
+    animation:
+        pageAppear
+        .2s
+        ease;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes pageAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* =================================
+   БАЛАНС
+================================= */
+
+.balance-card {
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(255,70,70,.20),
+            transparent 55%
+        ),
+        linear-gradient(
+            135deg,
+            #7d1111,
+            #3b0808
+        );
+
+    border-radius: 24px;
+
+    padding: 28px 20px;
+
+    text-align: center;
+
+    margin-bottom: 15px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.3);
+}
+
+.balance {
+    font-size: 44px;
+    font-weight: bold;
+
+    margin: 10px 0;
+}
+
+.income {
+    color: #72ff72;
+}
+
+
+/* =================================
+   КАРТОЧКИ
+================================= */
+
+.card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(35,13,13,.98),
+            rgba(21,7,7,.98)
+        );
+
+    border: 1px solid #351515;
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    margin-bottom: 14px;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.18);
+}
+
+.card h2,
+.card h3 {
+    margin-top: 0;
+}
+
+.card p {
+    color: #aaa;
+    line-height: 1.5;
+}
+
+
+/* =================================
+   ЭКОНОМИКА
+================================= */
+
+.economy-card {
+    background:
+        linear-gradient(
+            145deg,
+            #260909,
+            #140505
+        );
+
+    border: 1px solid #4d1616;
+
+    border-radius: 22px;
+
+    padding: 20px;
+
+    margin-bottom: 15px;
+
+    overflow: hidden;
+}
+
+.economy-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 14px;
+}
+
+.economy-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.multiplier-active {
+    background: #163516;
+    color: #72ff72;
+
+    padding: 7px 10px;
+
+    border-radius: 10px;
+
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.multiplier-none {
+    background: #321010;
+    color: #ff7777;
+
+    padding: 7px 10px;
+
+    border-radius: 10px;
+
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.current-multiplier {
+    text-align: center;
+
+    font-size: 48px;
+    font-weight: bold;
+
+    margin: 12px 0 4px;
+}
+
+.multiplier-time {
+    text-align: center;
+
+    color: #aaa;
+
+    font-size: 14px;
+
+    min-height: 20px;
+
+    margin-bottom: 15px;
+}
+
+.roulette-spin-button {
+    width: 100%;
+
+    font-size: 17px;
+
+    padding: 15px;
+}
+
+.claim-button {
+    width: 100%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a91c1c,
+            #681010
+        );
+
+    font-size: 17px;
+
+    padding: 15px;
+
+    display: none;
+}
+
+.claim-button.show {
+    display: block;
+}
+
+
+/* =================================
+   РУЛЕТКА
+================================= */
+
+.roulette-window {
+    position: relative;
+
+    height: 92px;
+
+    margin: 18px 0;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background: #0d0404;
+
+    border: 1px solid #421313;
+}
+
+.roulette-window::before {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    top: 0;
+    bottom: 0;
+
+    width: 3px;
+
+    transform: translateX(-50%);
+
+    background: #ff4545;
+
+    box-shadow:
+        0 0 14px rgba(255,50,50,.8);
+
+    z-index: 5;
+}
+
+.roulette-track {
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    transform: translateX(0);
+
+    will-change: transform;
+}
+
+.roulette-item {
+    flex: 0 0 76px;
+
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #281010;
+
+    border: 1px solid #4a1717;
+
+    color: #aaa;
+
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.roulette-item.selected {
+    background: #791414;
+
+    color: #fff;
+
+    border-color: #ff4444;
+}
+
+
+/* =================================
+   ВКЛАДКИ ПОДАРКОВ
+================================= */
+
+.shop-tabs {
+    display: flex;
+
+    gap: 8px;
+
+    margin-bottom: 14px;
+}
+
+.shop-tab {
+    flex: 1;
+
+    background: #241010;
+
+    border: 1px solid #3b1515;
+
+    color: #888;
+
+    padding: 11px 8px;
+}
+
+.shop-tab.active {
+    background: #761414;
+
+    border-color: #a52626;
+
+    color: white;
+}
+
+.shop-info {
+    background: #241010;
+
+    border: 1px solid #3b1515;
+
+    border-radius: 16px;
+
+    padding: 13px;
+
+    margin-bottom: 14px;
+
+    color: #aaa;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+.shop-info b {
+    color: white;
+}
+
+.refresh-shop {
+    width: 100%;
+
+    background: #321010;
+
+    margin-bottom: 12px;
+}
+
+
+/* =================================
+   СЕТКА ПОДАРКОВ
+================================= */
+
+.shop-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
+}
+
+
+/* =================================
+   КАРТОЧКА ПОДАРКА
+================================= */
+
+.gift-card {
+    position: relative;
+
+    overflow: hidden;
+
+    min-height: 285px;
+
+    padding: 14px 12px 12px;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(255,60,60,.10),
+            transparent 45%
+        ),
+        linear-gradient(
+            145deg,
+            #2a1114,
+            #17090b 70%,
+            #100607
+        );
+
+    border: 1px solid
+        rgba(255,92,92,.20);
+
+    border-radius: 22px;
+
+    text-align: center;
+
+    box-shadow:
+        0 8px 22px
+        rgba(0,0,0,.30);
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+.gift-card:active {
+    transform:
+        translateZ(0)
+        scale(.97);
+}
+
+
+/* =================================
+   ОПТИМИЗИРОВАННАЯ АНИМАЦИЯ
+================================= */
+
+.gift-visual {
+    position: relative;
+
+    width: 125px;
+    height: 125px;
+
+    margin: 3px auto 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 38px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,70,70,.16),
+            transparent 72%
+        );
+
+    overflow: visible;
+
+    isolation: isolate;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+.gift-visual::before {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 88px;
+    height: 88px;
+
+    transform:
+        translate3d(
+            -50%,
+            -50%,
+            0
+        )
+        scale(.8);
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,70,70,.34),
+            transparent 70%
+        );
+
+    opacity: .45;
+
+    animation:
+        giftAuraOptimized
+        2.6s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform,
+        opacity;
+
+    z-index: -1;
+}
+
+.gift-visual::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 72px;
+    height: 72px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(255,90,90,.12);
+
+    transform:
+        translate3d(
+            -50%,
+            -50%,
+            0
+        )
+        scale(.65);
+
+    opacity: .5;
+
+    animation:
+        giftRingOptimized
+        3.4s
+        ease-out
+        infinite;
+
+    will-change:
+        transform,
+        opacity;
+
+    pointer-events: none;
+}
+
+.gift-emoji {
+    position: relative;
+
+    z-index: 5;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 72px;
+
+    line-height: 1;
+
+    user-select: none;
+
+    transform-origin: center;
+
+    will-change:
+        transform;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+
+/* =================================
+   ИСКРЫ
+================================= */
+
+.gift-spark {
+    position: absolute;
+
+    z-index: 8;
+
+    pointer-events: none;
+
+    color: white;
+
+    font-weight: bold;
+
+    text-shadow:
+        0 0 5px
+        rgba(255,255,255,.8);
+
+    animation:
+        sparkOptimized
+        2.2s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform,
+        opacity;
+}
+
+.gift-spark-1 {
+    top: 9px;
+    left: 12px;
+
+    font-size: 17px;
+}
+
+.gift-spark-2 {
+    top: 18px;
+    right: 10px;
+
+    font-size: 10px;
+
+    animation-delay: .5s;
+}
+
+.gift-spark-3 {
+    left: 9px;
+    bottom: 17px;
+
+    font-size: 9px;
+
+    animation-delay: 1s;
+}
+
+.gift-spark-4 {
+    right: 14px;
+    bottom: 11px;
+
+    font-size: 14px;
+
+    animation-delay: 1.5s;
+}
+
+
+/* =================================
+   АНИМАЦИИ ПОДАРКОВ
+================================= */
+
+.gift-animation-bounce
+.gift-emoji {
+    animation:
+        normalGiftOptimized
+        2.4s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-heart
+.gift-emoji {
+    animation:
+        heartGiftOptimized
+        1.5s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-shine
+.gift-emoji {
+    animation:
+        diamondGiftOptimized
+        2.2s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-rocket
+.gift-emoji {
+    animation:
+        rocketGiftOptimized
+        1.7s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-magic
+.gift-emoji {
+    animation:
+        magicGiftOptimized
+        1.9s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+
+/* =================================
+   KEYFRAMES
+================================= */
+
+@keyframes giftAuraOptimized {
+
+    0%,
+    100% {
+        transform:
+            translate3d(
+                -50%,
+                -50%,
+                0
+            )
+            scale(.78);
+
+        opacity: .25;
+    }
+
+    50% {
+        transform:
+            translate3d(
+                -50%,
+                -50%,
+                0
+            )
+            scale(1.12);
+
+        opacity: .65;
+    }
+}
+
+@keyframes giftRingOptimized {
+
+    0% {
+        transform:
+            translate3d(
+                -50%,
+                -50%,
+                0
+            )
+            scale(.6);
+
+        opacity: .45;
+    }
+
+    75% {
+        transform:
+            translate3d(
+                -50%,
+                -50%,
+                0
+            )
+            scale(1.35);
+
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes sparkOptimized {
+
+    0%,
+    100% {
+        opacity: .15;
+
+        transform:
+            translate3d(
+                0,
+                5px,
+                0
+            )
+            scale(.7)
+            rotate(0deg);
+    }
+
+    50% {
+        opacity: .9;
+
+        transform:
+            translate3d(
+                0,
+                -7px,
+                0
+            )
+            scale(1.08)
+            rotate(35deg);
+    }
+}
+
+@keyframes normalGiftOptimized {
+
+    0%,
+    100% {
+        transform:
+            translate3d(
+                0,
+                0,
+                0
+            )
+            rotate(-2deg)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(
+                0,
+                -7px,
+                0
+            )
+            rotate(2deg)
+            scale(1.06);
+    }
+}
+
+@keyframes heartGiftOptimized {
+
+    0%,
+    100% {
+        transform:
+            translate3d(
+                0,
+                0,
+                0
+            )
+            scale(1)
+            rotate(-4deg);
+    }
+
+    25% {
+        transform:
+            translate3d(
+                0,
+                -3px,
+                0
+            )
+            scale(1.1)
+            rotate(4deg);
+    }
+
+    50% {
+        transform:
+            translate3d(
+                0,
+                -5px,
+                0
+            )
+            scale(.97)
+            rotate(-3deg);
+    }
+
+    75% {
+        transform:
+            translate3d(
+                0,
+                -3px,
+                0
+            )
+            scale(1.08)
+            rotate(3deg);
+    }
+}
+
+@keyframes diamondGiftOptimized {
+
+    0%,
+    100% {
+        transform:
+            translate3d(
+                0,
+                2px,
+                0
+            )
+            rotate(-5deg)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(
+                0,
+                -9px,
+                0
+            )
+            rotate(5deg)
+            scale(1.09);
+    }
+}
+
+@keyframes rocketGiftOptimized {
+
+    0%,
+    100% {
+        transform:
+            translate3d(
+                0,
+                6px,
+                0
+            )
+            rotate(-5deg)
+            scale(1);
+    }
+
+    45% {
+        transform:
+            translate3d(
+                0,
+                -14px,
+                0
+            )
+            rotate(5deg)
+            scale(1.08);
+    }
+
+    70% {
+        transform:
+            translate3d(
+                0,
+                -7px,
+                0
+            )
+            rotate(1deg)
+            scale(1.04);
+    }
+}
+
+@keyframes magicGiftOptimized {
+
+    0%,
+    100% {
+        transform:
+            translate3d(
+                0,
+                2px,
+                0
+            )
+            rotate(-4deg)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(
+                0,
+                -9px,
+                0
+            )
+            rotate(5deg)
+            scale(1.1);
+    }
+}
+
+
+/* =================================
+   ПАУЗА ДЛЯ НЕВИДИМЫХ ПОДАРКОВ
+================================= */
+
+.gift-paused *,
+.gift-paused::before,
+.gift-paused::after {
+    animation-play-state:
+        paused !important;
+}
+
+
+/* =================================
+   НАЗВАНИЕ / ЦЕНА
+================================= */
+
+.gift-name {
+    position: relative;
+    z-index: 2;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    min-height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #fff;
+
+    padding: 0 3px;
+}
+
+.gift-income {
+    position: relative;
+    z-index: 2;
+
+    display: inline-block;
+
+    color: #78ff9b;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    margin: 5px 0 7px;
+
+    padding: 4px 8px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(70,255,120,.07);
+}
+
+.gift-price {
+    position: relative;
+    z-index: 2;
+
+    color: #ffd84d;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    margin-bottom: 9px;
+}
+
+.gift-buy {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+
+    padding: 10px 7px;
+
+    border-radius: 12px;
+
+    font-size: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a91f2b,
+            #74111a
+        );
+}
+
+.gift-buy:disabled {
+    background: #321519;
+
+    color: #777;
+
+    border-color: #3b1b1f;
+}
+
+.gift-count {
+    position: absolute;
+
+    top: 9px;
+    right: 9px;
+
+    z-index: 10;
+
+    min-width: 30px;
+
+    padding: 5px 7px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(120,17,30,.9);
+
+    border:
+        1px solid
+        rgba(255,100,100,.18);
+
+    color: #fff;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* =================================
+   ИНВЕНТАРЬ
+================================= */
+
+.inventory-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.inventory-card {
+    background:
+        linear-gradient(
+            145deg,
+            #241010,
+            #160808
+        );
+
+    border: 1px solid #3b1515;
+
+    border-radius: 18px;
+
+    padding: 14px;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+.inventory-top {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.inventory-emoji {
+    width: 58px;
+    height: 58px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 40px;
+
+    border-radius: 16px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,70,70,.12),
+            transparent 70%
+        );
+
+    will-change:
+        transform;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+.inventory-emoji.gift-animation-bounce {
+    animation:
+        normalGiftOptimized
+        2.4s
+        ease-in-out
+        infinite;
+}
+
+.inventory-emoji.gift-animation-heart {
+    animation:
+        heartGiftOptimized
+        1.5s
+        ease-in-out
+        infinite;
+}
+
+.inventory-emoji.gift-animation-shine {
+    animation:
+        diamondGiftOptimized
+        2.2s
+        ease-in-out
+        infinite;
+}
+
+.inventory-emoji.gift-animation-rocket {
+    animation:
+        rocketGiftOptimized
+        1.7s
+        ease-in-out
+        infinite;
+}
+
+.inventory-emoji.gift-animation-magic {
+    animation:
+        magicGiftOptimized
+        1.9s
+        ease-in-out
+        infinite;
+}
+
+.inventory-paused
+.inventory-emoji {
+    animation-play-state:
+        paused !important;
+}
+
+.inventory-info {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.inventory-name {
+    font-weight: bold;
+
+    font-size: 16px;
+}
+
+.inventory-count {
+    color: #aaa;
+
+    font-size: 13px;
+
+    margin-top: 5px;
+}
+
+.inventory-income {
+    color: #72ff72;
+
+    font-size: 13px;
+
+    margin-top: 4px;
+}
+
+.inventory-purchases {
+    margin-top: 12px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.purchase-row {
+    background: #180808;
+
+    border-radius: 12px;
+
+    padding: 9px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 8px;
+
+    font-size: 12px;
+}
+
+.purchase-time {
+    color: #999;
+}
+
+.sell-button {
+    background: #5d1111;
+
+    padding: 8px 10px;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+.sell-button.ready {
+    background: #8f1717;
+}
+
+.empty-inventory {
+    text-align: center;
+
+    color: #888;
+
+    padding: 35px 15px;
+}
+
+
+/* =================================
+   АУКЦИОН
+================================= */
+
+.auction-placeholder {
+    text-align: center;
+
+    padding: 30px 10px;
+}
+
+
+/* =================================
+   НИЖНЯЯ НАВИГАЦИЯ
+================================= */
+
+.nav {
+    position: fixed;
+
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 78px;
+
+    background:
+        rgba(24,7,7,.97);
+
+    border-top:
+        1px solid #351515;
+
+    display: flex;
+
+    justify-content: space-around;
+
+    align-items: center;
+
+    z-index: 100;
+
+    backdrop-filter:
+        blur(12px);
+}
+
+.nav button {
+    background: transparent;
+
+    color: #777;
+
+    padding: 8px 12px;
+
+    font-size: 12px;
+
+    min-width: 70px;
+}
+
+.nav button.active {
+    color: white;
+}
+
+
+/* =================================
+   РУЛЕТКА МОДАЛКА
+================================= */
+
+.roulette-lock {
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(8,1,1,.96);
+
+    z-index: 1000;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.roulette-lock.show {
+    display: flex;
+}
+
+.roulette-modal {
+    width: 100%;
+
+    max-width: 430px;
+
+    background: #170707;
+
+    border: 1px solid #561515;
+
+    border-radius: 24px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.7);
+}
+
+.roulette-modal h2 {
+    text-align: center;
+
+    margin-top: 0;
+}
+
+.roulette-modal-text {
+    text-align: center;
+
+    color: #999;
+
+    font-size: 14px;
+
+    margin-bottom: 15px;
+}
+
+.roulette-result {
+    text-align: center;
+
+    color: #ff8585;
+
+    font-size: 14px;
+
+    min-height: 20px;
+
+    margin-bottom: 10px;
+}
+
+
+/* =================================
+   TOAST
+================================= */
+
+.toast {
+    position: fixed;
+
+    bottom: 95px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    background: #271010;
+
+    border: 1px solid #5c1a1a;
+
+    padding: 12px 18px;
+
+    border-radius: 12px;
+
+    display: none;
+
+    z-index: 2000;
+
+    white-space: nowrap;
+
+    max-width:
+        calc(100vw - 30px);
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =================================
+   МОБИЛЬНЫЕ
+================================= */
+
+@media (max-width: 360px) {
+
+    .shop-grid {
+        gap: 8px;
+    }
+
+    .gift-card {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .gift-visual {
+        width: 105px;
+        height: 105px;
+    }
+
+    .gift-emoji {
+        font-size: 60px;
+    }
+
+}
+
+
+/* =================================
+   ЕСЛИ У ПОЛЬЗОВАТЕЛЯ
+   ОТКЛЮЧЕНА АНИМАЦИЯ
+================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        scroll-behavior: auto !important;
+
+        transition-duration:
+            .01ms !important;
+    }
+
+}
+
+</style>
 </head>
+
 
 <body>
 
-<div id="loadingScreen" class="loading-screen">
-    <div class="loading-logo">RANE</div>
+
+<!-- =================================
+     ЗАГРУЗКА
+================================= -->
+
+<div
+    id="loading"
+    class="loading">
+
+    Загрузка RaneGame...
+
 </div>
 
-<div class="app">
 
-    <!-- МЕНЮ -->
-    <section id="page-home" class="page active">
+<div
+    id="game"
+    style="display:none;">
 
-        <div class="profile">
-            <div id="avatar" class="avatar">R</div>
 
-            <div>
-                <div id="profileName" class="profile-name">Rane</div>
-                <div id="profileId" class="profile-id">Telegram</div>
-            </div>
-        </div>
+<!-- =================================
+     ПРОФИЛЬ
+================================= -->
 
-        <div class="balance-card">
-            <div class="balance-label">Ваш баланс</div>
-            <div class="balance">
-                <span id="balance">0</span>
-                <span class="balance-star">⭐</span>
-            </div>
-            <div class="income">
-                +<span id="income">0</span> ⭐/час
-            </div>
-        </div>
+<div class="top">
 
-        <div class="cards">
+    <div
+        class="avatar"
+        id="avatar">
 
-            <div class="menu-card">
-                <div class="menu-card-icon">💰</div>
-                <div class="menu-card-title">Экономика</div>
-                <div id="economyInfo" class="menu-card-value">
-                    Множитель x1
-                </div>
-                <button
-                    class="action-button"
-                    type="button"
-                    onclick="collectIncome()">
-                    Собрать
-                </button>
-            </div>
+        R
 
-            <div class="menu-card">
-                <div class="menu-card-icon">🎰</div>
-                <div class="menu-card-title">Рулетка</div>
-                <div class="menu-card-value">
-                    Испытай удачу
-                </div>
-                <button
-                    class="action-button"
-                    type="button"
-                    onclick="openRoulette()">
-                    Играть
-                </button>
-            </div>
+    </div>
 
-        </div>
+    <div>
 
-        <div class="section-title">Реферальная система</div>
+        <div
+            class="name"
+            id="username">
 
-        <div class="referral-card">
-            <div>
-                Приглашай друзей и получай бонусы.
-            </div>
+            Игрок
 
-            <div id="referralLink" class="referral-link">
-                Загрузка...
-            </div>
-
-            <button
-                class="secondary-button"
-                type="button"
-                onclick="copyReferral()">
-                📋 Скопировать ссылку
-            </button>
-        </div>
-
-        <div class="bonus-card">
-            <div class="menu-card-title">🎁 Еженедельный бонус</div>
-            <div
-                id="bonusInfo"
-                class="menu-card-value">
-                Загрузка...
-            </div>
-
-            <button
-                id="bonusButton"
-                class="action-button"
-                type="button"
-                onclick="claimBonus()">
-                Забрать бонус
-            </button>
-        </div>
-
-        <!-- ПОДАРКИ ТЕПЕРЬ В МЕНЮ -->
-        <div class="section-title">🎁 Подарки</div>
-
-        <div class="tabs">
-            <button
-                id="shopTab"
-                class="tab active"
-                type="button"
-                onclick="switchGiftTab('shop')">
-                Магазин
-            </button>
-
-            <button
-                id="inventoryTab"
-                class="tab"
-                type="button"
-                onclick="switchGiftTab('inventory')">
-                Инвентарь
-            </button>
-        </div>
-
-        <div id="giftShopContainer">
-            <div id="giftShop" class="gift-grid"></div>
         </div>
 
         <div
-            id="inventoryContainer"
-            style="display:none;">
-            <div id="inventory" class="inventory-list"></div>
+            class="username"
+            id="tgusername">
+
+            @Telegram
+
         </div>
 
-    </section>
-
-    <!-- АУКЦИОН -->
-    <section id="page-auction" class="page">
-
-        <div class="section-title">🔨 Аукцион</div>
-
-        <div class="auction-placeholder">
-            <div class="placeholder-icon">🔨</div>
-            <div class="placeholder-title">
-                Аукцион
-            </div>
-            <div class="placeholder-text">
-                Здесь появятся подарки и лоты игроков.
-            </div>
-        </div>
-
-    </section>
-
-    <!-- ТОП -->
-    <section id="page-top" class="page">
-
-        <div class="section-title">🏆 Топ</div>
-
-        <div class="top-placeholder">
-            <div class="placeholder-icon">🏆</div>
-            <div class="placeholder-title">
-                Топ игроков
-            </div>
-            <div class="placeholder-text">
-                Таблица лидеров скоро появится.
-            </div>
-        </div>
-
-    </section>
+    </div>
 
 </div>
 
-<!-- НИЖНЕЕ МЕНЮ -->
-<nav class="bottom-nav">
+
+<!-- =================================
+     МЕНЮ
+================================= -->
+
+<section
+    id="home"
+    class="page active">
+
+
+<!-- БАЛАНС -->
+
+<div class="balance-card">
+
+    <div class="balance">
+
+        ⭐
+        <span id="balance">
+            0
+        </span>
+
+    </div>
+
+    <div>
+
+        <span class="income">
+
+            +
+            <span id="income">
+                0
+            </span>
+
+            в час
+
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- ЭКОНОМИКА -->
+
+<div class="economy-card">
+
+    <div class="economy-header">
+
+        <div class="economy-title">
+
+            Крутим
+
+        </div>
+
+        <div
+            id="economyStatus"
+            class="multiplier-none">
+
+            Не активна
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="current-multiplier"
+        id="currentMultiplier">
+
+        x1.0
+
+    </div>
+
+
+    <div
+        class="multiplier-time"
+        id="multiplierTime">
+
+        Крути рулетку
+
+    </div>
+
 
     <button
-        id="nav-home"
-        class="nav-button active"
-        type="button"
-        onclick="navigate('home')">
-        <span class="nav-icon">☰</span>
+        id="openRouletteButton"
+        class="roulette-spin-button"
+        onclick="openRoulette()">
+
+        🎰 Крутить
+
+    </button>
+
+</div>
+
+
+<!-- РЕФЕРАЛКА -->
+
+<div class="card">
+
+    <h3>
+        🔗 Твоя ссылка
+    </h3>
+
+    <div
+        style="
+            font-size:12px;
+            color:#888;
+            word-break:break-all;
+            margin:10px 0;
+        ">
+
+        https://t.me/RaneGameBot?start=ref_<span
+            id="refId">
+        </span>
+
+    </div>
+
+
+    <button
+        onclick="inviteFriend()">
+
+        Позови друга
+
+    </button>
+
+
+    <button
+        onclick="copyInviteLink()"
+        style="
+            background:#555;
+            margin-top:8px;
+        ">
+
+        Копировать
+
+    </button>
+
+</div>
+
+
+<!-- БОНУС -->
+
+<div class="card">
+
+    <h3>
+        🔥 Еженедельный бонус
+    </h3>
+
+    <p>
+        Забери еженедельную награду.
+    </p>
+
+    <button
+        id="bonusButton"
+        onclick="collect()">
+
+        Забрать +1000 ⭐
+
+    </button>
+
+</div>
+
+
+<!-- =================================
+     ПОДАРКИ
+================================= -->
+
+<div class="card">
+
+    <h2>
+        🎁 Подарки
+    </h2>
+
+
+    <div class="shop-tabs">
+
+        <button
+            id="shopTab"
+            class="shop-tab active"
+            onclick="showShopTab('shop')">
+
+            🛒 Магазин
+
+        </button>
+
+
+        <button
+            id="inventoryTab"
+            class="shop-tab"
+            onclick="showShopTab('inventory')">
+
+            🎒 Инвентарь
+
+        </button>
+
+    </div>
+
+
+    <!-- МАГАЗИН -->
+
+    <div
+        id="giftShop">
+
+
+        <div class="shop-info">
+
+            🔄 Ассортимент обновляется
+            <b>раз в 3 часа</b>.<br>
+
+            🎁 Каждый подарок даёт
+            <b>+1 ⭐/час</b>.<br>
+
+            📦 Одного вида можно купить
+            максимум <b>5 раз</b>.
+
+        </div>
+
+
+        <button
+            class="refresh-shop"
+            onclick="loadGiftShop(true)">
+
+            🔄 Обновить магазин
+
+        </button>
+
+
+        <div
+            id="shopGrid"
+            class="shop-grid">
+
+            <div
+                class="empty-inventory"
+                style="grid-column:1/-1;">
+
+                Загрузка подарков...
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ИНВЕНТАРЬ -->
+
+    <div
+        id="giftInventory"
+        style="display:none;">
+
+
+        <div class="shop-info">
+
+            💰 Подарок можно продать за его
+            <b>полную цену</b>.<br>
+
+            ⏳ После покупки должно пройти
+            <b>5 часов</b>.<br>
+
+            ⭐ Доход от подарка:
+            <b>+1 ⭐/час</b>.
+
+        </div>
+
+
+        <div
+            id="inventoryList"
+            class="inventory-list">
+
+            <div class="empty-inventory">
+
+                Загрузка инвентаря...
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+</section>
+
+
+<!-- =================================
+     АУКЦИОН
+================================= -->
+
+<section
+    id="auction"
+    class="page">
+
+<div class="card">
+
+    <h2>
+        🔨 Аукцион
+    </h2>
+
+    <div class="auction-placeholder">
+
+        <div
+            style="
+                font-size:55px;
+                margin-bottom:15px;
+            ">
+
+            🔨
+
+        </div>
+
+        <p>
+            Здесь скоро появится аукцион.
+        </p>
+
+        <button
+            onclick="
+                showToast(
+                    '🔨 Аукцион скоро будет доступен'
+                )
+            ">
+
+            Открыть
+
+        </button>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- =================================
+     ТОП
+================================= -->
+
+<section
+    id="top"
+    class="page">
+
+<div class="card">
+
+    <h2>
+        🏆 Топ игроков
+    </h2>
+
+    <p>
+        Таблица лидеров появится здесь.
+    </p>
+
+    <button
+        onclick="
+            showToast(
+                '🏆 Топ скоро появится'
+            )
+        ">
+
+        Обновить
+
+    </button>
+
+</div>
+
+</section>
+
+
+<!-- =================================
+     НИЖНЯЯ НАВИГАЦИЯ
+================================= -->
+
+<div class="nav">
+
+    <button
+        class="active"
+        data-page="home">
+
+        🏠
+        <br>
         Меню
+
     </button>
 
+
     <button
-        id="nav-auction"
-        class="nav-button"
-        type="button"
-        onclick="navigate('auction')">
-        <span class="nav-icon">🔨</span>
+        data-page="auction">
+
+        🔨
+        <br>
         Аукцион
+
     </button>
+
 
     <button
-        id="nav-top"
-        class="nav-button"
-        type="button"
-        onclick="navigate('top')">
-        <span class="nav-icon">🏆</span>
+        data-page="top">
+
+        🏆
+        <br>
         Топ
+
     </button>
 
-</nav>
+</div>
 
-<!-- ОКНО ПОКУПКИ -->
-<div id="buyModal" class="buy-modal">
 
-    <div class="buy-modal-box">
+</div>
 
-        <button
-            class="buy-modal-close"
-            type="button"
-            onclick="closeBuyModal()">
-            ✕
-        </button>
 
-        <div id="buyModalEmoji" class="buy-modal-emoji">
-            🎁
-        </div>
+<!-- =================================
+     РУЛЕТКА
+================================= -->
 
-        <div id="buyModalName" class="buy-modal-name">
-            Подарок
-        </div>
+<div
+    id="rouletteLock"
+    class="roulette-lock">
 
-        <div id="buyModalPrice" class="buy-modal-price">
-            15 ⭐ / 1 шт.
-        </div>
 
-        <div class="buy-quantity-title">
-            Сколько купить?
-        </div>
+<div class="roulette-modal">
 
-        <div class="buy-quantity">
 
-            <button
-                type="button"
-                onclick="changeBuyQuantity(-1)">
-                −
-            </button>
+<h2>
+    🎰 Экономика
+</h2>
 
-            <div id="buyQuantity">1</div>
 
-            <button
-                type="button"
-                onclick="changeBuyQuantity(1)">
-                +
-            </button>
+<div class="roulette-modal-text">
 
-        </div>
+    Крути рулетку и получи множитель
+    на 4 часа.
 
-        <div class="buy-total">
-            Итого:
-            <b id="buyTotal">15 ⭐</b>
-        </div>
+</div>
 
-        <button
-            id="buyConfirmButton"
-            class="buy-confirm-button"
-            type="button"
-            onclick="confirmBuyGift()">
-            Купить 1 шт.
-        </button>
 
-        <button
-            class="buy-cancel-button"
-            type="button"
-            onclick="closeBuyModal()">
-            Отмена
-        </button>
+<div class="roulette-window">
 
+    <div
+        id="rouletteTrack"
+        class="roulette-track">
     </div>
 
 </div>
 
-<!-- РУЛЕТКА -->
-<div id="rouletteModal" class="roulette-modal">
 
-    <div class="roulette-box">
+<div
+    id="rouletteResult"
+    class="roulette-result">
 
-        <div class="roulette-title">
-            🎰 Рулетка
-        </div>
-
-        <div class="roulette-wheel">
-            <span>⭐</span>
-        </div>
-
-        <div id="rouletteResult" class="roulette-result">
-            Нажми «Крутить»
-        </div>
-
-        <button
-            id="rouletteSpinButton"
-            class="action-button"
-            type="button"
-            onclick="spinRoulette()">
-            Крутить
-        </button>
-
-        <button
-            class="secondary-button"
-            type="button"
-            onclick="closeRoulette()">
-            Закрыть
-        </button>
-
-    </div>
+    Выбери свой множитель
 
 </div>
 
-<div id="toast" class="toast"></div>
+
+<button
+    id="rouletteSpinButton"
+    class="roulette-spin-button"
+    onclick="spinRoulette()">
+
+    🎰 Крутить
+
+</button>
+
+
+<button
+    id="rouletteClaimButton"
+    class="claim-button"
+    onclick="claimRoulette()">
+
+    Забрать
+
+</button>
+
+
+</div>
+
+</div>
+
+
+<!-- =================================
+     TOAST
+================================= -->
+
+<div
+    id="toast"
+    class="toast">
+</div>
+
 
 <script>
-    const tg = window.Telegram && window.Telegram.WebApp
-        ? window.Telegram.WebApp
-        : null;
-
-    if (tg) {
-        tg.ready();
-        tg.expand();
-    }
-
-    const API = "https://ranegame.onrender.com";
-
-    let player = null;
-    let balance = 0;
-    let income = 0;
-
-    let giftShop = [];
-    let inventory = [];
-
-    let giftTab = "shop";
-    let inventoryLoaded = false;
-
-    let giftObserver = null;
-
-    /* =========================
-       BUY MODAL
-    ========================= */
-
-    let buyModalGift = null;
-    let buyModalMax = 1;
-    let buyModalQuantity = 1;
-    let buyModalBusy = false;
-
-    /* =========================
-       HELPERS
-    ========================= */
-
-    function getTelegramUser() {
-        if (
-            tg &&
-            tg.initDataUnsafe &&
-            tg.initDataUnsafe.user
-        ) {
-            return tg.initDataUnsafe.user;
-        }
-
-        return {
-            id: 0,
-            first_name: "Игрок",
-            username: ""
-        };
-    }
-
-    function getTelegramId() {
-        return Number(getTelegramUser().id || 0);
-    }
-
-    async function apiRequest(endpoint, options = {}) {
-        const config = {
-            method: options.method || "POST",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-
-        if (options.body !== undefined) {
-            config.body = JSON.stringify(options.body);
-        }
-
-        const response = await fetch(API + endpoint, config);
-
-        let data = {};
-
-        try {
-            data = await response.json();
-        } catch (error) {
-            data = {};
-        }
-
-        if (!response.ok) {
-            throw new Error(
-                data.error ||
-                data.message ||
-                "Ошибка сервера"
-            );
-        }
-
-        return data;
-    }
-
-    function showToast(message) {
-        const toast = document.getElementById("toast");
-
-        toast.textContent = message;
-        toast.classList.add("show");
-
-        clearTimeout(showToast.timer);
-
-        showToast.timer = setTimeout(function() {
-            toast.classList.remove("show");
-        }, 2500);
-    }
-
-    function updateScreen() {
-        document.getElementById("balance").textContent =
-            Math.floor(balance);
-
-        document.getElementById("income").textContent =
-            Number(income || 0).toFixed(1).replace(".0", "");
-
-        if (player) {
-            const multiplier =
-                Number(player.economy_multiplier || 1);
-
-            document.getElementById("economyInfo").textContent =
-                "Множитель x" + multiplier;
-        }
-    }
-
-    /* =========================
-       PLAYER
-    ========================= */
-
-    async function loadPlayer() {
-        const telegramId = getTelegramId();
-
-        if (!telegramId) {
-            showToast("⚠️ Открой игру через Telegram");
-            return;
-        }
-
-        const data = await fetch(
-            API +
-            "/api/player?telegram_id=" +
-            encodeURIComponent(telegramId)
-        ).then(function(response) {
-            return response.json();
-        });
-
-        if (data.error) {
-            throw new Error(data.error);
-        }
-
-        player = data.player || data;
-
-        balance = Number(player.balance || 0);
-        income = Number(player.income || 0);
-
-        updateProfile();
-        updateScreen();
-        updateBonusInfo();
-    }
-
-    function updateProfile() {
-        const user = getTelegramUser();
-
-        const name =
-            user.first_name ||
-            user.username ||
-            "Игрок";
-
-        document.getElementById("profileName").textContent =
-            name;
-
-        document.getElementById("profileId").textContent =
-            "ID: " + getTelegramId();
-
-        const avatar = document.getElementById("avatar");
-
-        if (
-            user.photo_url &&
-            avatar
-        ) {
-            avatar.innerHTML =
-                '<img src="' +
-                user.photo_url +
-                '" alt="">';
-        } else {
-            avatar.textContent =
-                String(name).charAt(0).toUpperCase();
-        }
-
-        const referralLink =
-            "https://t.me/RaneGameBot?start=ref_" +
-            getTelegramId();
-
-        document.getElementById("referralLink").textContent =
-            referralLink;
-    }
-
-    /* =========================
-       NAVIGATION
-    ========================= */
-
-    function navigate(pageName) {
-        document
-            .querySelectorAll(".page")
-            .forEach(function(page) {
-                page.classList.remove("active");
-            });
-
-        document
-            .querySelectorAll(".nav-button")
-            .forEach(function(button) {
-                button.classList.remove("active");
-            });
-
-        const page =
-            document.getElementById(
-                "page-" + pageName
-            );
-
-        const nav =
-            document.getElementById(
-                "nav-" + pageName
-            );
-
-        if (page) {
-            page.classList.add("active");
-        }
-
-        if (nav) {
-            nav.classList.add("active");
-        }
-    }
-
-    /* =========================
-       INCOME
-    ========================= */
-
-    async function collectIncome() {
-        try {
-            const data = await apiRequest(
-                "/api/collect",
-                {
-                    body: {
-                        telegram_id: getTelegramId()
-                    }
-                }
-            );
-
-            if (data.player) {
-                player = data.player;
-                balance = Number(player.balance || 0);
-                income = Number(player.income || 0);
-                updateScreen();
-            }
-
-            showToast(
-                "💰 Доход собран"
-            );
-        } catch (error) {
-            console.error(error);
-            showToast("❌ " + error.message);
-        }
-    }
-
-    /* =========================
-       BONUS
-    ========================= */
-
-    function updateBonusInfo() {
-        const element =
-            document.getElementById("bonusInfo");
-
-        if (!player) {
-            element.textContent = "Загрузка...";
-            return;
-        }
-
-        if (player.bonus_claimed_at) {
-            element.textContent =
-                "Бонус уже получен";
-        } else {
-            element.textContent =
-                "Бонус доступен";
-        }
-    }
-
-    async function claimBonus() {
-        try {
-            const data = await apiRequest(
-                "/api/roulette/claim",
-                {
-                    body: {
-                        telegram_id: getTelegramId()
-                    }
-                }
-            );
-
-            if (data.player) {
-                player = data.player;
-                balance = Number(player.balance || 0);
-                income = Number(player.income || 0);
-                updateScreen();
-            }
-
-            showToast(
-                "🎁 Бонус получен"
-            );
-
-            updateBonusInfo();
-
-        } catch (error) {
-            console.error(error);
-            showToast("❌ " + error.message);
-        }
-    }
-
-    /* =========================
-       REFERRAL
-    ========================= */
-
-    function copyReferral() {
-        const text =
-            document.getElementById(
-                "referralLink"
-            ).textContent;
-
-        if (
-            navigator.clipboard &&
-            navigator.clipboard.writeText
-        ) {
-            navigator.clipboard
-                .writeText(text)
-                .then(function() {
-                    showToast(
-                        "📋 Ссылка скопирована"
-                    );
-                })
-                .catch(function() {
-                    showToast(text);
-                });
-
-            return;
-        }
-
-        showToast(text);
-    }
-
-    /* =========================
-       GIFT ANIMATIONS
-    ========================= */
-
-    function getGiftAnimationClass(gift) {
-        const emoji = String(
-            gift &&
-            gift.emoji
-                ? gift.emoji
-                : ""
+
+/* =================================
+   API
+================================= */
+
+const API =
+    "https://ranegame.onrender.com";
+
+
+/* =================================
+   TELEGRAM
+================================= */
+
+const tg =
+    window.Telegram &&
+    window.Telegram.WebApp;
+
+
+if (tg) {
+
+    tg.ready();
+
+    tg.expand();
+
+}
+
+
+/* =================================
+   СОСТОЯНИЕ
+================================= */
+
+let player = null;
+
+let balance = 0;
+
+let income = 0;
+
+let economyMultiplier = 1.0;
+
+let economyExpiresAt = null;
+
+let rouletteResult = null;
+
+let rouletteIssuedAt = null;
+
+let rouletteSignature = null;
+
+let rouletteSpinning = false;
+
+let giftShop = [];
+
+let inventory = [];
+
+let giftObserver = null;
+
+let shopLoaded = false;
+
+let inventoryLoaded = false;
+
+
+/* =================================
+   TELEGRAM USER
+================================= */
+
+function getTelegramUser() {
+
+    if (
+        !tg ||
+        !tg.initDataUnsafe ||
+        !tg.initDataUnsafe.user
+    ) {
+
+        throw new Error(
+            "Открой RaneGame через Telegram"
         );
 
-        if (
-            emoji.includes("❤️") ||
-            emoji.includes("💖") ||
-            emoji.includes("💕") ||
-            emoji.includes("💗") ||
-            emoji.includes("💓") ||
-            emoji.includes("💝")
-        ) {
-            return "gift-animation-heart";
-        }
-
-        if (
-            emoji.includes("💎") ||
-            emoji.includes("👑") ||
-            emoji.includes("⭐") ||
-            emoji.includes("🌟") ||
-            emoji.includes("✨") ||
-            emoji.includes("💰")
-        ) {
-            return "gift-animation-shine";
-        }
-
-        if (
-            emoji.includes("🚀") ||
-            emoji.includes("☄️") ||
-            emoji.includes("🛸")
-        ) {
-            return "gift-animation-rocket";
-        }
-
-        if (
-            emoji.includes("🔮") ||
-            emoji.includes("🪄") ||
-            emoji.includes("🧿") ||
-            emoji.includes("🌀") ||
-            emoji.includes("🎃")
-        ) {
-            return "gift-animation-magic";
-        }
-
-        return "gift-animation-bounce";
     }
 
-    /* =========================
-       GIFT SHOP
-    ========================= */
+    return tg.initDataUnsafe.user;
 
-    async function loadGiftShop() {
-        try {
-            const response =
-                await fetch(API + "/api/gifts");
+}
 
-            const data =
-                await response.json();
 
-            if (data.error) {
-                throw new Error(data.error);
+/* =================================
+   API REQUEST
+================================= */
+
+async function apiRequest(
+    endpoint,
+    body = {}
+) {
+
+    const tgUser =
+        getTelegramUser();
+
+
+    const response =
+        await fetch(
+            API + endpoint,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    ...body,
+                    user: tgUser
+                })
             }
+        );
 
-            giftShop =
-                Array.isArray(data)
-                    ? data
-                    : (
-                        data.gifts ||
-                        data.shop ||
-                        []
-                    );
 
-            renderGiftShop();
+    let data;
 
-        } catch (error) {
-            console.error(error);
 
-            document.getElementById(
-                "giftShop"
-            ).innerHTML =
-                '<div class="empty">' +
-                "❌ Не удалось загрузить магазин" +
-                "</div>";
-        }
+    try {
+
+        data =
+            await response.json();
+
+    } catch {
+
+        throw new Error(
+            "Сервер вернул неправильный ответ"
+        );
+
     }
 
-    function getOwnedGift(giftId) {
-        return inventory.find(function(item) {
-            return Number(item.gift_id) ===
-                Number(giftId);
-        });
+
+    if (!data.ok) {
+
+        throw new Error(
+            data.error ||
+            "Ошибка сервера"
+        );
+
     }
 
-    function renderGiftShop() {
-        const grid =
-            document.getElementById(
-                "giftShop"
+
+    return data;
+
+}
+
+
+/* =================================
+   ЗАГРУЗКА ИГРОКА
+================================= */
+
+async function loadPlayer() {
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/player"
             );
 
-        if (!giftShop.length) {
-            grid.innerHTML =
-                '<div class="empty">' +
-                "🎁 Подарков пока нет" +
-                "</div>";
 
-            return;
-        }
+        player =
+            data.player;
 
-        grid.innerHTML =
-            giftShop.map(function(gift) {
 
-                const owned =
-                    getOwnedGift(gift.id);
+        balance =
+            Number(
+                player.balance
+            );
 
-                const ownedQuantity =
-                    owned
-                        ? Number(
-                            owned.quantity || 0
+
+        income =
+            Number(
+                player.income
+            );
+
+
+        economyMultiplier =
+            Number(
+                player.economy_multiplier ||
+                1
+            );
+
+
+        economyExpiresAt =
+            player.economy_expires_at ||
+            null;
+
+
+        updateScreen();
+
+
+        document
+            .getElementById(
+                "loading"
+            )
+            .style.display =
+            "none";
+
+
+        document
+            .getElementById(
+                "game"
+            )
+            .style.display =
+            "block";
+
+
+        startMultiplierTimer();
+
+
+        await Promise.all([
+            loadGiftShop(),
+            loadInventory()
+        ]);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        document
+            .getElementById(
+                "loading"
+            )
+            .innerHTML = `
+
+                <div class="error">
+
+                    ❌ Ошибка
+
+                    <br><br>
+
+                    ${escapeHtml(
+                        error.message
+                    )}
+
+                    <br><br>
+
+                    Открой RaneGame
+                    через Telegram.
+
+                </div>
+
+            `;
+
+    }
+
+}
+
+
+/* =================================
+   ЭКРАН
+================================= */
+
+function updateScreen() {
+
+    document
+        .getElementById(
+            "balance"
+        )
+        .textContent =
+        Math.floor(balance)
+            .toLocaleString(
+                "ru-RU"
+            );
+
+
+    document
+        .getElementById(
+            "income"
+        )
+        .textContent =
+        income;
+
+
+    if (!player) {
+
+        return;
+
+    }
+
+
+    document
+        .getElementById(
+            "username"
+        )
+        .textContent =
+        player.first_name ||
+        "Игрок";
+
+
+    document
+        .getElementById(
+            "tgusername"
+        )
+        .textContent =
+        player.username
+            ? "@" +
+              player.username
+            : "Telegram";
+
+
+    document
+        .getElementById(
+            "avatar"
+        )
+        .textContent =
+        (
+            player.first_name ||
+            "R"
+        )
+        .charAt(0)
+        .toUpperCase();
+
+
+    document
+        .getElementById(
+            "refId"
+        )
+        .textContent =
+        player.telegram_id ||
+        "";
+
+
+    updateEconomyScreen();
+
+}
+
+
+/* =================================
+   ЭКОНОМИКА
+================================= */
+
+function updateEconomyScreen() {
+
+    const multiplierElement =
+        document.getElementById(
+            "currentMultiplier"
+        );
+
+
+    const statusElement =
+        document.getElementById(
+            "economyStatus"
+        );
+
+
+    const timeElement =
+        document.getElementById(
+            "multiplierTime"
+        );
+
+
+    if (
+        economyExpiresAt &&
+        new Date(
+            economyExpiresAt
+        ).getTime() >
+        Date.now()
+    ) {
+
+        multiplierElement.textContent =
+            "x" +
+            Number(
+                economyMultiplier
+            ).toFixed(1);
+
+
+        statusElement.textContent =
+            "Активна";
+
+
+        statusElement.className =
+            "multiplier-active";
+
+
+        timeElement.textContent =
+            "Осталось: " +
+            formatTime(
+                new Date(
+                    economyExpiresAt
+                ).getTime() -
+                Date.now()
+            );
+
+
+        return;
+
+    }
+
+
+    economyMultiplier = 1.0;
+
+    economyExpiresAt = null;
+
+
+    multiplierElement.textContent =
+        "x1.0";
+
+
+    statusElement.textContent =
+        "Не активна";
+
+
+    statusElement.className =
+        "multiplier-none";
+
+
+    timeElement.textContent =
+        "Крути рулетку";
+
+}
+
+
+/* =================================
+   ТАЙМЕР
+================================= */
+
+function startMultiplierTimer() {
+
+    clearInterval(
+        window.multiplierTimer
+    );
+
+
+    window.multiplierTimer =
+        setInterval(
+            function() {
+
+                updateEconomyScreen();
+
+            },
+            1000
+        );
+
+}
+
+
+/* =================================
+   ФОРМАТ ВРЕМЕНИ
+================================= */
+
+function formatTime(ms) {
+
+    if (ms <= 0) {
+
+        return "00:00:00";
+
+    }
+
+
+    const totalSeconds =
+        Math.floor(
+            ms / 1000
+        );
+
+
+    const hours =
+        Math.floor(
+            totalSeconds / 3600
+        );
+
+
+    const minutes =
+        Math.floor(
+            (
+                totalSeconds % 3600
+            ) / 60
+        );
+
+
+    const seconds =
+        totalSeconds % 60;
+
+
+    return (
+        String(hours)
+            .padStart(2, "0") +
+        ":" +
+        String(minutes)
+            .padStart(2, "0") +
+        ":" +
+        String(seconds)
+            .padStart(2, "0")
+    );
+
+}
+
+
+/* =================================
+   НАВИГАЦИЯ
+================================= */
+
+const navButtons =
+    document.querySelectorAll(
+        ".nav button"
+    );
+
+
+const pages =
+    document.querySelectorAll(
+        ".page"
+    );
+
+
+navButtons.forEach(
+    function(button) {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                if (
+                    document
+                        .getElementById(
+                            "rouletteLock"
                         )
-                        : 0;
+                        .classList
+                        .contains(
+                            "show"
+                        )
+                ) {
 
-                const remaining =
-                    Math.max(
-                        0,
-                        5 - ownedQuantity
-                    );
+                    return;
 
-                const animationClass =
-                    getGiftAnimationClass(gift);
-
-                const soldOut =
-                    remaining <= 0;
-
-                return `
-                    <div class="gift-card">
-
-                        <div class="gift-visual ${animationClass}">
-                            <div class="gift-emoji">
-                                ${gift.emoji || "🎁"}
-                            </div>
-                        </div>
-
-                        <div class="gift-name">
-                            ${escapeHtml(
-                                gift.name ||
-                                "Подарок"
-                            )}
-                        </div>
-
-                        <div class="gift-price">
-                            ${Number(gift.price || 0)} ⭐
-                        </div>
-
-                        <div class="gift-owned">
-                            ${
-                                soldOut
-                                    ? "Куплено 5/5"
-                                    : "Осталось " +
-                                      remaining +
-                                      " шт."
-                            }
-                        </div>
-
-                        ${
-                            soldOut
-                                ? `
-                                    <div class="gift-sold-out">
-                                        🔒 Количество исчерпано
-                                    </div>
-                                  `
-                                : `
-                                    <button
-                                        class="gift-buy"
-                                        type="button"
-                                        onclick="openBuyModal(${Number(gift.id)})">
-                                        Купить
-                                    </button>
-                                  `
-                        }
-
-                    </div>
-                `;
-            }).join("");
-
-        setupGiftAnimationObserver();
-    }
-
-    /* =========================
-       INVENTORY
-    ========================= */
-
-    async function loadInventory() {
-        try {
-            const telegramId =
-                getTelegramId();
-
-            const response =
-                await fetch(
-                    API +
-                    "/api/inventory?telegram_id=" +
-                    encodeURIComponent(
-                        telegramId
-                    )
-                );
-
-            const data =
-                await response.json();
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
-
-            inventory =
-                Array.isArray(data)
-                    ? data
-                    : (
-                        data.inventory ||
-                        []
-                    );
-
-            inventoryLoaded = true;
-
-            renderInventory();
-            renderGiftShop();
-
-        } catch (error) {
-            console.error(error);
-
-            document.getElementById(
-                "inventory"
-            ).innerHTML =
-                '<div class="empty">' +
-                "❌ Не удалось загрузить инвентарь" +
-                "</div>";
-        }
-    }
-
-    function renderInventory() {
-        const list =
-            document.getElementById(
-                "inventory"
-            );
-
-        if (!inventory.length) {
-            list.innerHTML =
-                '<div class="empty">' +
-                "🎁 У тебя пока нет подарков" +
-                "</div>";
-
-            return;
-        }
-
-        const rows = [];
-
-        inventory.forEach(function(item) {
-
-            const purchases =
-                Array.isArray(item.purchases)
-                    ? item.purchases
-                    : [];
-
-            if (!purchases.length) {
-                return;
-            }
-
-            purchases.forEach(function(purchase) {
-
-                const gift =
-                    giftShop.find(function(g) {
-                        return Number(g.id) ===
-                            Number(item.gift_id);
-                    });
-
-                const giftData =
-                    gift || {
-                        name:
-                            item.name ||
-                            "Подарок",
-                        emoji:
-                            item.emoji ||
-                            "🎁",
-                        price:
-                            item.price ||
-                            0
-                    };
-
-                const animationClass =
-                    getGiftAnimationClass(
-                        giftData
-                    );
-
-                const purchaseDate =
-                    new Date(
-                        purchase.purchased_at
-                    );
-
-                const now =
-                    Date.now();
-
-                const fiveHours =
-                    5 * 60 * 60 * 1000;
-
-                const passed =
-                    now -
-                    purchaseDate.getTime();
-
-                const canSell =
-                    passed >= fiveHours;
-
-                let waitText = "";
-
-                if (!canSell) {
-                    const left =
-                        fiveHours - passed;
-
-                    const hours =
-                        Math.floor(
-                            left / 3600000
-                        );
-
-                    const minutes =
-                        Math.floor(
-                            (left % 3600000) /
-                            60000
-                        );
-
-                    waitText =
-                        "Продажа через " +
-                        hours +
-                        "ч " +
-                        minutes +
-                        "м";
                 }
 
-                rows.push(`
-                    <div class="inventory-card">
 
-                        <div class="inventory-visual">
-                            <div class="inventory-emoji ${animationClass}">
-                                ${giftData.emoji}
-                            </div>
-                        </div>
+                const pageName =
+                    button.getAttribute(
+                        "data-page"
+                    );
 
-                        <div class="inventory-info">
 
-                            <div class="inventory-name">
-                                ${escapeHtml(
-                                    giftData.name
-                                )}
-                            </div>
+                pages.forEach(
+                    function(page) {
 
-                            <div class="inventory-date">
-                                Куплен:
-                                ${formatDate(
-                                    purchase.purchased_at
-                                )}
-                            </div>
+                        page.classList.remove(
+                            "active"
+                        );
 
-                            <div class="inventory-income">
-                                +1 ⭐/час
-                            </div>
-
-                            ${
-                                canSell
-                                    ? `
-                                        <button
-                                            class="inventory-sell"
-                                            type="button"
-                                            onclick="sellGift(${Number(purchase.id)})">
-                                            Продать за ${Number(giftData.price || 0)} ⭐
-                                        </button>
-                                      `
-                                    : `
-                                        <div class="inventory-wait">
-                                            ⏳ ${waitText}
-                                        </div>
-                                      `
-                            }
-
-                        </div>
-
-                    </div>
-                `);
-            });
-        });
-
-        if (!rows.length) {
-            list.innerHTML =
-                '<div class="empty">' +
-                "🎁 У тебя пока нет подарков" +
-                "</div>";
-        } else {
-            list.innerHTML =
-                rows.join("");
-        }
-
-        setupGiftAnimationObserver();
-    }
-
-    async function sellGift(purchaseId) {
-        try {
-            const data =
-                await apiRequest(
-                    "/api/gifts/sell",
-                    {
-                        body: {
-                            purchase_id:
-                                Number(
-                                    purchaseId
-                                )
-                        }
                     }
                 );
 
-            if (data.player) {
-                player = data.player;
 
-                balance =
-                    Number(
-                        player.balance || 0
+                navButtons.forEach(
+                    function(btn) {
+
+                        btn.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+                const selectedPage =
+                    document.getElementById(
+                        pageName
                     );
 
-                income =
-                    Number(
-                        player.income || 0
-                    );
 
-                updateScreen();
+                if (selectedPage) {
+
+                    selectedPage
+                        .classList
+                        .add(
+                            "active"
+                        );
+
+                }
+
+
+                button.classList.add(
+                    "active"
+                );
+
+
+                /*
+                 * ВАЖНО:
+                 * здесь больше НЕТ
+                 *
+                 * loadGiftShop();
+                 * loadInventory();
+                 *
+                 * при каждом открытии меню.
+                 *
+                 * Это убирает лишние запросы
+                 * и лишние перерисовки.
+                 */
+
+
+                window.scrollTo(
+                    0,
+                    0
+                );
+
             }
+        );
 
-            inventoryLoaded = false;
+    }
+);
 
-            await loadInventory();
 
-            showToast(
-                "💰 Подарок продан"
-            );
+/* =================================
+   ВКЛАДКИ ПОДАРКОВ
+================================= */
 
-        } catch (error) {
-            console.error(error);
-            showToast(
-                "❌ " +
-                error.message
-            );
+function showShopTab(tab) {
+
+    const shop =
+        document.getElementById(
+            "giftShop"
+        );
+
+
+    const inventoryElement =
+        document.getElementById(
+            "giftInventory"
+        );
+
+
+    const shopTab =
+        document.getElementById(
+            "shopTab"
+        );
+
+
+    const inventoryTab =
+        document.getElementById(
+            "inventoryTab"
+        );
+
+
+    if (
+        tab === "shop"
+    ) {
+
+        shop.style.display =
+            "block";
+
+
+        inventoryElement.style.display =
+            "none";
+
+
+        shopTab.classList.add(
+            "active"
+        );
+
+
+        inventoryTab.classList.remove(
+            "active"
+        );
+
+
+        if (!shopLoaded) {
+
+            loadGiftShop();
+
         }
+
+    } else {
+
+        shop.style.display =
+            "none";
+
+
+        inventoryElement.style.display =
+            "block";
+
+
+        shopTab.classList.remove(
+            "active"
+        );
+
+
+        inventoryTab.classList.add(
+            "active"
+        );
+
+
+        if (!inventoryLoaded) {
+
+            loadInventory();
+
+        }
+
     }
 
-    /* =========================
-       GIFT TABS
-    ========================= */
+}
 
-    function switchGiftTab(tab) {
-        giftTab = tab;
 
-        const shop =
-            document.getElementById(
-                "giftShopContainer"
-            );
+/* =================================
+   МАГАЗИН
+================================= */
 
-        const inventoryElement =
-            document.getElementById(
-                "inventoryContainer"
-            );
+async function loadGiftShop(
+    forceReload = false
+) {
 
-        const shopTab =
-            document.getElementById(
-                "shopTab"
-            );
+    if (
+        shopLoaded &&
+        !forceReload
+    ) {
 
-        const inventoryTab =
-            document.getElementById(
-                "inventoryTab"
-            );
+        return;
 
-        if (tab === "shop") {
-
-            shop.style.display =
-                "block";
-
-            inventoryElement.style.display =
-                "none";
-
-            shopTab.classList.add(
-                "active"
-            );
-
-            inventoryTab.classList.remove(
-                "active"
-            );
-
-        } else {
-
-            shop.style.display =
-                "none";
-
-            inventoryElement.style.display =
-                "block";
-
-            shopTab.classList.remove(
-                "active"
-            );
-
-            inventoryTab.classList.add(
-                "active"
-            );
-
-            if (!inventoryLoaded) {
-                loadInventory();
-            }
-        }
     }
 
-    /* =========================
-       BUY MODAL
-    ========================= */
 
-    function openBuyModal(giftId) {
+    const grid =
+        document.getElementById(
+            "shopGrid"
+        );
+
+
+    try {
+
+        if (!giftShop.length) {
+
+            grid.innerHTML = `
+
+                <div
+                    class="empty-inventory"
+                    style="grid-column:1/-1;">
+
+                    🔄 Загружаем магазин...
+
+                </div>
+
+            `;
+
+        }
+
+
+        const response =
+            await fetch(
+                API +
+                "/api/gifts"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.ok) {
+
+            throw new Error(
+                data.error ||
+                "Не удалось загрузить магазин"
+            );
+
+        }
+
+
+        giftShop =
+            Array.isArray(
+                data.gifts
+            )
+                ? data.gifts
+                : [];
+
+
+        shopLoaded =
+            true;
+
+
+        renderGiftShop();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        grid.innerHTML = `
+
+            <div
+                class="empty-inventory"
+                style="grid-column:1/-1;">
+
+                ❌ Не удалось загрузить магазин
+
+                <br><br>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =================================
+   ТИП АНИМАЦИИ
+================================= */
+
+function getGiftAnimationClass(
+    gift
+) {
+
+    const emoji =
+        String(
+            gift.emoji ||
+            ""
+        );
+
+
+    if (
+        [
+            "💝",
+            "💗",
+            "💖",
+            "💓",
+            "💞",
+            "💕"
+        ].includes(
+            emoji
+        )
+    ) {
+
+        return "gift-animation-heart";
+
+    }
+
+
+    if (
+        [
+            "💎",
+            "👑",
+            "⭐",
+            "🌟",
+            "✨",
+            "🏆",
+            "🏅",
+            "💰"
+        ].includes(
+            emoji
+        )
+    ) {
+
+        return "gift-animation-shine";
+
+    }
+
+
+    if (
+        emoji === "🚀" ||
+        emoji === "☄️"
+    ) {
+
+        return "gift-animation-rocket";
+
+    }
+
+
+    if (
+        [
+            "🔮",
+            "🔥",
+            "⚡",
+            "🌈",
+            "🎆",
+            "🌌",
+            "🪄"
+        ].includes(
+            emoji
+        )
+    ) {
+
+        return "gift-animation-magic";
+
+    }
+
+
+    return "gift-animation-bounce";
+
+}
+
+
+/* =================================
+   МАГАЗИН
+================================= */
+
+function renderGiftShop() {
+
+    const grid =
+        document.getElementById(
+            "shopGrid"
+        );
+
+
+    if (!giftShop.length) {
+
+        grid.innerHTML = `
+
+            <div
+                class="empty-inventory"
+                style="grid-column:1/-1;">
+
+                🎁 Сейчас подарков нет
+
+            </div>
+
+        `;
+
+        setupGiftAnimationObserver();
+
+        return;
+
+    }
+
+
+    grid.innerHTML =
+        giftShop
+            .map(
+                function(gift) {
+
+                    const owned =
+                        inventory.find(
+                            function(item) {
+
+                                return Number(
+                                    item.gift_id
+                                ) ===
+                                Number(
+                                    gift.id
+                                );
+
+                            }
+                        );
+
+
+                    const quantity =
+                        owned
+                            ? Number(
+                                owned.quantity ||
+                                0
+                            )
+                            : 0;
+
+
+                    const maxReached =
+                        quantity >= 5;
+
+
+                    const animationClass =
+                        getGiftAnimationClass(
+                            gift
+                        );
+
+
+                    return `
+
+                        <div
+                            class="gift-card">
+
+
+                            ${
+                                quantity > 0
+                                    ? `
+                                        <div
+                                            class="gift-count">
+
+                                            ${quantity}/5
+
+                                        </div>
+                                      `
+                                    : ""
+                            }
+
+
+                            <div
+                                class="gift-visual ${animationClass}">
+
+                                <span
+                                    class="gift-spark gift-spark-1">
+
+                                    ✦
+
+                                </span>
+
+
+                                <span
+                                    class="gift-spark gift-spark-2">
+
+                                    ✧
+
+                                </span>
+
+
+                                <span
+                                    class="gift-spark gift-spark-3">
+
+                                    ·
+
+                                </span>
+
+
+                                <span
+                                    class="gift-spark gift-spark-4">
+
+                                    ✦
+
+                                </span>
+
+
+                                <div
+                                    class="gift-emoji">
+
+                                    ${escapeHtml(
+                                        gift.emoji
+                                    )}
+
+                                </div>
+
+                            </div>
+
+
+                            <div
+                                class="gift-name">
+
+                                ${escapeHtml(
+                                    gift.name
+                                )}
+
+                            </div>
+
+
+                            <div
+                                class="gift-income">
+
+                                +${
+                                    Number(
+                                        gift.income ||
+                                        1
+                                    )
+                                } ⭐/час
+
+                            </div>
+
+
+                            <div
+                                class="gift-price">
+
+                                ${Number(
+                                    gift.price
+                                )} ⭐
+
+                            </div>
+
+
+                            <button
+                                class="gift-buy"
+
+                                ${
+                                    maxReached
+                                        ? "disabled"
+                                        : ""
+                                }
+
+                                onclick="
+                                    buyGift(
+                                        ${Number(
+                                            gift.id
+                                        )}
+                                    )
+                                ">
+
+                                ${
+                                    maxReached
+                                        ? "Максимум"
+                                        : "Купить"
+                                }
+
+                            </button>
+
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    setupGiftAnimationObserver();
+
+}
+
+
+/* =================================
+   ПОКУПКА
+================================= */
+
+async function buyGift(
+    giftId
+) {
+
+    try {
 
         const gift =
-            giftShop.find(function(item) {
-                return Number(item.id) ===
-                    Number(giftId);
-            });
+            giftShop.find(
+                function(item) {
+
+                    return Number(
+                        item.id
+                    ) ===
+                    Number(
+                        giftId
+                    );
+
+                }
+            );
+
 
         if (!gift) {
+
             showToast(
                 "❌ Подарок не найден"
             );
+
             return;
+
         }
 
-        const owned =
-            getOwnedGift(giftId);
 
-        const ownedQuantity =
+        const owned =
+            inventory.find(
+                function(item) {
+
+                    return Number(
+                        item.gift_id
+                    ) ===
+                    Number(
+                        giftId
+                    );
+
+                }
+            );
+
+
+        const quantity =
             owned
                 ? Number(
-                    owned.quantity || 0
+                    owned.quantity ||
+                    0
                 )
                 : 0;
 
-        buyModalMax =
-            Math.max(
-                0,
-                5 - ownedQuantity
-            );
 
-        if (buyModalMax <= 0) {
+        if (quantity >= 5) {
+
             showToast(
-                "🔒 Количество исчерпано"
+                "❌ Максимум 5 одинаковых подарков"
             );
+
             return;
+
         }
 
-        buyModalGift = gift;
-        buyModalQuantity = 1;
-        buyModalBusy = false;
-
-        document.getElementById(
-            "buyModalEmoji"
-        ).textContent =
-            gift.emoji || "🎁";
-
-        document.getElementById(
-            "buyModalName"
-        ).textContent =
-            gift.name || "Подарок";
-
-        document.getElementById(
-            "buyModal"
-        ).classList.add("show");
-
-        updateBuyModal();
-    }
-
-    function closeBuyModal() {
-
-        if (buyModalBusy) {
-            return;
-        }
-
-        document.getElementById(
-            "buyModal"
-        ).classList.remove("show");
-
-        buyModalGift = null;
-    }
-
-    function changeBuyQuantity(delta) {
 
         if (
-            !buyModalGift ||
-            buyModalBusy
-        ) {
-            return;
-        }
-
-        buyModalQuantity =
-            Math.max(
-                1,
-                Math.min(
-                    buyModalMax,
-                    buyModalQuantity +
-                    Number(delta)
-                )
-            );
-
-        updateBuyModal();
-    }
-
-    function updateBuyModal() {
-
-        if (!buyModalGift) {
-            return;
-        }
-
-        const price =
+            balance <
             Number(
-                buyModalGift.price || 0
-            );
-
-        const total =
-            price *
-            buyModalQuantity;
-
-        document.getElementById(
-            "buyQuantity"
-        ).textContent =
-            buyModalQuantity;
-
-        document.getElementById(
-            "buyTotal"
-        ).textContent =
-            total + " ⭐";
-
-        document.getElementById(
-            "buyModalPrice"
-        ).textContent =
-            price +
-            " ⭐ / 1 шт. · доступно " +
-            buyModalMax +
-            " шт.";
-
-        const confirm =
-            document.getElementById(
-                "buyConfirmButton"
-            );
-
-        confirm.disabled =
-            buyModalBusy ||
-            balance < total;
-
-        if (balance < total) {
-            confirm.textContent =
-                "Недостаточно ⭐";
-        } else {
-            confirm.textContent =
-                "Купить " +
-                buyModalQuantity +
-                " шт.";
-        }
-    }
-
-    async function confirmBuyGift() {
-
-        if (
-            !buyModalGift ||
-            buyModalBusy
+                gift.price
+            )
         ) {
-            return;
-        }
 
-        const gift =
-            buyModalGift;
-
-        const quantity =
-            buyModalQuantity;
-
-        const total =
-            Number(gift.price || 0) *
-            quantity;
-
-        if (balance < total) {
             showToast(
                 "❌ Недостаточно ⭐"
             );
+
             return;
+
         }
 
-        buyModalBusy = true;
-        updateBuyModal();
 
-        try {
+        showToast(
+            "⏳ Покупаем..."
+        );
 
-            /*
-             * Покупаем каждую штуку отдельным
-             * запросом, поэтому существующий
-             * backend менять не нужно.
-             */
-            for (
-                let i = 0;
-                i < quantity;
-                i++
-            ) {
 
-                const data =
-                    await apiRequest(
-                        "/api/gifts/buy",
-                        {
-                            body: {
-                                gift_id:
-                                    Number(
-                                        gift.id
-                                    )
-                            }
-                        }
-                    );
-
-                if (data.player) {
-
-                    player =
-                        data.player;
-
-                    balance =
+        const data =
+            await apiRequest(
+                "/api/gifts/buy",
+                {
+                    gift_id:
                         Number(
-                            player.balance ||
-                            0
-                        );
-
-                    income =
-                        Number(
-                            player.income ||
-                            0
-                        );
-
-                    updateScreen();
+                            giftId
+                        )
                 }
-            }
-
-            /*
-             * После покупки сразу обновляем
-             * инвентарь и магазин.
-             *
-             * Никакой кнопки «Обновить»
-             * пользователю не требуется.
-             */
-            inventoryLoaded = false;
-
-            await loadInventory();
-
-            renderGiftShop();
-
-            closeBuyModal();
-
-            showToast(
-                "🎁 Куплено: " +
-                quantity +
-                " × " +
-                gift.name
             );
 
-        } catch (error) {
 
-            console.error(error);
+        if (data.player) {
 
-            showToast(
-                "❌ " +
-                error.message
-            );
+            player =
+                data.player;
 
-            buyModalBusy = false;
 
-            updateBuyModal();
+            balance =
+                Number(
+                    player.balance
+                );
+
+
+            income =
+                Number(
+                    player.income
+                );
+
+
+            updateScreen();
+
         }
+
+
+        showToast(
+            "🎁 " +
+            gift.name +
+            " куплен!"
+        );
+
+
+        /*
+         * Обновляем только после покупки.
+         */
+
+        inventoryLoaded =
+            false;
+
+
+        await loadInventory();
+
+
+        renderGiftShop();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
     }
 
-    /* =========================
-       ANIMATION OPTIMIZATION
-    ========================= */
+}
 
-    function setupGiftAnimationObserver() {
 
-        if (giftObserver) {
-            giftObserver.disconnect();
+/* =================================
+   ИНВЕНТАРЬ
+================================= */
+
+async function loadInventory(
+    forceReload = false
+) {
+
+    if (
+        inventoryLoaded &&
+        !forceReload
+    ) {
+
+        return;
+
+    }
+
+
+    const list =
+        document.getElementById(
+            "inventoryList"
+        );
+
+
+    try {
+
+        if (!inventory.length) {
+
+            list.innerHTML = `
+
+                <div class="empty-inventory">
+
+                    🔄 Загружаем инвентарь...
+
+                </div>
+
+            `;
+
         }
+
+
+        const tgUser =
+            getTelegramUser();
+
+
+        const response =
+            await fetch(
+                API +
+                "/api/inventory?telegram_id=" +
+                encodeURIComponent(
+                    tgUser.id
+                )
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.ok) {
+
+            throw new Error(
+                data.error ||
+                "Не удалось загрузить инвентарь"
+            );
+
+        }
+
+
+        inventory =
+            Array.isArray(
+                data.inventory
+            )
+                ? data.inventory
+                : [];
+
+
+        inventoryLoaded =
+            true;
+
+
+        renderInventory();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        list.innerHTML = `
+
+            <div class="empty-inventory">
+
+                ❌ Не удалось загрузить инвентарь
+
+                <br><br>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =================================
+   ИНВЕНТАРЬ
+================================= */
+
+function renderInventory() {
+
+    const list =
+        document.getElementById(
+            "inventoryList"
+        );
+
+
+    if (!inventory.length) {
+
+        list.innerHTML = `
+
+            <div class="empty-inventory">
+
+                🎒 Инвентарь пуст
+
+                <br><br>
+
+                Купи подарок в магазине.
+
+            </div>
+
+        `;
+
+        setupGiftAnimationObserver();
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        inventory
+            .map(
+                function(item) {
+
+                    const gift =
+                        item.gift ||
+                        item;
+
+
+                    const purchases =
+                        Array.isArray(
+                            item.purchases
+                        )
+                            ? item.purchases
+                            : [];
+
+
+                    const animationClass =
+                        getGiftAnimationClass(
+                            gift
+                        );
+
+
+                    return `
+
+                        <div
+                            class="inventory-card">
+
+
+                            <div
+                                class="inventory-top">
+
+
+                                <div
+                                    class="
+                                        inventory-emoji
+                                        ${animationClass}
+                                    ">
+
+                                    ${escapeHtml(
+                                        gift.emoji ||
+                                        "🎁"
+                                    )}
+
+                                </div>
+
+
+                                <div
+                                    class="inventory-info">
+
+
+                                    <div
+                                        class="inventory-name">
+
+                                        ${escapeHtml(
+                                            gift.name ||
+                                            "Подарок"
+                                        )}
+
+                                    </div>
+
+
+                                    <div
+                                        class="inventory-count">
+
+                                        Количество:
+                                        ${
+                                            Number(
+                                                item.quantity ||
+                                                0
+                                            )
+                                        }
+                                        / 5
+
+                                    </div>
+
+
+                                    <div
+                                        class="inventory-income">
+
+                                        +${
+                                            Number(
+                                                gift.income ||
+                                                1
+                                            ) *
+                                            Number(
+                                                item.quantity ||
+                                                0
+                                            )
+                                        }
+                                        ⭐/час
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                            ${
+                                purchases.length
+                                    ? `
+
+                                        <div
+                                            class="
+                                                inventory-purchases
+                                            ">
+
+                                            ${purchases
+                                                .map(
+                                                    function(
+                                                        purchase
+                                                    ) {
+
+                                                        const purchasedAt =
+                                                            new Date(
+                                                                purchase.purchased_at
+                                                            );
+
+
+                                                        const canSellAt =
+                                                            purchasedAt.getTime() +
+                                                            5 *
+                                                            60 *
+                                                            60 *
+                                                            1000;
+
+
+                                                        const ready =
+                                                            Date.now() >=
+                                                            canSellAt;
+
+
+                                                        return `
+
+                                                            <div
+                                                                class="
+                                                                    purchase-row
+                                                                ">
+
+
+                                                                <div>
+
+                                                                    <div>
+
+                                                                        🎁 Покупка
+
+                                                                    </div>
+
+
+                                                                    <div
+                                                                        class="
+                                                                            purchase-time
+                                                                        ">
+
+                                                                        ${
+                                                                            purchasedAt.toLocaleString(
+                                                                                "ru-RU"
+                                                                            )
+                                                                        }
+
+                                                                    </div>
+
+
+                                                                    ${
+                                                                        ready
+                                                                            ? `
+                                                                                <div
+                                                                                    style="
+                                                                                        color:#72ff72;
+                                                                                        margin-top:4px;
+                                                                                    ">
+
+                                                                                    Можно продать
+
+                                                                                </div>
+                                                                              `
+                                                                            : `
+                                                                                <div
+                                                                                    style="
+                                                                                        color:#ff9999;
+                                                                                        margin-top:4px;
+                                                                                    ">
+
+                                                                                    Продажа через
+                                                                                    ${formatRemaining(
+                                                                                        canSellAt -
+                                                                                        Date.now()
+                                                                                    )}
+
+                                                                                </div>
+                                                                              `
+                                                                    }
+
+                                                                </div>
+
+
+                                                                <button
+                                                                    class="
+                                                                        sell-button
+                                                                        ${
+                                                                            ready
+                                                                                ? "ready"
+                                                                                : ""
+                                                                        }
+                                                                    "
+
+                                                                    ${
+                                                                        ready
+                                                                            ? ""
+                                                                            : "disabled"
+                                                                    }
+
+                                                                    onclick="
+                                                                        sellGift(
+                                                                            ${Number(
+                                                                                purchase.id
+                                                                            )}
+                                                                        )
+                                                                    ">
+
+                                                                    Продать
+                                                                    ${Number(
+                                                                        gift.price
+                                                                    )}
+                                                                    ⭐
+
+                                                                </button>
+
+
+                                                            </div>
+
+                                                        `;
+
+                                                    }
+                                                )
+                                                .join("")}
+
+                                        </div>
+
+                                      `
+                                    : ""
+                            }
+
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    setupGiftAnimationObserver();
+
+}
+
+
+/* =================================
+   ПРОДАЖА
+================================= */
+
+async function sellGift(
+    purchaseId
+) {
+
+    try {
 
         if (
-            !(
-                "IntersectionObserver"
-                in window
+            !confirm(
+                "Продать этот подарок?"
             )
         ) {
+
             return;
+
         }
 
-        giftObserver =
-            new IntersectionObserver(
-                function(entries) {
 
-                    entries.forEach(
-                        function(entry) {
+        showToast(
+            "⏳ Продаём..."
+        );
 
-                            const element =
-                                entry.target;
 
-                            if (
-                                entry.isIntersecting
-                            ) {
-
-                                element.classList.remove(
-                                    "gift-paused"
-                                );
-
-                                element.classList.remove(
-                                    "inventory-paused"
-                                );
-
-                            } else {
-
-                                element.classList.add(
-                                    "gift-paused"
-                                );
-
-                                element.classList.add(
-                                    "inventory-paused"
-                                );
-                            }
-                        }
-                    );
-                },
+        const data =
+            await apiRequest(
+                "/api/gifts/sell",
                 {
-                    root: null,
-                    rootMargin:
-                        "100px 0px 100px 0px",
-                    threshold: 0.01
+                    purchase_id:
+                        Number(
+                            purchaseId
+                        )
                 }
             );
 
-        document
-            .querySelectorAll(
-                ".gift-card, .inventory-card"
-            )
-            .forEach(
-                function(element) {
-                    giftObserver.observe(
-                        element
-                    );
-                }
-            );
+
+        if (data.player) {
+
+            player =
+                data.player;
+
+
+            balance =
+                Number(
+                    player.balance
+                );
+
+
+            income =
+                Number(
+                    player.income
+                );
+
+
+            updateScreen();
+
+        }
+
+
+        showToast(
+            "💰 Подарок продан"
+        );
+
+
+        inventoryLoaded =
+            false;
+
+
+        await loadInventory();
+
+
+        renderGiftShop();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
     }
 
-    /* =========================
-       ROULETTE
-    ========================= */
+}
 
-    function openRoulette() {
 
-        document
-            .getElementById(
-                "rouletteModal"
-            )
-            .classList.add("show");
+/* =================================
+   ТАЙМЕР ПРОДАЖИ
+================================= */
 
-        document.getElementById(
-            "rouletteResult"
-        ).textContent =
-            "Нажми «Крутить»";
+function formatRemaining(ms) {
+
+    if (ms <= 0) {
+
+        return "00:00:00";
+
     }
 
-    function closeRoulette() {
 
-        document
-            .getElementById(
-                "rouletteModal"
-            )
-            .classList.remove("show");
+    const totalSeconds =
+        Math.floor(
+            ms / 1000
+        );
+
+
+    const hours =
+        Math.floor(
+            totalSeconds / 3600
+        );
+
+
+    const minutes =
+        Math.floor(
+            (
+                totalSeconds % 3600
+            ) / 60
+        );
+
+
+    const seconds =
+        totalSeconds % 60;
+
+
+    return (
+        String(hours)
+            .padStart(2, "0") +
+        ":" +
+        String(minutes)
+            .padStart(2, "0") +
+        ":" +
+        String(seconds)
+            .padStart(2, "0")
+    );
+
+}
+
+
+/* =================================
+   ОПТИМИЗАЦИЯ АНИМАЦИЙ
+================================= */
+
+function setupGiftAnimationObserver() {
+
+    if (giftObserver) {
+
+        giftObserver.disconnect();
+
     }
 
-    async function spinRoulette() {
 
-        const button =
-            document.getElementById(
-                "rouletteSpinButton"
-            );
+    if (
+        !(
+            "IntersectionObserver"
+            in window
+        )
+    ) {
 
-        const result =
-            document.getElementById(
-                "rouletteResult"
-            );
+        return;
 
-        button.disabled = true;
-        result.textContent =
-            "🎰 Крутим...";
+    }
 
-        try {
 
-            const data =
-                await apiRequest(
-                    "/api/roulette/spin",
-                    {
-                        body: {
-                            telegram_id:
-                                getTelegramId()
+    giftObserver =
+        new IntersectionObserver(
+            function(entries) {
+
+                entries.forEach(
+                    function(entry) {
+
+                        const element =
+                            entry.target;
+
+
+                        if (
+                            entry.isIntersecting
+                        ) {
+
+                            element.classList.remove(
+                                "gift-paused"
+                            );
+
+                            element.classList.remove(
+                                "inventory-paused"
+                            );
+
+                        } else {
+
+                            element.classList.add(
+                                "gift-paused"
+                            );
+
+                            element.classList.add(
+                                "inventory-paused"
+                            );
+
                         }
+
                     }
                 );
 
-            if (data.player) {
-
-                player =
-                    data.player;
-
-                balance =
-                    Number(
-                        player.balance || 0
-                    );
-
-                income =
-                    Number(
-                        player.income || 0
-                    );
-
-                updateScreen();
-            }
-
-            result.textContent =
-                data.message ||
-                (
-                    "🎉 Выигрыш: " +
-                    Number(
-                        data.reward || 0
-                    ) +
-                    " ⭐"
-                );
-
-        } catch (error) {
-
-            console.error(error);
-
-            result.textContent =
-                "❌ " +
-                error.message;
-
-        } finally {
-
-            button.disabled = false;
-        }
-    }
-
-    /* =========================
-       UTILS
-    ========================= */
-
-    function escapeHtml(value) {
-
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    function formatDate(value) {
-
-        if (!value) {
-            return "неизвестно";
-        }
-
-        const date =
-            new Date(value);
-
-        if (
-            Number.isNaN(
-                date.getTime()
-            )
-        ) {
-            return "неизвестно";
-        }
-
-        return date.toLocaleString(
-            "ru-RU",
+            },
             {
-                day: "2-digit",
-                month: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit"
+                root: null,
+
+                rootMargin:
+                    "100px 0px 100px 0px",
+
+                threshold: 0.01
             }
         );
+
+
+    document
+        .querySelectorAll(
+            ".gift-card, .inventory-card"
+        )
+        .forEach(
+            function(element) {
+
+                giftObserver.observe(
+                    element
+                );
+
+            }
+        );
+
+}
+
+
+/* =================================
+   РУЛЕТКА
+================================= */
+
+function openRoulette() {
+
+    if (
+        economyExpiresAt &&
+        new Date(
+            economyExpiresAt
+        ).getTime() >
+        Date.now()
+    ) {
+
+        showToast(
+            "⚡ Множитель уже активен"
+        );
+
+        return;
+
     }
 
-    /* =========================
-       START
-    ========================= */
 
-    async function init() {
+    rouletteResult = null;
 
-        try {
+    rouletteIssuedAt = null;
 
-            await loadPlayer();
+    rouletteSignature = null;
 
-            await loadGiftShop();
+    rouletteSpinning = false;
 
-            /*
-             * Загружаем инвентарь сразу,
-             * чтобы магазин сразу знал,
-             * сколько подарков уже куплено.
-             *
-             * Поэтому лимит 5/5 отображается
-             * сразу, без кнопки обновления.
-             */
-            await loadInventory();
 
-        } catch (error) {
+    const lock =
+        document.getElementById(
+            "rouletteLock"
+        );
 
-            console.error(error);
 
-            showToast(
-                "❌ " +
-                error.message
+    const spinButton =
+        document.getElementById(
+            "rouletteSpinButton"
+        );
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    const resultText =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    spinButton.disabled =
+        false;
+
+
+    spinButton.style.display =
+        "block";
+
+
+    spinButton.textContent =
+        "🎰 Крутить";
+
+
+    claimButton.classList.remove(
+        "show"
+    );
+
+
+    resultText.textContent =
+        "Выбери свой множитель";
+
+
+    buildRoulette();
+
+
+    lock.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =================================
+   РУЛЕТКА
+================================= */
+
+function buildRoulette() {
+
+    const track =
+        document.getElementById(
+            "rouletteTrack"
+        );
+
+
+    track.innerHTML = "";
+
+
+    const values = [];
+
+
+    for (
+        let repeat = 0;
+        repeat < 7;
+        repeat++
+    ) {
+
+        for (
+            let i = 1;
+            i <= 20;
+            i++
+        ) {
+
+            values.push(
+                (i / 10).toFixed(1)
             );
 
-        } finally {
-
-            setTimeout(
-                function() {
-                    document
-                        .getElementById(
-                            "loadingScreen"
-                        )
-                        .style.display =
-                        "none";
-                },
-                300
-            );
         }
+
     }
 
-    init();
+
+    values.forEach(
+        function(value) {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "roulette-item";
+
+
+            item.textContent =
+                "x" +
+                value;
+
+
+            track.appendChild(
+                item
+            );
+
+        }
+    );
+
+
+    track.style.transition =
+        "none";
+
+
+    track.style.transform =
+        "translateX(0)";
+
+}
+
+
+/* =================================
+   КРУТИТЬ
+================================= */
+
+async function spinRoulette() {
+
+    if (rouletteSpinning) {
+
+        return;
+
+    }
+
+
+    rouletteSpinning =
+        true;
+
+
+    const spinButton =
+        document.getElementById(
+            "rouletteSpinButton"
+        );
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    const resultText =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    spinButton.disabled =
+        true;
+
+
+    spinButton.textContent =
+        "⏳ Крутим...";
+
+
+    claimButton.classList.remove(
+        "show"
+    );
+
+
+    resultText.textContent =
+        "Рулетка вращается...";
+
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/roulette/spin"
+            );
+
+
+        rouletteResult =
+            Number(
+                data.multiplier
+            );
+
+
+        rouletteIssuedAt =
+            Number(
+                data.issuedAt
+            );
+
+
+        rouletteSignature =
+            data.signature;
+
+
+        animateRoulette(
+            rouletteResult
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        rouletteSpinning =
+            false;
+
+
+        spinButton.disabled =
+            false;
+
+
+        spinButton.textContent =
+            "🎰 Крутить";
+
+
+        resultText.textContent =
+            "Ошибка";
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =================================
+   АНИМАЦИЯ РУЛЕТКИ
+================================= */
+
+function animateRoulette(
+    result
+) {
+
+    const track =
+        document.getElementById(
+            "rouletteTrack"
+        );
+
+
+    const items =
+        track.querySelectorAll(
+            ".roulette-item"
+        );
+
+
+    const resultIndex =
+        120 +
+        Math.floor(
+            Math.random() * 8
+        );
+
+
+    let targetIndex =
+        resultIndex;
+
+
+    for (
+        let i = resultIndex;
+        i < items.length;
+        i++
+    ) {
+
+        if (
+            Number(
+                items[i]
+                    .textContent
+                    .replace(
+                        "x",
+                        ""
+                    )
+            ) === result
+        ) {
+
+            targetIndex =
+                i;
+
+            break;
+
+        }
+
+    }
+
+
+    const item =
+        items[targetIndex];
+
+
+    if (!item) {
+
+        finishRoulette();
+
+        return;
+
+    }
+
+
+    const container =
+        document.querySelector(
+            ".roulette-window"
+        );
+
+
+    const containerCenter =
+        container.offsetWidth / 2;
+
+
+    const itemCenter =
+        item.offsetLeft +
+        item.offsetWidth / 2;
+
+
+    const offset =
+        containerCenter -
+        itemCenter;
+
+
+    track.style.transition =
+        "transform 5s cubic-bezier(.08,.72,.12,1)";
+
+
+    track.style.transform =
+        "translateX(" +
+        offset +
+        "px)";
+
+
+    setTimeout(
+        function() {
+
+            items.forEach(
+                function(el) {
+
+                    el.classList.remove(
+                        "selected"
+                    );
+
+                }
+            );
+
+
+            item.classList.add(
+                "selected"
+            );
+
+
+            finishRoulette();
+
+        },
+        5100
+    );
+
+}
+
+
+/* =================================
+   РУЛЕТКА РЕЗУЛЬТАТ
+================================= */
+
+function finishRoulette() {
+
+    rouletteSpinning =
+        false;
+
+
+    const spinButton =
+        document.getElementById(
+            "rouletteSpinButton"
+        );
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    const resultText =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    spinButton.style.display =
+        "none";
+
+
+    resultText.textContent =
+        "Выпало: x" +
+        rouletteResult.toFixed(1);
+
+
+    claimButton.textContent =
+        "Забрать x" +
+        rouletteResult.toFixed(1);
+
+
+    claimButton.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =================================
+   ЗАБРАТЬ РУЛЕТКУ
+================================= */
+
+async function claimRoulette() {
+
+    if (
+        rouletteResult === null ||
+        rouletteIssuedAt === null ||
+        !rouletteSignature
+    ) {
+
+        return;
+
+    }
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    claimButton.disabled =
+        true;
+
+
+    claimButton.textContent =
+        "⏳ Активируем...";
+
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/roulette/claim",
+                {
+                    multiplier:
+                        rouletteResult,
+
+                    issuedAt:
+                        rouletteIssuedAt,
+
+                    signature:
+                        rouletteSignature
+                }
+            );
+
+
+        player =
+            data.player;
+
+
+        balance =
+            Number(
+                player.balance
+            );
+
+
+        income =
+            Number(
+                player.income
+            );
+
+
+        economyMultiplier =
+            Number(
+                player.economy_multiplier ||
+                1
+            );
+
+
+        economyExpiresAt =
+            player.economy_expires_at ||
+            null;
+
+
+        updateScreen();
+
+
+        document
+            .getElementById(
+                "rouletteLock"
+            )
+            .classList
+            .remove(
+                "show"
+            );
+
+
+        rouletteResult = null;
+
+        rouletteIssuedAt = null;
+
+        rouletteSignature = null;
+
+
+        showToast(
+            "🔥 Множитель активирован"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        claimButton.disabled =
+            false;
+
+
+        claimButton.textContent =
+            "Забрать x" +
+            rouletteResult.toFixed(1);
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =================================
+   БОНУС
+================================= */
+
+async function collect() {
+
+    try {
+
+        const button =
+            document.getElementById(
+                "bonusButton"
+            );
+
+
+        button.disabled =
+            true;
+
+
+        button.textContent =
+            "⏳ Получаем...";
+
+
+        const data =
+            await apiRequest(
+                "/api/collect"
+            );
+
+
+        player =
+            data.player;
+
+
+        balance =
+            Number(
+                player.balance
+            );
+
+
+        income =
+            Number(
+                player.income
+            );
+
+
+        updateScreen();
+
+
+        showToast(
+            "🔥 +1000 ⭐"
+        );
+
+
+        button.textContent =
+            "✅ Получено";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+
+        const button =
+            document.getElementById(
+                "bonusButton"
+            );
+
+
+        button.disabled =
+            false;
+
+
+        button.textContent =
+            "Забрать +1000 ⭐";
+
+    }
+
+}
+
+
+/* =================================
+   ПРИГЛАСИТЬ
+================================= */
+
+function inviteFriend() {
+
+    try {
+
+        const tgUser =
+            getTelegramUser();
+
+
+        const link =
+            "https://t.me/" +
+            "RaneGameBot" +
+            "?start=ref_" +
+            tgUser.id;
+
+
+        const shareUrl =
+            "https://t.me/share/url" +
+            "?url=" +
+            encodeURIComponent(
+                link
+            ) +
+            "&text=" +
+            encodeURIComponent(
+                "Залетай в RaneGame!"
+            );
+
+
+        if (
+            tg &&
+            tg.openTelegramLink
+        ) {
+
+            tg.openTelegramLink(
+                shareUrl
+            );
+
+        } else {
+
+            navigator.clipboard
+                .writeText(
+                    link
+                )
+                .then(
+                    function() {
+
+                        showToast(
+                            "🔗 Ссылка скопирована"
+                        );
+
+                    }
+                );
+
+        }
+
+    } catch (error) {
+
+        showToast(
+            "❌ Открой игру через Telegram"
+        );
+
+    }
+
+}
+
+
+/* =================================
+   КОПИРОВАТЬ
+================================= */
+
+function copyInviteLink() {
+
+    try {
+
+        const tgUser =
+            getTelegramUser();
+
+
+        const link =
+            "https://t.me/RaneGameBot?start=ref_" +
+            tgUser.id;
+
+
+        navigator.clipboard
+            .writeText(
+                link
+            )
+            .then(
+                function() {
+
+                    showToast(
+                        "🔗 Ссылка скопирована"
+                    );
+
+                }
+            )
+            .catch(
+                function() {
+
+                    showToast(
+                        "❌ Не удалось скопировать"
+                    );
+
+                }
+            );
+
+    } catch (error) {
+
+        showToast(
+            "❌ Открой игру через Telegram"
+        );
+
+    }
+
+}
+
+
+/* =================================
+   TOAST
+================================= */
+
+function showToast(text) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        text;
+
+
+    toast.style.display =
+        "block";
+
+
+    clearTimeout(
+        window.toastTimer
+    );
+
+
+    window.toastTimer =
+        setTimeout(
+            function() {
+
+                toast.style.display =
+                    "none";
+
+            },
+            2500
+        );
+
+}
+
+
+/* =================================
+   ESCAPE HTML
+================================= */
+
+function escapeHtml(text) {
+
+    return String(text)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =================================
+   ЗАПУСК
+================================= */
+
+loadPlayer();
+
 </script>
 
 </body>
