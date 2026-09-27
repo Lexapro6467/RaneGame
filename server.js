@@ -22,8 +22,16 @@ const SUPABASE_SERVICE_ROLE_KEY =
 const BOT_TOKEN =
     process.env.BOT_TOKEN;
 
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
 const DEV_TELEGRAM_ID =
-    "5370959021438146805";
+    "8791077915";
+
+const ADMIN_PASSWORD =
+    "LexaJordon1122";
 
 
 /* =========================================================
@@ -69,11 +77,6 @@ const ROULETTE_DURATION_MS =
 /* =========================================================
    FRONTEND — INDEX.HTML
 ========================================================= */
-
-/*
-   ВАЖНО:
-   Render должен отдавать index.html при открытии сайта.
-*/
 
 app.use(
     express.static(
@@ -266,7 +269,9 @@ app.post(
 
         try {
 
-            const user = req.body?.user;
+            const user =
+                req.body?.user;
+
 
             /* =========================================
                ПРОВЕРКА АДМИНА
@@ -286,23 +291,25 @@ app.post(
 
             }
 
+
             const telegramId =
                 Number(DEV_TELEGRAM_ID);
 
 
             /* =========================================
-               УДАЛЯЕМ ВСЕ ПОКУПКИ
+               УДАЛЯЕМ ПОКУПКИ
             ========================================= */
 
             const {
                 error: purchasesError
-            } = await supabase
-                .from("gift_purchases")
-                .delete()
-                .eq(
-                    "telegram_id",
-                    telegramId
-                );
+            } =
+                await supabase
+                    .from("gift_purchases")
+                    .delete()
+                    .eq(
+                        "telegram_id",
+                        telegramId
+                    );
 
             if (purchasesError) {
                 throw purchasesError;
@@ -310,18 +317,19 @@ app.post(
 
 
             /* =========================================
-               УДАЛЯЕМ ВСЕ ПОДАРКИ ИЗ ИНВЕНТАРЯ
+               УДАЛЯЕМ ПОДАРКИ
             ========================================= */
 
             const {
                 error: giftsError
-            } = await supabase
-                .from("player_gifts")
-                .delete()
-                .eq(
-                    "telegram_id",
-                    telegramId
-                );
+            } =
+                await supabase
+                    .from("player_gifts")
+                    .delete()
+                    .eq(
+                        "telegram_id",
+                        telegramId
+                    );
 
             if (giftsError) {
                 throw giftsError;
@@ -335,32 +343,33 @@ app.post(
             const {
                 data: player,
                 error: playerError
-            } = await supabase
-                .from("players")
-                .update({
+            } =
+                await supabase
+                    .from("players")
+                    .update({
 
-                    /* ⭐ Баланс */
-                    balance: 0,
+                        balance:
+                            0,
 
-                    /* 💰 Доход */
-                    income: 0,
+                        income:
+                            0,
 
-                    /* 📈 Множитель */
-                    economy_multiplier: 1.00,
+                        economy_multiplier:
+                            1.00,
 
-                    /* ⏱️ Время действия множителя */
-                    economy_expires_at: null,
+                        economy_expires_at:
+                            null,
 
-                    /* 🎁 Недельный бонус */
-                    bonus_claimed_at: null
+                        bonus_claimed_at:
+                            null
 
-                })
-                .eq(
-                    "telegram_id",
-                    telegramId
-                )
-                .select("*")
-                .single();
+                    })
+                    .eq(
+                        "telegram_id",
+                        telegramId
+                    )
+                    .select("*")
+                    .single();
 
 
             if (playerError) {
@@ -374,9 +383,11 @@ app.post(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
-                success: true,
+                success:
+                    true,
 
                 message:
                     "Аккаунт полностью сброшен",
@@ -397,7 +408,8 @@ app.post(
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message ||
@@ -431,7 +443,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан Telegram user"
@@ -449,7 +462,8 @@ app.post(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
                 player
 
@@ -462,12 +476,12 @@ app.post(
                 error
             );
 
-
             return res
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message
@@ -862,7 +876,8 @@ app.get(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
                 gifts,
 
@@ -891,7 +906,8 @@ app.get(
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message
@@ -926,7 +942,8 @@ app.get(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан telegram_id"
@@ -1043,7 +1060,8 @@ app.get(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
                 inventory
 
@@ -1061,7 +1079,8 @@ app.get(
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message
@@ -1094,7 +1113,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан Telegram user"
@@ -1116,7 +1136,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан gift_id"
@@ -1139,7 +1160,8 @@ app.post(
                 quantity < 1
             ) {
 
-                quantity = 1;
+                quantity =
+                    1;
 
             }
 
@@ -1150,8 +1172,13 @@ app.post(
                 );
 
 
-            if (quantity > 5) {
-                quantity = 5;
+            if (
+                quantity > 5
+            ) {
+
+                quantity =
+                    5;
+
             }
 
 
@@ -1203,7 +1230,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Этого подарка сейчас нет в магазине"
@@ -1225,7 +1253,8 @@ app.post(
 
             const giftIncome =
                 Number(
-                    gift.income || 1
+                    gift.income ||
+                    1
                 );
 
 
@@ -1273,7 +1302,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Можно купить максимум 5 одинаковых подарков"
@@ -1308,7 +1338,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Недостаточно ⭐"
@@ -1469,7 +1500,8 @@ app.post(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
                 player:
                     updatedPlayer,
@@ -1498,7 +1530,8 @@ app.post(
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message
@@ -1531,7 +1564,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан Telegram user"
@@ -1553,7 +1587,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан purchase_id"
@@ -1604,7 +1639,8 @@ app.post(
                     .status(404)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Покупка не найдена"
@@ -1656,7 +1692,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             `Подарок пока нельзя продать. Осталось примерно ${hours} ч. ${minutes} мин.`
@@ -1678,7 +1715,8 @@ app.post(
 
             const giftIncome =
                 Number(
-                    gift.income || 1
+                    gift.income ||
+                    1
                 );
 
 
@@ -1718,7 +1756,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Подарка нет в инвентаре"
@@ -1854,7 +1893,8 @@ app.post(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
                 player:
                     updatedPlayer,
@@ -1876,7 +1916,8 @@ app.post(
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message
@@ -1909,7 +1950,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан Telegram user"
@@ -1931,7 +1973,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не указана цена"
@@ -1956,7 +1999,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Недостаточно ⭐"
@@ -1989,7 +2033,8 @@ app.post(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
                 player:
                     updatedPlayer
@@ -2008,7 +2053,8 @@ app.post(
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message
@@ -2041,7 +2087,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан Telegram user"
@@ -2108,7 +2155,8 @@ app.post(
                         .status(400)
                         .json({
 
-                            ok: false,
+                            ok:
+                                false,
 
                             error:
                                 `Бонус будет доступен через ${days} дн.`
@@ -2140,7 +2188,8 @@ app.post(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
                 player:
                     updatedPlayer,
@@ -2162,7 +2211,8 @@ app.post(
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message
@@ -2241,7 +2291,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан Telegram user"
@@ -2274,7 +2325,8 @@ app.post(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
                 multiplier,
 
@@ -2296,7 +2348,8 @@ app.post(
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message
@@ -2329,7 +2382,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Не передан Telegram user"
@@ -2365,7 +2419,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Недостаточно данных рулетки"
@@ -2385,7 +2440,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Неверный множитель"
@@ -2405,7 +2461,8 @@ app.post(
                     .status(400)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Результат рулетки устарел"
@@ -2432,7 +2489,8 @@ app.post(
                     .status(403)
                     .json({
 
-                        ok: false,
+                        ok:
+                            false,
 
                         error:
                             "Неверная подпись рулетки"
@@ -2472,7 +2530,8 @@ app.post(
 
             return res.json({
 
-                ok: true,
+                ok:
+                    true,
 
                 player:
                     updatedPlayer,
@@ -2496,7 +2555,8 @@ app.post(
                 .status(500)
                 .json({
 
-                    ok: false,
+                    ok:
+                        false,
 
                     error:
                         error.message
@@ -2519,7 +2579,8 @@ app.get(
 
         res.json({
 
-            ok: true,
+            ok:
+                true,
 
             service:
                 "RaneGame",
@@ -2595,15 +2656,20 @@ async function telegramRequest(
 
 const referralRewards = {
 
-    2: 500,
+    2:
+        500,
 
-    4: 1000,
+    4:
+        1000,
 
-    6: 4000,
+    6:
+        4000,
 
-    8: 7000,
+    8:
+        7000,
 
-    10: 1000
+    10:
+        1000
 
 };
 
@@ -3037,6 +3103,10 @@ app.listen(
 
         console.log(
             "🛠️ Admin Panel: OK"
+        );
+
+        console.log(
+            `👑 Admin Telegram ID: ${DEV_TELEGRAM_ID}`
         );
 
         telegramPolling();
