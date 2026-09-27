@@ -287,6 +287,447 @@ async function updatePlayer(
 
 
 /* =====================================================
+   РЕФЕРАЛЫ
+===================================================== */
+
+async function addBalance(
+    telegramId,
+    amount
+) {
+
+    const player =
+        await getPlayer(
+            telegramId
+        );
+
+    if (!player) {
+        return null;
+    }
+
+    return await updatePlayer(
+        telegramId,
+        {
+            balance:
+                Number(player.balance) +
+                amount
+        }
+    );
+}
+
+
+async function getReferral(
+    invitedTelegramId
+) {
+
+    const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/referrals?invited_telegram_id=eq.${invitedTelegramId}&select=*`,
+        {
+            headers: {
+                apikey: SUPABASE_KEY,
+                Authorization:
+                    `Bearer ${SUPABASE_KEY}`
+            }
+        }
+    );
+
+    if (!response.ok) {
+
+        console.error(
+            await response.text()
+        );
+
+        throw new Error(
+            "Ошибка проверки реферала"
+        );
+    }
+
+    const referrals =
+        await response.json();
+
+    return referrals.length
+        ? referrals[0]
+        : null;
+}
+
+
+async function getInviterReferralCount(
+    inviterTelegramId
+) {
+
+    const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/referrals?inviter_telegram_id=eq.${inviterTelegramId}&select=id`,
+        {
+            headers: {
+                apikey: SUPABASE_KEY,
+                Authorization:
+                    `Bearer ${SUPABASE_KEY}`
+            }
+        }
+    );
+
+    if (!response.ok) {
+
+        console.error(
+            await response.text()
+        );
+
+        throw new Error(
+            "Ошибка подсчёта рефералов"
+        );
+    }
+
+    const referrals =
+        await response.json();
+
+    return referrals.length;
+}
+
+
+async function addReferral(
+    inviterTelegramId,
+    invitedTelegramId
+) {
+
+    if (
+        String(inviterTelegramId) ===
+        String(invitedTelegramId)
+    ) {
+        return {
+            ok: false,
+            error: "Нельзя пригласить себя"
+        };
+    }
+
+    const inviter =
+        await getPlayer(
+            inviterTelegramId
+        );
+
+    const invited =
+        await getPlayer(
+            invitedTelegramId
+        );
+
+    if (!inviter || !invited) {
+        return {
+            ok: false,
+            error: "Игрок не найден"
+        };
+    }
+
+    const existing =
+        await getReferral(
+            invitedTelegramId
+        );
+
+    if (existing) {
+        return {
+            ok: false,
+            error:
+                "Этот пользователь уже был приглашён"
+        };
+    }
+
+    const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/referrals`,
+        {
+            method: "POST",
+
+            headers: {
+                apikey: SUPABASE_KEY,
+
+                Authorization:
+                    `Bearer ${SUPABASE_KEY}`,
+
+                "Content-Type":
+                    "application/json",
+
+                Prefer:
+                    "return=representation"
+            },
+
+            body: JSON.stringify({
+                inviter_telegram_id:
+                    inviterTelegramId,
+
+                invited_telegram_id:
+                    invitedTelegramId
+            })
+        }
+    );
+
+    if (!response.ok) {
+
+        console.error(
+            await response.text()
+        );
+
+        return {
+            ok: false,
+            error:
+                "Не удалось сохранить реферала"
+        };
+    }
+
+
+    /*
+     * Новый друг получает 200 ⭐
+     */
+
+    await addBalance(
+        invitedTelegramId,
+        200
+    );
+
+
+    /*
+     * Считаем приглашённых
+     */
+
+    const count =
+        await getInviterReferralCount(
+            inviterTelegramId
+        );
+
+
+    /*
+     * За каждые 2 приглашённых
+     * пригласивший получает 500 ⭐
+     */
+
+    if (
+        count >= 2 &&
+        count % 2 === 0
+    ) {
+
+        await addBalance(
+            inviterTelegramId,
+            500
+        );
+
+    }
+
+    console.log(
+        `РЕФЕРАЛ: ${inviterTelegramId} -> ${invitedTelegramId}`
+    );
+
+    return {
+        ok: true,
+        count
+    };
+}
+
+
+/* =====================================================
+   TELEGRAM BOT — REFERRAL /START
+===================================================== */
+
+let telegramOffset = 0;
+
+
+async function telegramApi(
+    method,
+    body
+) {
+
+    const response = await fetch(
+        `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body:
+                JSON.stringify(body)
+        }
+    );
+
+    return await response.json();
+}
+
+
+async function processTelegramUpdates() {
+
+    if (!BOT_TOKEN) {
+        return;
+    }
+
+    try {
+
+        const result =
+            await telegramApi(
+                "getUpdates",
+                {
+                    offset:
+                        telegramOffset,
+
+                    timeout: 0,
+
+                    allowed_updates:
+                        ["message"]
+                }
+            );
+
+        if (
+            !result ||
+            !result.ok ||
+            !Array.isArray(result.result)
+        ) {
+            return;
+        }
+
+
+        for (
+            const update of result.result
+        ) {
+
+            telegramOffset =
+                update.update_id + 1;
+
+
+            const message =
+                update.message;
+
+            if (!message) {
+                continue;
+            }
+
+
+            const text =
+                message.text || "";
+
+
+            if (
+                !text.startsWith("/start")
+            ) {
+                continue;
+            }
+
+
+            const parts =
+                text.trim().split(/\s+/);
+
+
+            if (
+                parts.length < 2
+            ) {
+                continue;
+            }
+
+
+            const startParam =
+                parts[1];
+
+
+            if (
+                !startParam.startsWith("ref_")
+            ) {
+                continue;
+            }
+
+
+            const inviterTelegramId =
+                startParam.substring(
+                    4
+                );
+
+
+            if (
+                !/^\d+$/.test(
+                    inviterTelegramId
+                )
+            ) {
+                continue;
+            }
+
+
+            const invitedTelegramId =
+                message.from &&
+                message.from.id;
+
+
+            if (!invitedTelegramId) {
+                continue;
+            }
+
+
+            await addReferral(
+                inviterTelegramId,
+                invitedTelegramId
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "TELEGRAM REFERRAL ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   ЗАПУСК ПРОВЕРКИ TELEGRAM
+===================================================== */
+
+async function startTelegramPolling() {
+
+    if (!BOT_TOKEN) {
+
+        console.log(
+            "BOT_TOKEN не найден — Telegram polling отключён"
+        );
+
+        return;
+    }
+
+
+    /*
+     * Если у бота раньше был webhook,
+     * удаляем его, чтобы getUpdates работал.
+     */
+
+    try {
+
+        await telegramApi(
+            "deleteWebhook",
+            {
+                drop_pending_updates:
+                    false
+            }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Ошибка удаления webhook:",
+            error
+        );
+
+    }
+
+
+    console.log(
+        "Telegram referral polling запущен"
+    );
+
+
+    setInterval(
+        processTelegramUpdates,
+        3000
+    );
+
+}
+
+
+/* =====================================================
    ПОДПИСЬ РЕЗУЛЬТАТА РУЛЕТКИ
 ===================================================== */
 
@@ -354,7 +795,10 @@ function verifyRouletteResult(
         return false;
     }
 
-    return crypto.timingSafeEqual(a, b);
+    return crypto.timingSafeEqual(
+        a,
+        b
+    );
 }
 
 
@@ -497,12 +941,6 @@ app.post(
             }
 
 
-            /*
-             * Если предыдущий множитель
-             * ещё действует — новую рулетку
-             * крутить нельзя.
-             */
-
             if (
                 player.economy_expires_at &&
                 new Date(
@@ -518,10 +956,6 @@ app.post(
 
             }
 
-
-            /*
-             * x0.1 ... x2.0
-             */
 
             const multiplier =
                 Number(
@@ -618,10 +1052,6 @@ app.post(
                 req.body.signature;
 
 
-            /*
-             * Проверяем диапазон
-             */
-
             if (
                 !Number.isFinite(multiplier) ||
                 multiplier < 0.1 ||
@@ -636,11 +1066,6 @@ app.post(
 
             }
 
-
-            /*
-             * Только значения 0.1,
-             * 0.2 ... 2.0
-             */
 
             const tenth =
                 Math.round(
@@ -663,15 +1088,12 @@ app.post(
             }
 
 
-            /*
-             * Результат должен быть
-             * свежим
-             */
-
             if (
                 !Number.isFinite(issuedAt) ||
-                Date.now() - issuedAt > 10 * 60 * 1000 ||
-                issuedAt - Date.now() > 60 * 1000
+                Date.now() - issuedAt >
+                    10 * 60 * 1000 ||
+                issuedAt - Date.now() >
+                    60 * 1000
             ) {
 
                 return res.status(400).json({
@@ -682,10 +1104,6 @@ app.post(
 
             }
 
-
-            /*
-             * Проверяем подпись сервера
-             */
 
             if (
                 !verifyRouletteResult(
@@ -721,11 +1139,6 @@ app.post(
             }
 
 
-            /*
-             * Проверяем, что множитель
-             * не был активирован раньше.
-             */
-
             if (
                 player.economy_expires_at &&
                 new Date(
@@ -741,10 +1154,6 @@ app.post(
 
             }
 
-
-            /*
-             * 4 часа
-             */
 
             const expiresAt =
                 new Date(
@@ -1011,6 +1420,8 @@ app.listen(
         console.log(
             `RaneGame запущен на порту ${PORT}`
         );
+
+        startTelegramPolling();
 
     }
 );
