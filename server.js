@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require("5370959021438146805");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
@@ -223,38 +223,60 @@ async function updatePlayer(
    ГЛАВНАЯ
 ========================================================= */
 
-app.get(
-    "/",
-    (req, res) => {
+app.post("/api/dev/reset-account", async (req, res) => {
+    try {
+        const user = req.body?.user;
 
-        const indexPath =
-            path.join(
-                __dirname,
-                "index.html"
-            );
-
-
-        if (
-            fs.existsSync(
-                indexPath
-            )
-        ) {
-
-            return res.sendFile(
-                indexPath
-            );
-
+        if (!user || String(user.id) !== DEV_TELEGRAM_ID) {
+            return res.status(403).json({
+                error: "Доступ запрещён"
+            });
         }
 
+        const telegramId = DEV_TELEGRAM_ID;
 
-        return res
-            .status(200)
-            .send(
-                "RaneGame server работает."
-            );
+        const { error: purchasesError } = await supabase
+            .from("gift_purchases")
+            .delete()
+            .eq("telegram_id", telegramId);
 
+        if (purchasesError) throw purchasesError;
+
+        const { error: giftsError } = await supabase
+            .from("player_gifts")
+            .delete()
+            .eq("telegram_id", telegramId);
+
+        if (giftsError) throw giftsError;
+
+        const { data: player, error: playerError } = await supabase
+            .from("players")
+            .update({
+                balance: 0,
+                income: 0,
+                economy_multiplier: 1.00,
+                economy_expires_at: null,
+                bonus_claimed_at: null
+            })
+            .eq("telegram_id", telegramId)
+            .select()
+            .single();
+
+        if (playerError) throw playerError;
+
+        res.json({
+            success: true,
+            player
+        });
+
+    } catch (error) {
+        console.error("RESET ACCOUNT ERROR:", error);
+
+        res.status(500).json({
+            error: error.message
+        });
     }
-);
+});
 
 
 /* =========================================================
