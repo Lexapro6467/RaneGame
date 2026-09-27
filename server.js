@@ -61,18 +61,12 @@ function validateTelegramInitData(initData) {
         .join("\n");
 
     const secretKey = crypto
-        .createHmac(
-            "sha256",
-            "WebAppData"
-        )
+        .createHmac("sha256", "WebAppData")
         .update(BOT_TOKEN)
         .digest();
 
     const calculatedHash = crypto
-        .createHmac(
-            "sha256",
-            secretKey
-        )
+        .createHmac("sha256", secretKey)
         .update(dataCheckString)
         .digest("hex");
 
@@ -106,8 +100,7 @@ function validateTelegramInitData(initData) {
         };
     }
 
-    const userData =
-        params.get("user");
+    const userData = params.get("user");
 
     if (!userData) {
         return {
@@ -332,10 +325,6 @@ async function getReferral(
 
     if (!response.ok) {
 
-        console.error(
-            await response.text()
-        );
-
         throw new Error(
             "Ошибка проверки реферала"
         );
@@ -366,10 +355,6 @@ async function getInviterReferralCount(
     );
 
     if (!response.ok) {
-
-        console.error(
-            await response.text()
-        );
 
         throw new Error(
             "Ошибка подсчёта рефералов"
@@ -469,31 +454,15 @@ async function addReferral(
         };
     }
 
-
-    /*
-     * Новый друг получает 200 ⭐
-     */
-
     await addBalance(
         invitedTelegramId,
         200
     );
 
-
-    /*
-     * Считаем приглашённых
-     */
-
     const count =
         await getInviterReferralCount(
             inviterTelegramId
         );
-
-
-    /*
-     * За каждые 2 приглашённых
-     * пригласивший получает 500 ⭐
-     */
 
     if (
         count >= 2 &&
@@ -579,14 +548,12 @@ async function processTelegramUpdates() {
             return;
         }
 
-
         for (
             const update of result.result
         ) {
 
             telegramOffset =
                 update.update_id + 1;
-
 
             const message =
                 update.message;
@@ -595,10 +562,8 @@ async function processTelegramUpdates() {
                 continue;
             }
 
-
             const text =
                 message.text || "";
-
 
             if (
                 !text.startsWith("/start")
@@ -606,10 +571,8 @@ async function processTelegramUpdates() {
                 continue;
             }
 
-
             const parts =
                 text.trim().split(/\s+/);
-
 
             if (
                 parts.length < 2
@@ -617,10 +580,8 @@ async function processTelegramUpdates() {
                 continue;
             }
 
-
             const startParam =
                 parts[1];
-
 
             if (
                 !startParam.startsWith("ref_")
@@ -628,12 +589,8 @@ async function processTelegramUpdates() {
                 continue;
             }
 
-
             const inviterTelegramId =
-                startParam.substring(
-                    4
-                );
-
+                startParam.substring(4);
 
             if (
                 !/^\d+$/.test(
@@ -643,22 +600,18 @@ async function processTelegramUpdates() {
                 continue;
             }
 
-
             const invitedTelegramId =
                 message.from &&
                 message.from.id;
-
 
             if (!invitedTelegramId) {
                 continue;
             }
 
-
             await addReferral(
                 inviterTelegramId,
                 invitedTelegramId
             );
-
         }
 
     } catch (error) {
@@ -669,13 +622,8 @@ async function processTelegramUpdates() {
         );
 
     }
-
 }
 
-
-/* =====================================================
-   ЗАПУСК ПРОВЕРКИ TELEGRAM
-===================================================== */
 
 async function startTelegramPolling() {
 
@@ -687,12 +635,6 @@ async function startTelegramPolling() {
 
         return;
     }
-
-
-    /*
-     * Если у бота раньше был webhook,
-     * удаляем его, чтобы getUpdates работал.
-     */
 
     try {
 
@@ -713,22 +655,19 @@ async function startTelegramPolling() {
 
     }
 
-
     console.log(
         "Telegram referral polling запущен"
     );
-
 
     setInterval(
         processTelegramUpdates,
         3000
     );
-
 }
 
 
 /* =====================================================
-   ПОДПИСЬ РЕЗУЛЬТАТА РУЛЕТКИ
+   ПОДПИСЬ РУЛЕТКИ
 ===================================================== */
 
 function getRouletteSecret() {
@@ -940,7 +879,6 @@ app.post(
 
             }
 
-
             if (
                 player.economy_expires_at &&
                 new Date(
@@ -956,7 +894,6 @@ app.post(
 
             }
 
-
             const multiplier =
                 Number(
                     (
@@ -967,10 +904,8 @@ app.post(
                     ).toFixed(2)
                 );
 
-
             const issuedAt =
                 Date.now();
-
 
             const signature =
                 signRouletteResult(
@@ -979,17 +914,12 @@ app.post(
                     issuedAt
                 );
 
-
             res.json({
                 ok: true,
-
                 multiplier,
-
                 issuedAt,
-
                 signature
             });
-
 
         } catch (error) {
 
@@ -1037,7 +967,6 @@ app.post(
             const user =
                 auth.user;
 
-
             const multiplier =
                 Number(
                     req.body.multiplier
@@ -1050,7 +979,6 @@ app.post(
 
             const signature =
                 req.body.signature;
-
 
             if (
                 !Number.isFinite(multiplier) ||
@@ -1065,7 +993,6 @@ app.post(
                 });
 
             }
-
 
             const tenth =
                 Math.round(
@@ -1087,7 +1014,6 @@ app.post(
 
             }
 
-
             if (
                 !Number.isFinite(issuedAt) ||
                 Date.now() - issuedAt >
@@ -1103,7 +1029,6 @@ app.post(
                 });
 
             }
-
 
             if (
                 !verifyRouletteResult(
@@ -1122,7 +1047,6 @@ app.post(
 
             }
 
-
             const player =
                 await getPlayer(
                     user.id
@@ -1137,7 +1061,6 @@ app.post(
                 });
 
             }
-
 
             if (
                 player.economy_expires_at &&
@@ -1154,13 +1077,11 @@ app.post(
 
             }
 
-
             const expiresAt =
                 new Date(
                     Date.now() +
                     4 * 60 * 60 * 1000
                 ).toISOString();
-
 
             const updated =
                 await updatePlayer(
@@ -1174,17 +1095,12 @@ app.post(
                     }
                 );
 
-
             res.json({
                 ok: true,
-
                 player: updated,
-
                 multiplier,
-
                 expiresAt
             });
-
 
         } catch (error) {
 
@@ -1206,7 +1122,7 @@ app.post(
 
 
 /* =====================================================
-   BONUS
+   BONUS — РАЗ В 7 ДНЕЙ
 ===================================================== */
 
 app.post(
@@ -1247,22 +1163,98 @@ app.post(
 
             }
 
+
+            /* =========================================
+               ПРОВЕРЯЕМ 7 ДНЕЙ
+            ========================================= */
+
+            const now =
+                Date.now();
+
+            const week =
+                7 * 24 * 60 * 60 * 1000;
+
+
+            if (
+                player.bonus_claimed_at
+            ) {
+
+                const lastClaim =
+                    new Date(
+                        player.bonus_claimed_at
+                    ).getTime();
+
+                const difference =
+                    now - lastClaim;
+
+
+                if (
+                    difference < week
+                ) {
+
+                    const nextClaim =
+                        new Date(
+                            lastClaim + week
+                        ).toISOString();
+
+                    return res.status(400).json({
+                        ok: false,
+
+                        error:
+                            "Бонус ещё недоступен",
+
+                        nextClaimAt:
+                            nextClaim
+                    });
+
+                }
+
+            }
+
+
+            /* =========================================
+               ВЫДАЁМ 1000 ⭐
+            ========================================= */
+
             const balance =
-                Number(player.balance);
+                Number(
+                    player.balance
+                );
+
+            const claimedAt =
+                new Date().toISOString();
+
 
             const updated =
                 await updatePlayer(
                     user.id,
                     {
+
                         balance:
-                            balance + 1000
+                            balance + 1000,
+
+                        bonus_claimed_at:
+                            claimedAt
+
                     }
                 );
 
+
             res.json({
                 ok: true,
-                player: updated
+
+                player:
+                    updated,
+
+                reward:
+                    1000,
+
+                nextClaimAt:
+                    new Date(
+                        Date.now() + week
+                    ).toISOString()
             });
+
 
         } catch (error) {
 
@@ -1342,9 +1334,13 @@ app.post(
             }
 
             const balance =
-                Number(player.balance);
+                Number(
+                    player.balance
+                );
 
-            if (balance < price) {
+            if (
+                balance < price
+            ) {
 
                 return res.status(400).json({
                     ok: false,
@@ -1355,17 +1351,21 @@ app.post(
             }
 
             const income =
-                Number(player.income);
+                Number(
+                    player.income
+                );
 
             const updated =
                 await updatePlayer(
                     user.id,
                     {
+
                         balance:
                             balance - price,
 
                         income:
                             income + 1
+
                     }
                 );
 
