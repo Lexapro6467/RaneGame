@@ -1,2930 +1,4086 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const fs = require("fs");
-const crypto = require("crypto");
+<!DOCTYPE html>
+<html lang="ru">
+<head>
 
-const { createClient } = require("@supabase/supabase-js");
+<meta charset="UTF-8">
 
-const app = express();
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
 
-app.use(cors());
-app.use(express.json());
+<title>RaneGame</title>
 
-const PORT = Number(process.env.PORT) || 3000;
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-const SUPABASE_URL =
-    process.env.SUPABASE_URL;
+<style>
 
-const SUPABASE_SERVICE_ROLE_KEY =
-    process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const BOT_TOKEN =
-    process.env.BOT_TOKEN;
-
-const DEV_TELEGRAM_ID =
-    "5370959021438146805";
-
-
-/* =========================================================
-   ПРОВЕРКА ENV
-========================================================= */
-
-if (!SUPABASE_URL) {
-    console.error("❌ SUPABASE_URL не задан");
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-if (!SUPABASE_SERVICE_ROLE_KEY) {
-    console.error(
-        "❌ SUPABASE_SERVICE_ROLE_KEY не задан"
-    );
+html {
+    scroll-behavior: smooth;
 }
 
-if (!BOT_TOKEN) {
-    console.error("❌ BOT_TOKEN не задан");
-}
+body {
+    margin: 0;
+    padding: 0 0 90px;
 
-
-const supabase =
-    createClient(
-        SUPABASE_URL,
-        SUPABASE_SERVICE_ROLE_KEY
-    );
-
-
-/* =========================================================
-   НАСТРОЙКИ
-========================================================= */
-
-const SHOP_REFRESH_MS =
-    3 * 60 * 60 * 1000;
-
-const GIFT_SELL_DELAY_MS =
-    5 * 60 * 60 * 1000;
-
-const ROULETTE_DURATION_MS =
-    4 * 60 * 60 * 1000;
-
-
-/* =========================================================
-   FRONTEND — INDEX.HTML
-========================================================= */
-
-/*
-   ВАЖНО:
-   Render должен отдавать index.html при открытии сайта.
-*/
-
-app.use(
-    express.static(
-        path.join(__dirname)
-    )
-);
-
-app.get(
-    "/",
-    (req, res) => {
-
-        res.sendFile(
-            path.join(
-                __dirname,
-                "index.html"
-            )
+    background:
+        radial-gradient(
+            circle at top,
+            #210909 0%,
+            #100606 42%,
+            #080303 100%
         );
 
-    }
-);
+    color: #fff;
 
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
-/* =========================================================
-   TELEGRAM USER
-========================================================= */
+    min-height: 100vh;
 
-function getTelegramUser(req) {
+    overflow-x: hidden;
+}
 
-    const user =
-        req.body?.user ||
-        req.query?.user;
+button {
+    border: 0;
+    outline: none;
 
-    if (
-        !user ||
-        !user.id
-    ) {
-        return null;
-    }
+    border-radius: 14px;
 
-    return user;
+    padding: 13px 18px;
+
+    background: #8f1717;
+    color: #fff;
+
+    font-weight: bold;
+    font-size: 15px;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        filter .15s ease,
+        opacity .15s ease;
+}
+
+button:active {
+    transform: scale(.96);
+}
+
+button:hover {
+    filter: brightness(1.08);
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: default;
+}
+
+.loading {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color: #aaa;
+
+    padding: 20px;
+}
+
+.error {
+    background: #350b0b;
+
+    border: 1px solid #761717;
+
+    padding: 18px;
+
+    border-radius: 16px;
+
+    max-width: 400px;
+
+    line-height: 1.5;
 }
 
 
-/* =========================================================
-   СОЗДАНИЕ / ПОЛУЧЕНИЕ ИГРОКА
-========================================================= */
+/* =================================
+   ВЕРХНИЙ ПРОФИЛЬ
+================================= */
 
-async function getOrCreatePlayer(user) {
+.top {
+    padding: 20px 18px;
 
-    const telegramId =
-        Number(user.id);
+    display: flex;
+    align-items: center;
 
-    if (!telegramId) {
-        throw new Error(
-            "Не передан Telegram user"
-        );
-    }
-
-    const {
-        data: existing,
-        error: findError
-    } =
-        await supabase
-            .from("players")
-            .select("*")
-            .eq(
-                "telegram_id",
-                telegramId
-            )
-            .maybeSingle();
-
-    if (findError) {
-        throw findError;
-    }
-
-    if (existing) {
-        return existing;
-    }
-
-    const {
-        data: created,
-        error: createError
-    } =
-        await supabase
-            .from("players")
-            .insert({
-
-                telegram_id:
-                    telegramId,
-
-                username:
-                    user.username ||
-                    null,
-
-                first_name:
-                    user.first_name ||
-                    "Игрок",
-
-                balance:
-                    3918,
-
-                income:
-                    201,
-
-                economy_multiplier:
-                    1.00,
-
-                economy_expires_at:
-                    null
-
-            })
-            .select("*")
-            .single();
-
-    if (createError) {
-        throw createError;
-    }
-
-    return created;
+    gap: 12px;
 }
 
-
-/* =========================================================
-   ПОИСК ИГРОКА
-========================================================= */
-
-async function getPlayerByTelegramId(
-    telegramId
-) {
-
-    const {
-        data,
-        error
-    } =
-        await supabase
-            .from("players")
-            .select("*")
-            .eq(
-                "telegram_id",
-                Number(telegramId)
-            )
-            .single();
-
-    if (error) {
-        throw error;
-    }
-
-    return data;
-}
-
-
-/* =========================================================
-   ОБНОВЛЕНИЕ ИГРОКА
-========================================================= */
-
-async function updatePlayer(
-    telegramId,
-    values
-) {
-
-    const {
-        data,
-        error
-    } =
-        await supabase
-            .from("players")
-            .update(values)
-            .eq(
-                "telegram_id",
-                Number(telegramId)
-            )
-            .select("*")
-            .single();
-
-    if (error) {
-        throw error;
-    }
-
-    return data;
-}
-
-
-/* =========================================================
-   ADMIN — СБРОС МОЕГО АККАУНТА
-========================================================= */
-
-app.post(
-    "/api/dev/reset-account",
-    async (req, res) => {
-
-        try {
-
-            const user =
-                req.body?.user;
-
-
-            if (
-                !user ||
-                String(user.id) !==
-                DEV_TELEGRAM_ID
-            ) {
-
-                return res
-                    .status(403)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Доступ запрещён"
-
-                    });
-
-            }
-
-
-            const telegramId =
-                DEV_TELEGRAM_ID;
-
-
-            const {
-                error: purchasesError
-            } =
-                await supabase
-                    .from("gift_purchases")
-                    .delete()
-                    .eq(
-                        "telegram_id",
-                        telegramId
-                    );
-
-
-            if (purchasesError) {
-                throw purchasesError;
-            }
-
-
-            const {
-                error: giftsError
-            } =
-                await supabase
-                    .from("player_gifts")
-                    .delete()
-                    .eq(
-                        "telegram_id",
-                        telegramId
-                    );
-
-
-            if (giftsError) {
-                throw giftsError;
-            }
-
-
-            const {
-                data: player,
-                error: playerError
-            } =
-                await supabase
-                    .from("players")
-                    .update({
-
-                        balance:
-                            0,
-
-                        income:
-                            0,
-
-                        economy_multiplier:
-                            1.00,
-
-                        economy_expires_at:
-                            null,
-
-                        bonus_claimed_at:
-                            null
-
-                    })
-                    .eq(
-                        "telegram_id",
-                        telegramId
-                    )
-                    .select("*")
-                    .single();
-
-
-            if (playerError) {
-                throw playerError;
-            }
-
-
-            return res.json({
-
-                ok: true,
-
-                success: true,
-
-                player
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "RESET ACCOUNT ERROR:",
-                error
-            );
-
-            return res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        error.message
-
-                });
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   PLAYER
-========================================================= */
-
-app.post(
-    "/api/player",
-    async (req, res) => {
-
-        try {
-
-            const user =
-                getTelegramUser(req);
-
-
-            if (!user) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не передан Telegram user"
-
-                    });
-
-            }
-
-
-            const player =
-                await getOrCreatePlayer(
-                    user
-                );
-
-
-            return res.json({
-
-                ok: true,
-
-                player
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "PLAYER ERROR:",
-                error
-            );
-
-
-            return res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        error.message
-
-                });
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   SHOP STATE
-========================================================= */
-
-async function getShopState() {
-
-    const {
-        data,
-        error
-    } =
-        await supabase
-            .from("shop_state")
-            .select("*")
-            .eq(
-                "id",
-                1
-            )
-            .maybeSingle();
-
-
-    if (error) {
-        throw error;
-    }
-
-
-    if (data) {
-        return data;
-    }
-
-
-    const {
-        data: created,
-        error: createError
-    } =
-        await supabase
-            .from("shop_state")
-            .insert({
-
-                id:
-                    1,
-
-                updated_at:
-                    new Date().toISOString()
-
-            })
-            .select("*")
-            .single();
-
-
-    if (createError) {
-        throw createError;
-    }
-
-
-    return created;
-}
-
-
-/* =========================================================
-   СОЗДАНИЕ НОВОГО АССОРТИМЕНТА
-========================================================= */
-
-async function refreshGiftShop() {
-
-    const {
-        data: allGifts,
-        error
-    } =
-        await supabase
-            .from("gifts")
-            .select("*")
-            .eq(
-                "active",
-                true
-            );
-
-
-    if (error) {
-        throw error;
-    }
-
-
-    const groups = {
-
-        15:
-            allGifts.filter(
-                gift =>
-                    Number(gift.price) === 15
-            ),
-
-        18:
-            allGifts.filter(
-                gift =>
-                    Number(gift.price) === 18
-            ),
-
-        22:
-            allGifts.filter(
-                gift =>
-                    Number(gift.price) === 22
-            ),
-
-        33:
-            allGifts.filter(
-                gift =>
-                    Number(gift.price) === 33
-            )
-
-    };
-
-
-    function randomItems(
-        array,
-        count
-    ) {
-
-        const copy =
-            [...array];
-
-
-        for (
-            let i = copy.length - 1;
-            i > 0;
-            i--
-        ) {
-
-            const j =
-                Math.floor(
-                    Math.random() *
-                    (i + 1)
-                );
-
-
-            [
-                copy[i],
-                copy[j]
-            ] =
-            [
-                copy[j],
-                copy[i]
-            ];
-
-        }
-
-
-        return copy.slice(
-            0,
-            Math.min(
-                count,
-                copy.length
-            )
+.avatar {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #a51d1d,
+            #510909
         );
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    font-weight: bold;
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,.35);
+}
+
+.name {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.username {
+    color: #999;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+
+/* =================================
+   СТРАНИЦЫ
+================================= */
+
+.page {
+    display: none;
+
+    padding: 0 16px;
+
+    animation:
+        pageAppear
+        .2s
+        ease;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes pageAppear {
+
+    from {
+        opacity: 0;
+        transform: translateY(4px);
     }
 
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
-    const selected = [
+}
 
-        ...randomItems(
-            groups[15],
-            10
+
+/* =================================
+   БАЛАНС
+================================= */
+
+.balance-card {
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(255,70,70,.20),
+            transparent 55%
         ),
-
-        ...randomItems(
-            groups[18],
-            5
-        ),
-
-        ...randomItems(
-            groups[22],
-            3
-        ),
-
-        ...randomItems(
-            groups[33],
-            2
-        )
-
-    ];
-
-
-    const {
-        error: deleteError
-    } =
-        await supabase
-            .from("shop_gifts")
-            .delete()
-            .eq(
-                "shop_id",
-                1
-            );
-
-
-    if (deleteError) {
-        throw deleteError;
-    }
-
-
-    if (selected.length > 0) {
-
-        const rows =
-            selected.map(
-                gift => ({
-
-                    shop_id:
-                        1,
-
-                    gift_id:
-                        gift.id
-
-                })
-            );
-
-
-        const {
-            error: insertError
-        } =
-            await supabase
-                .from("shop_gifts")
-                .insert(rows);
-
-
-        if (insertError) {
-            throw insertError;
-        }
-
-    }
-
-
-    const {
-        error: stateError
-    } =
-        await supabase
-            .from("shop_state")
-            .update({
-
-                updated_at:
-                    new Date().toISOString()
-
-            })
-            .eq(
-                "id",
-                1
-            );
-
-
-    if (stateError) {
-        throw stateError;
-    }
-
-
-    return selected;
-}
-
-
-/* =========================================================
-   ПРОВЕРКА / АВТООБНОВЛЕНИЕ МАГАЗИНА
-========================================================= */
-
-async function ensureGiftShop() {
-
-    const state =
-        await getShopState();
-
-
-    const updatedAt =
-        new Date(
-            state.updated_at
-        ).getTime();
-
-
-    const now =
-        Date.now();
-
-
-    const {
-        data: currentShop,
-        error: shopError
-    } =
-        await supabase
-            .from("shop_gifts")
-            .select("id")
-            .eq(
-                "shop_id",
-                1
-            );
-
-
-    if (shopError) {
-        throw shopError;
-    }
-
-
-    const shopIsEmpty =
-        !currentShop ||
-        currentShop.length === 0;
-
-
-    const timeToRefresh =
-        !updatedAt ||
-        now - updatedAt >=
-        SHOP_REFRESH_MS;
-
-
-    if (
-        shopIsEmpty ||
-        timeToRefresh
-    ) {
-
-        console.log(
-            "🎁 Обновляем магазин подарков..."
+        linear-gradient(
+            135deg,
+            #7d1111,
+            #3b0808
         );
 
+    border-radius: 24px;
 
-        return await refreshGiftShop();
+    padding: 28px 20px;
 
-    }
+    text-align: center;
 
+    margin-bottom: 15px;
 
-    return null;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.3);
+}
+
+.balance {
+    font-size: 44px;
+    font-weight: bold;
+
+    margin: 10px 0;
+}
+
+.income {
+    color: #72ff72;
 }
 
 
-/* =========================================================
-   GET /api/gifts
-========================================================= */
+/* =================================
+   КАРТОЧКИ
+================================= */
 
-app.get(
-    "/api/gifts",
-    async (req, res) => {
+.card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(35,13,13,.98),
+            rgba(21,7,7,.98)
+        );
 
-        try {
+    border: 1px solid #351515;
 
-            await ensureGiftShop();
+    border-radius: 18px;
 
+    padding: 18px;
 
-            const {
-                data,
-                error
-            } =
-                await supabase
-                    .from("shop_gifts")
-                    .select(`
-                        gift:gifts(
-                            id,
-                            name,
-                            emoji,
-                            price,
-                            income,
-                            active
-                        )
-                    `)
-                    .eq(
-                        "shop_id",
-                        1
-                    );
+    margin-bottom: 14px;
 
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.18);
+}
 
-            if (error) {
-                throw error;
-            }
+.card h2,
+.card h3 {
+    margin-top: 0;
+}
 
+.card p {
+    color: #aaa;
+    line-height: 1.5;
+}
 
-            const gifts =
-                data
-                    .map(
-                        row =>
-                            row.gift
-                    )
-                    .filter(Boolean)
-                    .filter(
-                        gift =>
-                            gift.active
-                    );
 
+/* =================================
+   ЭКОНОМИКА
+================================= */
 
-            const state =
-                await getShopState();
+.economy-card {
+    background:
+        linear-gradient(
+            145deg,
+            #260909,
+            #140505
+        );
 
+    border: 1px solid #4d1616;
 
-            return res.json({
+    border-radius: 22px;
 
-                ok: true,
+    padding: 20px;
 
-                gifts,
+    margin-bottom: 15px;
 
-                shop_updated_at:
-                    state.updated_at,
+    overflow: hidden;
+}
 
-                next_refresh_at:
-                    new Date(
-                        new Date(
-                            state.updated_at
-                        ).getTime() +
-                        SHOP_REFRESH_MS
-                    ).toISOString()
+.economy-header {
+    display: flex;
 
-            });
+    justify-content: space-between;
+    align-items: center;
 
-        } catch (error) {
+    gap: 10px;
 
-            console.error(
-                "GIFTS ERROR:",
-                error
-            );
-
-
-            return res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        error.message
-
-                });
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   INVENTORY
-========================================================= */
-
-app.get(
-    "/api/inventory",
-    async (req, res) => {
-
-        try {
-
-            const telegramId =
-                Number(
-                    req.query.telegram_id
-                );
-
-
-            if (!telegramId) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не передан telegram_id"
-
-                    });
-
-            }
-
-
-            const {
-                data,
-                error
-            } =
-                await supabase
-                    .from("player_gifts")
-                    .select(`
-                        id,
-                        telegram_id,
-                        gift_id,
-                        quantity,
-                        purchased_at,
-                        gift:gifts(
-                            id,
-                            name,
-                            emoji,
-                            price,
-                            income
-                        )
-                    `)
-                    .eq(
-                        "telegram_id",
-                        telegramId
-                    )
-                    .order(
-                        "id",
-                        {
-                            ascending:
-                                true
-                        }
-                    );
+    margin-bottom: 14px;
+}
 
+.economy-title {
+    font-size: 20px;
+    font-weight: bold;
+}
 
-            if (error) {
-                throw error;
-            }
+.multiplier-active {
+    background: #163516;
+    color: #72ff72;
 
+    padding: 7px 10px;
 
-            const {
-                data: purchases,
-                error: purchasesError
-            } =
-                await supabase
-                    .from("gift_purchases")
-                    .select(`
-                        id,
-                        gift_id,
-                        purchased_at
-                    `)
-                    .eq(
-                        "telegram_id",
-                        telegramId
-                    )
-                    .order(
-                        "purchased_at",
-                        {
-                            ascending:
-                                true
-                        }
-                    );
+    border-radius: 10px;
 
+    font-weight: bold;
+    font-size: 13px;
+}
 
-            if (purchasesError) {
-                throw purchasesError;
-            }
+.multiplier-none {
+    background: #321010;
+    color: #ff7777;
 
+    padding: 7px 10px;
 
-            const inventory =
-                (data || []).map(
-                    item => ({
+    border-radius: 10px;
 
-                        id:
-                            item.id,
+    font-weight: bold;
+    font-size: 13px;
+}
 
-                        telegram_id:
-                            item.telegram_id,
+.current-multiplier {
+    text-align: center;
 
-                        gift_id:
-                            item.gift_id,
+    font-size: 48px;
+    font-weight: bold;
 
-                        quantity:
-                            item.quantity,
+    margin: 12px 0 4px;
+}
 
-                        purchased_at:
-                            item.purchased_at,
+.multiplier-time {
+    text-align: center;
 
-                        gift:
-                            item.gift,
+    color: #aaa;
 
-                        purchases:
-                            (purchases || [])
-                                .filter(
-                                    purchase =>
-                                        Number(
-                                            purchase.gift_id
-                                        ) ===
-                                        Number(
-                                            item.gift_id
-                                        )
-                                )
+    font-size: 14px;
 
-                    })
-                );
+    min-height: 20px;
 
+    margin-bottom: 15px;
+}
 
-            return res.json({
+.roulette-spin-button {
+    width: 100%;
 
-                ok: true,
+    font-size: 17px;
 
-                inventory
+    padding: 15px;
+}
 
-            });
+.claim-button {
+    width: 100%;
 
-        } catch (error) {
+    background:
+        linear-gradient(
+            135deg,
+            #a91c1c,
+            #681010
+        );
 
-            console.error(
-                "INVENTORY ERROR:",
-                error
-            );
+    font-size: 17px;
 
+    padding: 15px;
 
-            return res
-                .status(500)
-                .json({
+    display: none;
+}
 
-                    ok: false,
+.claim-button.show {
+    display: block;
+}
 
-                    error:
-                        error.message
 
-                });
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ПОКУПКА ПОДАРКА
-========================================================= */
-
-app.post(
-    "/api/gifts/buy",
-    async (req, res) => {
-
-        try {
-
-            const user =
-                getTelegramUser(req);
-
-
-            if (!user) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не передан Telegram user"
-
-                    });
-
-            }
-
-
-            const giftId =
-                Number(
-                    req.body?.gift_id
-                );
-
-
-            if (!giftId) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не передан gift_id"
-
-                    });
-
-            }
-
-
-            let quantity =
-                Number(
-                    req.body?.quantity
-                );
-
-
-            if (
-                !Number.isFinite(
-                    quantity
-                ) ||
-                quantity < 1
-            ) {
-
-                quantity = 1;
-
-            }
-
-
-            quantity =
-                Math.floor(
-                    quantity
-                );
-
-
-            if (quantity > 5) {
-                quantity = 5;
-            }
-
-
-            const player =
-                await getOrCreatePlayer(
-                    user
-                );
-
-
-            const {
-                data: shopGift,
-                error: shopError
-            } =
-                await supabase
-                    .from("shop_gifts")
-                    .select(`
-                        gift:gifts(
-                            id,
-                            name,
-                            emoji,
-                            price,
-                            income,
-                            active
-                        )
-                    `)
-                    .eq(
-                        "shop_id",
-                        1
-                    )
-                    .eq(
-                        "gift_id",
-                        giftId
-                    )
-                    .maybeSingle();
-
-
-            if (shopError) {
-                throw shopError;
-            }
-
-
-            if (
-                !shopGift ||
-                !shopGift.gift ||
-                !shopGift.gift.active
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Этого подарка сейчас нет в магазине"
-
-                    });
-
-            }
-
-
-            const gift =
-                shopGift.gift;
-
-
-            const price =
-                Number(
-                    gift.price
-                );
-
-
-            const giftIncome =
-                Number(
-                    gift.income || 1
-                );
-
-
-            const {
-                data: existingGift,
-                error: existingError
-            } =
-                await supabase
-                    .from("player_gifts")
-                    .select("*")
-                    .eq(
-                        "telegram_id",
-                        Number(user.id)
-                    )
-                    .eq(
-                        "gift_id",
-                        giftId
-                    )
-                    .maybeSingle();
-
-
-            if (existingError) {
-                throw existingError;
-            }
-
-
-            const currentQuantity =
-                existingGift
-                    ? Number(
-                        existingGift.quantity
-                    )
-                    : 0;
-
-
-            const remaining =
-                5 -
-                currentQuantity;
-
-
-            if (
-                remaining <= 0
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Можно купить максимум 5 одинаковых подарков"
-
-                    });
-
-            }
-
-
-            if (
-                quantity >
-                remaining
-            ) {
-
-                quantity =
-                    remaining;
-
-            }
-
-
-            const totalPrice =
-                price *
-                quantity;
-
-
-            if (
-                Number(player.balance) <
-                totalPrice
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Недостаточно ⭐"
-
-                    });
-
-            }
-
-
-            const newBalance =
-                Number(
-                    player.balance
-                ) -
-                totalPrice;
-
-
-            const newIncome =
-                Number(
-                    player.income
-                ) +
-                (
-                    giftIncome *
-                    quantity
-                );
-
-
-            const {
-                data: updatedPlayer,
-                error: playerUpdateError
-            } =
-                await supabase
-                    .from("players")
-                    .update({
-
-                        balance:
-                            newBalance,
-
-                        income:
-                            newIncome
-
-                    })
-                    .eq(
-                        "telegram_id",
-                        Number(user.id)
-                    )
-                    .select("*")
-                    .single();
-
-
-            if (playerUpdateError) {
-                throw playerUpdateError;
-            }
-
-
-            const purchaseRows =
-                Array.from(
-                    {
-                        length:
-                            quantity
-                    },
-                    () => ({
-
-                        telegram_id:
-                            Number(user.id),
-
-                        gift_id:
-                            giftId,
-
-                        purchased_at:
-                            new Date().toISOString()
-
-                    })
-                );
-
-
-            const {
-                data: purchases,
-                error: purchaseError
-            } =
-                await supabase
-                    .from("gift_purchases")
-                    .insert(
-                        purchaseRows
-                    )
-                    .select("*");
-
-
-            if (purchaseError) {
-                throw purchaseError;
-            }
-
-
-            const newQuantity =
-                currentQuantity +
-                quantity;
-
-
-            if (existingGift) {
-
-                const {
-                    error: updateGiftError
-                } =
-                    await supabase
-                        .from("player_gifts")
-                        .update({
-
-                            quantity:
-                                newQuantity,
-
-                            purchased_at:
-                                new Date().toISOString()
-
-                        })
-                        .eq(
-                            "telegram_id",
-                            Number(user.id)
-                        )
-                        .eq(
-                            "gift_id",
-                            giftId
-                        );
-
-
-                if (updateGiftError) {
-                    throw updateGiftError;
-                }
-
-            } else {
-
-                const {
-                    error: insertGiftError
-                } =
-                    await supabase
-                        .from("player_gifts")
-                        .insert({
-
-                            telegram_id:
-                                Number(user.id),
-
-                            gift_id:
-                                giftId,
-
-                            quantity:
-                                quantity,
-
-                            purchased_at:
-                                new Date().toISOString()
-
-                        });
-
-
-                if (insertGiftError) {
-                    throw insertGiftError;
-                }
-
-            }
-
-
-            return res.json({
-
-                ok: true,
-
-                player:
-                    updatedPlayer,
-
-                purchases:
-                    purchases || [],
-
-                gift,
-
-                quantity,
-
-                total_price:
-                    totalPrice
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "BUY GIFT ERROR:",
-                error
-            );
-
-
-            return res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        error.message
-
-                });
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ПРОДАЖА ПОДАРКА
-========================================================= */
-
-app.post(
-    "/api/gifts/sell",
-    async (req, res) => {
-
-        try {
-
-            const user =
-                getTelegramUser(req);
-
-
-            if (!user) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не передан Telegram user"
-
-                    });
-
-            }
-
-
-            const purchaseId =
-                Number(
-                    req.body?.purchase_id
-                );
-
-
-            if (!purchaseId) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не передан purchase_id"
-
-                    });
-
-            }
-
-
-            const {
-                data: purchase,
-                error: purchaseError
-            } =
-                await supabase
-                    .from("gift_purchases")
-                    .select(`
-                        id,
-                        telegram_id,
-                        gift_id,
-                        purchased_at,
-                        gift:gifts(
-                            id,
-                            name,
-                            emoji,
-                            price,
-                            income
-                        )
-                    `)
-                    .eq(
-                        "id",
-                        purchaseId
-                    )
-                    .eq(
-                        "telegram_id",
-                        Number(user.id)
-                    )
-                    .maybeSingle();
-
-
-            if (purchaseError) {
-                throw purchaseError;
-            }
-
-
-            if (!purchase) {
-
-                return res
-                    .status(404)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Покупка не найдена"
-
-                    });
-
-            }
-
-
-            const purchasedAt =
-                new Date(
-                    purchase.purchased_at
-                ).getTime();
-
-
-            const sellAt =
-                purchasedAt +
-                GIFT_SELL_DELAY_MS;
-
-
-            if (
-                Date.now() <
-                sellAt
-            ) {
-
-                const remaining =
-                    sellAt -
-                    Date.now();
-
-
-                const hours =
-                    Math.floor(
-                        remaining /
-                        3600000
-                    );
-
-
-                const minutes =
-                    Math.floor(
-                        (
-                            remaining %
-                            3600000
-                        ) /
-                        60000
-                    );
-
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            `Подарок пока нельзя продать. Осталось примерно ${hours} ч. ${minutes} мин.`
-
-                    });
-
-            }
-
-
-            const gift =
-                purchase.gift;
-
-
-            const price =
-                Number(
-                    gift.price
-                );
-
-
-            const giftIncome =
-                Number(
-                    gift.income || 1
-                );
-
-
-            const {
-                data: playerGift,
-                error: playerGiftError
-            } =
-                await supabase
-                    .from("player_gifts")
-                    .select("*")
-                    .eq(
-                        "telegram_id",
-                        Number(user.id)
-                    )
-                    .eq(
-                        "gift_id",
-                        Number(
-                            purchase.gift_id
-                        )
-                    )
-                    .maybeSingle();
-
-
-            if (playerGiftError) {
-                throw playerGiftError;
-            }
-
-
-            if (
-                !playerGift ||
-                Number(
-                    playerGift.quantity
-                ) <= 0
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Подарка нет в инвентаре"
-
-                    });
-
-            }
-
-
-            const {
-                error: deletePurchaseError
-            } =
-                await supabase
-                    .from("gift_purchases")
-                    .delete()
-                    .eq(
-                        "id",
-                        purchaseId
-                    )
-                    .eq(
-                        "telegram_id",
-                        Number(user.id)
-                    );
-
-
-            if (deletePurchaseError) {
-                throw deletePurchaseError;
-            }
-
-
-            const newQuantity =
-                Number(
-                    playerGift.quantity
-                ) -
-                1;
-
-
-            if (
-                newQuantity <= 0
-            ) {
-
-                const {
-                    error
-                } =
-                    await supabase
-                        .from("player_gifts")
-                        .delete()
-                        .eq(
-                            "telegram_id",
-                            Number(user.id)
-                        )
-                        .eq(
-                            "gift_id",
-                            Number(
-                                purchase.gift_id
-                            )
-                        );
-
-
-                if (error) {
-                    throw error;
-                }
-
-            } else {
-
-                const {
-                    error
-                } =
-                    await supabase
-                        .from("player_gifts")
-                        .update({
-
-                            quantity:
-                                newQuantity
-
-                        })
-                        .eq(
-                            "telegram_id",
-                            Number(user.id)
-                        )
-                        .eq(
-                            "gift_id",
-                            Number(
-                                purchase.gift_id
-                            )
-                        );
-
-
-                if (error) {
-                    throw error;
-                }
-
-            }
-
-
-            const player =
-                await getPlayerByTelegramId(
-                    user.id
-                );
-
-
-            const newBalance =
-                Number(
-                    player.balance
-                ) +
-                price;
-
-
-            const newIncome =
-                Math.max(
-                    0,
-                    Number(
-                        player.income
-                    ) -
-                    giftIncome
-                );
-
-
-            const updatedPlayer =
-                await updatePlayer(
-                    user.id,
-                    {
-
-                        balance:
-                            newBalance,
-
-                        income:
-                            newIncome
-
-                    }
-                );
-
-
-            return res.json({
-
-                ok: true,
-
-                player:
-                    updatedPlayer,
-
-                refund:
-                    price
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "SELL GIFT ERROR:",
-                error
-            );
-
-
-            return res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        error.message
-
-                });
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   СТАРЫЙ /api/buy
-========================================================= */
-
-app.post(
-    "/api/buy",
-    async (req, res) => {
-
-        try {
-
-            const user =
-                getTelegramUser(req);
-
-
-            if (!user) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не передан Telegram user"
-
-                    });
-
-            }
-
-
-            const price =
-                Number(
-                    req.body?.price
-                );
-
-
-            if (!price) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не указана цена"
-
-                    });
-
-            }
-
-
-            const player =
-                await getOrCreatePlayer(
-                    user
-                );
-
-
-            if (
-                Number(player.balance) <
-                price
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Недостаточно ⭐"
-
-                    });
-
-            }
-
-
-            const updatedPlayer =
-                await updatePlayer(
-                    user.id,
-                    {
-
-                        balance:
-                            Number(
-                                player.balance
-                            ) -
-                            price,
-
-                        income:
-                            Number(
-                                player.income
-                            ) +
-                            1
-
-                    }
-                );
-
-
-            return res.json({
-
-                ok: true,
-
-                player:
-                    updatedPlayer
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "OLD BUY ERROR:",
-                error
-            );
-
-
-            return res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        error.message
-
-                });
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   WEEKLY BONUS
-========================================================= */
-
-app.post(
-    "/api/collect",
-    async (req, res) => {
-
-        try {
-
-            const user =
-                getTelegramUser(req);
-
-
-            if (!user) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не передан Telegram user"
-
-                    });
-
-            }
-
-
-            const player =
-                await getOrCreatePlayer(
-                    user
-                );
-
-
-            const now =
-                Date.now();
-
-
-            if (
-                player.bonus_claimed_at
-            ) {
-
-                const lastClaim =
-                    new Date(
-                        player.bonus_claimed_at
-                    ).getTime();
-
-
-                const week =
-                    7 *
-                    24 *
-                    60 *
-                    60 *
-                    1000;
-
-
-                if (
-                    now - lastClaim <
-                    week
-                ) {
-
-                    const remaining =
-                        week -
-                        (
-                            now -
-                            lastClaim
-                        );
-
-
-                    const days =
-                        Math.ceil(
-                            remaining /
-                            (
-                                24 *
-                                60 *
-                                60 *
-                                1000
-                            )
-                        );
-
-
-                    return res
-                        .status(400)
-                        .json({
-
-                            ok: false,
-
-                            error:
-                                `Бонус будет доступен через ${days} дн.`
-
-                        });
-
-                }
-
-            }
-
-
-            const updatedPlayer =
-                await updatePlayer(
-                    user.id,
-                    {
-
-                        balance:
-                            Number(
-                                player.balance
-                            ) +
-                            1000,
-
-                        bonus_claimed_at:
-                            new Date().toISOString()
-
-                    }
-                );
-
-
-            return res.json({
-
-                ok: true,
-
-                player:
-                    updatedPlayer,
-
-                reward:
-                    1000
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "COLLECT ERROR:",
-                error
-            );
-
-
-            return res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        error.message
-
-                });
-
-        }
-
-    }
-);
-
-
-/* =========================================================
+/* =================================
    РУЛЕТКА
-========================================================= */
+================================= */
 
-const ROULETTE_VALUES = [
+.roulette-window {
+    position: relative;
 
-    1.0,
-    1.1,
-    1.2,
-    1.3,
-    1.4,
-    1.5,
-    1.6,
-    1.7,
-    1.8,
-    1.9,
-    2.0
+    height: 92px;
 
-];
+    margin: 18px 0;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    background: #0d0404;
+
+    border: 1px solid #421313;
+}
+
+.roulette-window::before {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    top: 0;
+    bottom: 0;
+
+    width: 3px;
+
+    transform: translateX(-50%);
+
+    background: #ff4545;
+
+    box-shadow:
+        0 0 14px rgba(255,50,50,.8);
+
+    z-index: 5;
+}
+
+.roulette-track {
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    transform: translateX(0);
+
+    will-change: transform;
+}
+
+.roulette-item {
+    flex: 0 0 76px;
+
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #281010;
+
+    border: 1px solid #4a1717;
+
+    color: #aaa;
+
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.roulette-item.selected {
+    background: #791414;
+
+    color: #fff;
+
+    border-color: #ff4444;
+}
 
 
-function createRouletteSignature(
-    telegramId,
-    multiplier,
-    issuedAt
-) {
+/* =================================
+   ВКЛАДКИ ПОДАРКОВ
+================================= */
 
-    const text =
-        [
-            telegramId,
-            multiplier.toFixed(1),
-            issuedAt
-        ].join(":");
+.shop-tabs {
+    display: flex;
+
+    gap: 8px;
+
+    margin-bottom: 14px;
+}
+
+.shop-tab {
+    flex: 1;
+
+    background: #241010;
+
+    border: 1px solid #3b1515;
+
+    color: #888;
+
+    padding: 11px 8px;
+}
+
+.shop-tab.active {
+    background: #761414;
+
+    border-color: #a52626;
+
+    color: white;
+}
+
+.shop-info {
+    background: #241010;
+
+    border: 1px solid #3b1515;
+
+    border-radius: 16px;
+
+    padding: 13px;
+
+    margin-bottom: 14px;
+
+    color: #aaa;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+.shop-info b {
+    color: white;
+}
+
+.refresh-shop {
+    width: 100%;
+
+    background: #321010;
+
+    margin-bottom: 12px;
+}
 
 
-    return crypto
-        .createHmac(
-            "sha256",
-            BOT_TOKEN
+/* =================================
+   СЕТКА ПОДАРКОВ
+================================= */
+
+.shop-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
+}
+
+
+/* =================================
+   КАРТОЧКА ПОДАРКА
+================================= */
+
+.gift-card {
+    position: relative;
+
+    overflow: hidden;
+
+    min-height: 285px;
+
+    padding: 14px 12px 12px;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(255,60,60,.10),
+            transparent 45%
+        ),
+        linear-gradient(
+            145deg,
+            #2a1114,
+            #17090b 70%,
+            #100607
+        );
+
+    border: 1px solid
+        rgba(255,92,92,.20);
+
+    border-radius: 22px;
+
+    text-align: center;
+
+    box-shadow:
+        0 8px 22px
+        rgba(0,0,0,.30);
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+.gift-card:active {
+    transform:
+        translateZ(0)
+        scale(.97);
+}
+
+.gift-visual {
+    position: relative;
+
+    width: 125px;
+    height: 125px;
+
+    margin: 3px auto 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 38px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,70,70,.16),
+            transparent 72%
+        );
+
+    overflow: visible;
+
+    isolation: isolate;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+.gift-visual::before {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 88px;
+    height: 88px;
+
+    transform:
+        translate3d(
+            -50%,
+            -50%,
+            0
         )
-        .update(text)
-        .digest("hex");
+        scale(.8);
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,70,70,.34),
+            transparent 70%
+        );
+
+    opacity: .45;
+
+    animation:
+        giftAuraOptimized
+        2.6s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform,
+        opacity;
+
+    z-index: -1;
+}
+
+.gift-visual::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 72px;
+    height: 72px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        rgba(255,90,90,.12);
+
+    transform:
+        translate3d(
+            -50%,
+            -50%,
+            0
+        )
+        scale(.65);
+
+    opacity: .5;
+
+    animation:
+        giftRingOptimized
+        3.4s
+        ease-out
+        infinite;
+
+    will-change:
+        transform,
+        opacity;
+
+    pointer-events: none;
+}
+
+.gift-emoji {
+    position: relative;
+
+    z-index: 5;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 72px;
+
+    line-height: 1;
+
+    user-select: none;
+
+    transform-origin: center;
+
+    will-change:
+        transform;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+
+/* =================================
+   ИСКРЫ
+================================= */
+
+.gift-spark {
+    position: absolute;
+
+    z-index: 8;
+
+    pointer-events: none;
+
+    color: white;
+
+    font-weight: bold;
+
+    text-shadow:
+        0 0 5px
+        rgba(255,255,255,.8);
+
+    animation:
+        sparkOptimized
+        2.2s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform,
+        opacity;
+}
+
+.gift-spark-1 {
+    top: 9px;
+    left: 12px;
+
+    font-size: 17px;
+}
+
+.gift-spark-2 {
+    top: 18px;
+    right: 10px;
+
+    font-size: 10px;
+
+    animation-delay: .5s;
+}
+
+.gift-spark-3 {
+    left: 9px;
+    bottom: 17px;
+
+    font-size: 9px;
+
+    animation-delay: 1s;
+}
+
+.gift-spark-4 {
+    right: 14px;
+    bottom: 11px;
+
+    font-size: 14px;
+
+    animation-delay: 1.5s;
+}
+
+
+/* =================================
+   АНИМАЦИИ ПОДАРКОВ
+================================= */
+
+.gift-animation-bounce .gift-emoji {
+    animation:
+        normalGiftOptimized
+        2.4s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-heart .gift-emoji {
+    animation:
+        heartGiftOptimized
+        1.5s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-shine .gift-emoji {
+    animation:
+        diamondGiftOptimized
+        2.2s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-rocket .gift-emoji {
+    animation:
+        rocketGiftOptimized
+        1.7s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+.gift-animation-magic .gift-emoji {
+    animation:
+        magicGiftOptimized
+        1.9s
+        ease-in-out
+        infinite;
+
+    will-change:
+        transform;
+}
+
+
+/* =================================
+   KEYFRAMES
+================================= */
+
+@keyframes giftAuraOptimized {
+
+    0%, 100% {
+        transform:
+            translate3d(-50%,-50%,0)
+            scale(.78);
+
+        opacity: .25;
+    }
+
+    50% {
+        transform:
+            translate3d(-50%,-50%,0)
+            scale(1.12);
+
+        opacity: .65;
+    }
+}
+
+@keyframes giftRingOptimized {
+
+    0% {
+        transform:
+            translate3d(-50%,-50%,0)
+            scale(.6);
+
+        opacity: .45;
+    }
+
+    75% {
+        transform:
+            translate3d(-50%,-50%,0)
+            scale(1.35);
+
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes sparkOptimized {
+
+    0%, 100% {
+        opacity: .15;
+
+        transform:
+            translate3d(0,5px,0)
+            scale(.7)
+            rotate(0deg);
+    }
+
+    50% {
+        opacity: .9;
+
+        transform:
+            translate3d(0,-7px,0)
+            scale(1.08)
+            rotate(35deg);
+    }
+}
+
+@keyframes normalGiftOptimized {
+
+    0%, 100% {
+        transform:
+            translate3d(0,0,0)
+            rotate(-2deg)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(0,-7px,0)
+            rotate(2deg)
+            scale(1.06);
+    }
+}
+
+@keyframes heartGiftOptimized {
+
+    0%, 100% {
+        transform:
+            translate3d(0,0,0)
+            scale(1)
+            rotate(-4deg);
+    }
+
+    25% {
+        transform:
+            translate3d(0,-3px,0)
+            scale(1.1)
+            rotate(4deg);
+    }
+
+    50% {
+        transform:
+            translate3d(0,-5px,0)
+            scale(.97)
+            rotate(-3deg);
+    }
+
+    75% {
+        transform:
+            translate3d(0,-3px,0)
+            scale(1.08)
+            rotate(3deg);
+    }
+}
+
+@keyframes diamondGiftOptimized {
+
+    0%, 100% {
+        transform:
+            translate3d(0,2px,0)
+            rotate(-5deg)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(0,-9px,0)
+            rotate(5deg)
+            scale(1.09);
+    }
+}
+
+@keyframes rocketGiftOptimized {
+
+    0%, 100% {
+        transform:
+            translate3d(0,6px,0)
+            rotate(-5deg)
+            scale(1);
+    }
+
+    45% {
+        transform:
+            translate3d(0,-14px,0)
+            rotate(5deg)
+            scale(1.08);
+    }
+
+    70% {
+        transform:
+            translate3d(0,-7px,0)
+            rotate(1deg)
+            scale(1.04);
+    }
+}
+
+@keyframes magicGiftOptimized {
+
+    0%, 100% {
+        transform:
+            translate3d(0,2px,0)
+            rotate(-4deg)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(0,-9px,0)
+            rotate(5deg)
+            scale(1.1);
+    }
+}
+
+.gift-paused *,
+.gift-paused::before,
+.gift-paused::after {
+    animation-play-state:
+        paused !important;
+}
+
+
+.gift-name {
+    position: relative;
+    z-index: 2;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    min-height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #fff;
+
+    padding: 0 3px;
+}
+
+.gift-income {
+    position: relative;
+    z-index: 2;
+
+    display: inline-block;
+
+    color: #78ff9b;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    margin: 5px 0 7px;
+
+    padding: 4px 8px;
+
+    border-radius: 8px;
+
+    background:
+        rgba(70,255,120,.07);
+}
+
+.gift-price {
+    position: relative;
+    z-index: 2;
+
+    color: #ffd84d;
+
+    font-size: 16px;
+    font-weight: 800;
+
+    margin-bottom: 9px;
+}
+
+.gift-buy {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+
+    padding: 10px 7px;
+
+    border-radius: 12px;
+
+    font-size: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #a91f2b,
+            #74111a
+        );
+}
+
+.gift-buy:disabled {
+    background: #321519;
+
+    color: #777;
+
+    border-color: #3b1b1f;
+}
+
+.gift-count {
+    position: absolute;
+
+    top: 9px;
+    right: 9px;
+
+    z-index: 10;
+
+    min-width: 30px;
+
+    padding: 5px 7px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(120,17,30,.9);
+
+    border:
+        1px solid
+        rgba(255,100,100,.18);
+
+    color: #fff;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* =================================
+   ИНВЕНТАРЬ
+================================= */
+
+.inventory-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.inventory-card {
+    background:
+        linear-gradient(
+            145deg,
+            #241010,
+            #160808
+        );
+
+    border: 1px solid #3b1515;
+
+    border-radius: 18px;
+
+    padding: 14px;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+.inventory-top {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.inventory-emoji {
+    width: 58px;
+    height: 58px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 40px;
+
+    border-radius: 16px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,70,70,.12),
+            transparent 70%
+        );
+
+    will-change:
+        transform;
+
+    contain:
+        layout
+        paint;
+
+    transform:
+        translateZ(0);
+}
+
+.inventory-emoji.gift-animation-bounce {
+    animation:
+        normalGiftOptimized
+        2.4s
+        ease-in-out
+        infinite;
+}
+
+.inventory-emoji.gift-animation-heart {
+    animation:
+        heartGiftOptimized
+        1.5s
+        ease-in-out
+        infinite;
+}
+
+.inventory-emoji.gift-animation-shine {
+    animation:
+        diamondGiftOptimized
+        2.2s
+        ease-in-out
+        infinite;
+}
+
+.inventory-emoji.gift-animation-rocket {
+    animation:
+        rocketGiftOptimized
+        1.7s
+        ease-in-out
+        infinite;
+}
+
+.inventory-emoji.gift-animation-magic {
+    animation:
+        magicGiftOptimized
+        1.9s
+        ease-in-out
+        infinite;
+}
+
+.inventory-paused .inventory-emoji {
+    animation-play-state:
+        paused !important;
+}
+
+.inventory-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.inventory-name {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.inventory-count {
+    color: #aaa;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.inventory-income {
+    color: #72ff72;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.inventory-purchases {
+    margin-top: 12px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.purchase-row {
+    background: #180808;
+
+    border-radius: 12px;
+
+    padding: 9px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 8px;
+
+    font-size: 12px;
+}
+
+.purchase-time {
+    color: #999;
+}
+
+.sell-button {
+    background: #5d1111;
+
+    padding: 8px 10px;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+.sell-button.ready {
+    background: #8f1717;
+}
+
+
+/* =================================
+   АУКЦИОН
+================================= */
+
+.auction-placeholder {
+    text-align: center;
+
+    padding: 30px 10px;
+}
+
+
+/* =================================
+   АДМИН ПАНЕЛЬ
+================================= */
+
+.admin-button {
+    display: none;
+
+    margin-top: 8px;
+
+    padding: 9px 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8f1717,
+            #571010
+        );
+
+    border: 1px solid #a52a2a;
+
+    border-radius: 10px;
+
+    color: #fff;
+
+    font-size: 13px;
+
+    width: 100%;
+}
+
+.admin-card {
+    background:
+        linear-gradient(
+            145deg,
+            #2a0b0b,
+            #130505
+        );
+
+    border: 1px solid #651818;
+
+    border-radius: 20px;
+
+    padding: 18px;
+
+    margin-bottom: 15px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.3);
+}
+
+.admin-card h2 {
+    margin-top: 0;
+}
+
+.admin-card p {
+    color: #aaa;
+    line-height: 1.5;
+}
+
+.admin-button-action {
+    width: 100%;
+
+    margin-top: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8f1717,
+            #5d0d0d
+        );
+}
+
+.admin-back {
+    width: 100%;
+
+    margin-bottom: 14px;
+
+    background: #321010;
+}
+
+
+/* =================================
+   НАВИГАЦИЯ
+================================= */
+
+.nav {
+    position: fixed;
+
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    height: 78px;
+
+    background:
+        rgba(24,7,7,.97);
+
+    border-top:
+        1px solid #351515;
+
+    display: flex;
+
+    justify-content: space-around;
+
+    align-items: center;
+
+    z-index: 100;
+
+    backdrop-filter:
+        blur(12px);
+}
+
+.nav button {
+    background: transparent;
+
+    color: #777;
+
+    padding: 8px 12px;
+
+    font-size: 12px;
+
+    min-width: 70px;
+}
+
+.nav button.active {
+    color: white;
+}
+
+
+/* =================================
+   РУЛЕТКА МОДАЛКА
+================================= */
+
+.roulette-lock {
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(8,1,1,.96);
+
+    z-index: 1000;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.roulette-lock.show {
+    display: flex;
+}
+
+.roulette-modal {
+    width: 100%;
+
+    max-width: 430px;
+
+    background: #170707;
+
+    border: 1px solid #561515;
+
+    border-radius: 24px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.7);
+}
+
+.roulette-modal h2 {
+    text-align: center;
+    margin-top: 0;
+}
+
+.roulette-modal-text {
+    text-align: center;
+
+    color: #999;
+
+    font-size: 14px;
+
+    margin-bottom: 15px;
+}
+
+.roulette-result {
+    text-align: center;
+
+    color: #ff8585;
+
+    font-size: 14px;
+
+    min-height: 20px;
+
+    margin-bottom: 10px;
+}
+
+
+/* =================================
+   МОДАЛКА ПОКУПКИ
+================================= */
+
+.buy-modal {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(5,1,1,.82);
+
+    z-index: 1500;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+}
+
+.buy-modal.show {
+    display: flex;
+}
+
+.buy-modal-box {
+    width: 100%;
+    max-width: 360px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #2a0b0b,
+            #130505
+        );
+
+    border: 1px solid #551717;
+
+    border-radius: 22px;
+
+    padding: 22px;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,.7);
+}
+
+.buy-modal-gift {
+    font-size: 60px;
+    margin-bottom: 8px;
+}
+
+.buy-modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.buy-modal-price {
+    color: #ffd84d;
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+.buy-quantity {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    margin: 18px 0;
+}
+
+.quantity-button {
+    width: 46px;
+    height: 46px;
+
+    padding: 0;
+
+    font-size: 24px;
+
+    background: #541111;
+
+    border: 1px solid #751919;
+}
+
+.quantity-value {
+    min-width: 45px;
+
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.buy-total {
+    color: #aaa;
+
+    font-size: 14px;
+
+    margin-bottom: 16px;
+}
+
+.buy-total strong {
+    color: #ffd84d;
+
+    font-size: 18px;
+}
+
+.buy-modal-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.buy-modal-actions button {
+    flex: 1;
+}
+
+.buy-cancel {
+    background: #3a1717;
+}
+
+
+/* =================================
+   TOAST
+================================= */
+
+.toast {
+    position: fixed;
+
+    bottom: 95px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    background: #271010;
+
+    border: 1px solid #5c1a1a;
+
+    padding: 12px 18px;
+
+    border-radius: 12px;
+
+    display: none;
+
+    z-index: 2000;
+
+    white-space: nowrap;
+
+    max-width:
+        calc(100vw - 30px);
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =================================
+   МОБИЛЬНЫЕ
+================================= */
+
+@media (max-width: 360px) {
+
+    .shop-grid {
+        gap: 8px;
+    }
+
+    .gift-card {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .gift-visual {
+        width: 105px;
+        height: 105px;
+    }
+
+    .gift-emoji {
+        font-size: 60px;
+    }
 
 }
 
 
-/* =========================================================
-   ROULETTE SPIN
-========================================================= */
+/* =================================
+   ОТКЛЮЧЕНА АНИМАЦИЯ
+================================= */
 
-app.post(
-    "/api/roulette/spin",
-    async (req, res) => {
+@media (prefers-reduced-motion: reduce) {
 
-        try {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
 
-            const user =
-                getTelegramUser(req);
+        animation-iteration-count:
+            1 !important;
+
+        scroll-behavior: auto !important;
+
+        transition-duration:
+            .01ms !important;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
 
 
-            if (!user) {
+<div
+    id="loading"
+    class="loading">
 
-                return res
-                    .status(400)
-                    .json({
+    Загрузка RaneGame...
 
-                        ok: false,
-
-                        error:
-                            "Не передан Telegram user"
-
-                    });
-
-            }
+</div>
 
 
-            const multiplier =
-                ROULETTE_VALUES[
-                    Math.floor(
-                        Math.random() *
-                        ROULETTE_VALUES.length
+<div
+    id="game"
+    style="display:none;">
+
+
+<!-- =================================
+     ПРОФИЛЬ
+================================= -->
+
+<div class="top">
+
+    <div>
+
+        <div
+            class="name"
+            id="username">
+
+            Игрок
+
+        </div>
+
+        <div
+            class="username"
+            id="tgusername">
+
+            @Telegram
+
+        </div>
+
+        <button
+            id="adminButton"
+            class="admin-button"
+            type="button"
+            onclick="openAdminPanel()">
+
+            ⚙️ Админ Панель
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =================================
+     МЕНЮ
+================================= -->
+
+<section
+    id="home"
+    class="page active">
+
+
+<div class="balance-card">
+
+    <div class="balance">
+
+        ⭐
+        <span id="balance">
+            0
+        </span>
+
+    </div>
+
+    <div>
+
+        <span class="income">
+
+            +
+            <span id="income">
+                0
+            </span>
+
+            в час
+
+        </span>
+
+    </div>
+
+</div>
+
+
+<div class="economy-card">
+
+    <div class="economy-header">
+
+        <div class="economy-title">
+            Крутим
+        </div>
+
+        <div
+            id="economyStatus"
+            class="multiplier-none">
+
+            Не активна
+
+        </div>
+
+    </div>
+
+    <div
+        class="current-multiplier"
+        id="currentMultiplier">
+
+        x1.0
+
+    </div>
+
+    <div
+        class="multiplier-time"
+        id="multiplierTime">
+
+        Крути рулетку
+
+    </div>
+
+    <button
+        id="openRouletteButton"
+        class="roulette-spin-button"
+        onclick="openRoulette()">
+
+        🎰 Крутить
+
+    </button>
+
+</div>
+
+
+<div class="card">
+
+    <h3>
+        🔗 Твоя ссылка
+    </h3>
+
+    <div
+        style="
+            font-size:12px;
+            color:#888;
+            word-break:break-all;
+            margin:10px 0;
+        ">
+
+        https://t.me/RaneGameBot?start=ref_<span
+            id="refId">
+        </span>
+
+    </div>
+
+    <button
+        onclick="inviteFriend()">
+
+        Позови друга
+
+    </button>
+
+    <button
+        onclick="copyInviteLink()"
+        style="
+            background:#555;
+            margin-top:8px;
+        ">
+
+        Копировать
+
+    </button>
+
+</div>
+
+
+<div class="card">
+
+    <h3>
+        🔥 Еженедельный бонус
+    </h3>
+
+    <p>
+        Забери еженедельную награду.
+    </p>
+
+    <button
+        id="bonusButton"
+        onclick="collect()">
+
+        Забрать +1000 ⭐
+
+    </button>
+
+</div>
+
+
+<div class="card">
+
+    <h2>
+        🎁 Подарки
+    </h2>
+
+    <div class="shop-tabs">
+
+        <button
+            id="shopTab"
+            class="shop-tab active"
+            onclick="showShopTab('shop')">
+
+            🛒 Магазин
+
+        </button>
+
+        <button
+            id="inventoryTab"
+            class="shop-tab"
+            onclick="showShopTab('inventory')">
+
+            🎒 Инвентарь
+
+        </button>
+
+    </div>
+
+
+    <div id="giftShop">
+
+        <div class="shop-info">
+
+            🔄 Ассортимент обновляется
+            <b>раз в 3 часа</b>.<br>
+
+            🎁 Каждый подарок даёт
+            <b>+1 ⭐/час</b>.<br>
+
+            📦 Одного вида можно купить
+            максимум <b>5 раз</b>.
+
+        </div>
+
+        <button
+            class="refresh-shop"
+            onclick="loadGiftShop(true)">
+
+            🔄 Обновить магазин
+
+        </button>
+
+        <div
+            id="shopGrid"
+            class="shop-grid">
+
+            <div
+                class="empty-inventory"
+                style="grid-column:1/-1;">
+
+                Загрузка подарков...
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        id="giftInventory"
+        style="display:none;">
+
+        <div class="shop-info">
+
+            💰 Подарок можно продать за его
+            <b>полную цену</b>.<br>
+
+            ⏳ После покупки должно пройти
+            <b>5 часов</b>.<br>
+
+            ⭐ Доход от подарка:
+            <b>+1 ⭐/час</b>.
+
+        </div>
+
+        <div
+            id="inventoryList"
+            class="inventory-list">
+
+            <div class="empty-inventory">
+
+                Загрузка инвентаря...
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- =================================
+     АДМИН ПАНЕЛЬ
+================================= -->
+
+<section
+    id="admin"
+    class="page">
+
+    <button
+        type="button"
+        class="admin-back"
+        onclick="closeAdminPanel()">
+
+        ← Назад в меню
+
+    </button>
+
+    <div class="admin-card">
+
+        <h2>
+            ⚙️ Админ Панель
+        </h2>
+
+        <p>
+            Панель доступна только владельцу.
+        </p>
+
+        <button
+            type="button"
+            class="admin-button-action"
+            onclick="resetMyAccount()">
+
+            🧹 Сбросить мой аккаунт
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =================================
+     АУКЦИОН
+================================= -->
+
+<section
+    id="auction"
+    class="page">
+
+    <div class="card">
+
+        <h2>
+            🔨 Аукцион
+        </h2>
+
+        <div class="auction-placeholder">
+
+            <div
+                style="
+                    font-size:55px;
+                    margin-bottom:15px;
+                ">
+
+                🔨
+
+            </div>
+
+            <p>
+                Здесь скоро появится аукцион.
+            </p>
+
+            <button
+                onclick="
+                    showToast(
+                        '🔨 Аукцион скоро будет доступен'
                     )
-                ];
+                ">
+
+                Открыть
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
 
 
-            const issuedAt =
-                Date.now();
+<!-- =================================
+     ТОП
+================================= -->
 
+<section
+    id="top"
+    class="page">
 
-            const signature =
-                createRouletteSignature(
-                    Number(user.id),
-                    multiplier,
-                    issuedAt
-                );
+    <div class="card">
 
+        <h2>
+            🏆 Топ игроков
+        </h2>
 
-            return res.json({
+        <p>
+            Таблица лидеров появится здесь.
+        </p>
 
-                ok: true,
-
-                multiplier,
-
-                issuedAt,
-
-                signature
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "ROULETTE SPIN ERROR:",
-                error
-            );
-
-
-            return res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        error.message
-
-                });
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   ROULETTE CLAIM
-========================================================= */
-
-app.post(
-    "/api/roulette/claim",
-    async (req, res) => {
-
-        try {
-
-            const user =
-                getTelegramUser(req);
-
-
-            if (!user) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Не передан Telegram user"
-
-                    });
-
-            }
-
-
-            const multiplier =
-                Number(
-                    req.body?.multiplier
-                );
-
-
-            const issuedAt =
-                Number(
-                    req.body?.issuedAt
-                );
-
-
-            const signature =
-                req.body?.signature;
-
-
-            if (
-                !multiplier ||
-                !issuedAt ||
-                !signature
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Недостаточно данных рулетки"
-
-                    });
-
-            }
-
-
-            if (
-                !ROULETTE_VALUES.includes(
-                    multiplier
+        <button
+            onclick="
+                showToast(
+                    '🏆 Топ скоро появится'
                 )
-            ) {
+            ">
 
-                return res
-                    .status(400)
-                    .json({
+            Обновить
 
-                        ok: false,
+        </button>
 
-                        error:
-                            "Неверный множитель"
+    </div>
 
-                    });
-
-            }
+</section>
 
 
-            if (
-                Date.now() -
-                issuedAt >
-                2 * 60 * 1000
-            ) {
+<!-- =================================
+     НАВИГАЦИЯ
+================================= -->
 
-                return res
-                    .status(400)
-                    .json({
+<div class="nav">
 
-                        ok: false,
+    <button
+        class="active"
+        data-page="home">
 
-                        error:
-                            "Результат рулетки устарел"
+        🏠
+        <br>
+        Меню
 
-                    });
+    </button>
 
-            }
+    <button
+        data-page="auction">
 
+        🔨
+        <br>
+        Аукцион
 
-            const expectedSignature =
-                createRouletteSignature(
-                    Number(user.id),
-                    multiplier,
-                    issuedAt
-                );
+    </button>
 
+    <button
+        data-page="top">
 
-            if (
-                signature !==
-                expectedSignature
-            ) {
+        🏆
+        <br>
+        Топ
 
-                return res
-                    .status(403)
-                    .json({
+    </button>
 
-                        ok: false,
+</div>
 
-                        error:
-                            "Неверная подпись рулетки"
-
-                    });
-
-            }
+</div>
 
 
-            const player =
-                await getOrCreatePlayer(
-                    user
-                );
+<!-- =================================
+     РУЛЕТКА
+================================= -->
+
+<div
+    id="rouletteLock"
+    class="roulette-lock">
+
+    <div class="roulette-modal">
+
+        <h2>
+            🎰 Экономика
+        </h2>
+
+        <div class="roulette-modal-text">
+
+            Крути рулетку и получи множитель
+            на 4 часа.
+
+        </div>
+
+        <div class="roulette-window">
+
+            <div
+                id="rouletteTrack"
+                class="roulette-track">
+            </div>
+
+        </div>
+
+        <div
+            id="rouletteResult"
+            class="roulette-result">
+
+            Выбери свой множитель
+
+        </div>
+
+        <button
+            id="rouletteSpinButton"
+            class="roulette-spin-button"
+            onclick="spinRoulette()">
+
+            🎰 Крутить
+
+        </button>
+
+        <button
+            id="rouletteClaimButton"
+            class="claim-button"
+            onclick="claimRoulette()">
+
+            Забрать
+
+        </button>
+
+    </div>
+
+</div>
 
 
-            const expiresAt =
-                new Date(
-                    Date.now() +
-                    ROULETTE_DURATION_MS
-                ).toISOString();
+<!-- =================================
+     МОДАЛКА ПОКУПКИ
+================================= -->
+
+<div
+    id="buyModal"
+    class="buy-modal">
+
+    <div class="buy-modal-box">
+
+        <div
+            id="buyModalGift"
+            class="buy-modal-gift">
+
+            🎁
+
+        </div>
+
+        <div
+            id="buyModalTitle"
+            class="buy-modal-title">
+
+            Подарок
+
+        </div>
+
+        <div
+            id="buyModalPrice"
+            class="buy-modal-price">
+
+            0 ⭐ за 1 шт.
+
+        </div>
+
+        <div class="buy-quantity">
+
+            <button
+                type="button"
+                class="quantity-button"
+                onclick="changeBuyQuantity(-1)">
+
+                −
+
+            </button>
+
+            <div
+                id="buyQuantity"
+                class="quantity-value">
+
+                1
+
+            </div>
+
+            <button
+                type="button"
+                class="quantity-button"
+                onclick="changeBuyQuantity(1)">
+
+                +
+
+            </button>
+
+        </div>
+
+        <div class="buy-total">
+
+            Итого:
+            <strong id="buyTotal">
+                0 ⭐
+            </strong>
+
+        </div>
+
+        <div class="buy-modal-actions">
+
+            <button
+                type="button"
+                class="buy-cancel"
+                onclick="closeBuyModal()">
+
+                Отмена
+
+            </button>
+
+            <button
+                type="button"
+                onclick="confirmBuyGift()">
+
+                Купить
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 
-            const updatedPlayer =
-                await updatePlayer(
-                    user.id,
-                    {
+<!-- =================================
+     TOAST
+================================= -->
 
-                        economy_multiplier:
-                            multiplier,
-
-                        economy_expires_at:
-                            expiresAt
-
-                    }
-                );
+<div
+    id="toast"
+    class="toast">
+</div>
 
 
-            return res.json({
+<script>
 
-                ok: true,
+/* =================================
+   API
+================================= */
 
-                player:
-                    updatedPlayer,
-
-                multiplier,
-
-                expires_at:
-                    expiresAt
-
-            });
-
-        } catch (error) {
-
-            console.error(
-                "ROULETTE CLAIM ERROR:",
-                error
-            );
+const API =
+    "https://ranegame.onrender.com";
 
 
-            return res
-                .status(500)
-                .json({
+/* =================================
+   TELEGRAM
+================================= */
 
-                    ok: false,
+const tg =
+    window.Telegram &&
+    window.Telegram.WebApp;
 
-                    error:
-                        error.message
+if (tg) {
 
-                });
+    tg.ready();
+    tg.expand();
 
-        }
+}
+
+
+/* =================================
+   СОСТОЯНИЕ
+================================= */
+
+let player = null;
+
+let balance = 0;
+
+let income = 0;
+
+let economyMultiplier = 1.0;
+
+let economyExpiresAt = null;
+
+let rouletteResult = null;
+
+let rouletteIssuedAt = null;
+
+let rouletteSignature = null;
+
+let rouletteSpinning = false;
+
+let giftShop = [];
+
+let inventory = [];
+
+let giftObserver = null;
+
+let shopLoaded = false;
+
+let inventoryLoaded = false;
+
+
+/* =================================
+   TELEGRAM USER
+================================= */
+
+function getTelegramUser() {
+
+    if (
+        !tg ||
+        !tg.initDataUnsafe ||
+        !tg.initDataUnsafe.user
+    ) {
+
+        throw new Error(
+            "Открой RaneGame через Telegram"
+        );
 
     }
-);
+
+    return tg.initDataUnsafe.user;
+
+}
 
 
-/* =========================================================
-   HEALTH
-========================================================= */
+/* =================================
+   API REQUEST
+================================= */
 
-app.get(
-    "/api/health",
-    (req, res) => {
-
-        res.json({
-
-            ok: true,
-
-            service:
-                "RaneGame",
-
-            time:
-                new Date().toISOString()
-
-        });
-
-    }
-);
-
-
-/* =========================================================
-   TELEGRAM BOT
-========================================================= */
-
-let telegramOffset = 0;
-
-
-/* =========================================================
-   TELEGRAM API
-========================================================= */
-
-async function telegramRequest(
-    method,
-    body
+async function apiRequest(
+    endpoint,
+    body = {}
 ) {
+
+    const tgUser =
+        getTelegramUser();
+
+    const safeUser = {
+        ...tgUser,
+
+        /*
+         * Telegram ID очень большой.
+         * Используем строку, чтобы не терять точность.
+         */
+        id:
+            player &&
+            player.telegram_id
+                ? String(player.telegram_id)
+                : String(tgUser.id)
+    };
 
     const response =
         await fetch(
-            `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
+            API + endpoint,
             {
-
-                method:
-                    "POST",
+                method: "POST",
 
                 headers: {
-
                     "Content-Type":
                         "application/json"
-
                 },
 
-                body:
-                    JSON.stringify(body)
-
+                body: JSON.stringify({
+                    ...body,
+                    user: safeUser
+                })
             }
         );
 
 
-    const data =
-        await response.json();
+    let data;
+
+    try {
+
+        data =
+            await response.json();
+
+    } catch {
+
+        throw new Error(
+            "Сервер вернул неправильный ответ"
+        );
+
+    }
 
 
     if (!data.ok) {
 
         throw new Error(
-            data.description ||
-            "Telegram API error"
+            data.error ||
+            "Ошибка сервера"
         );
 
     }
 
 
     return data;
+
 }
 
 
-/* =========================================================
-   REFERRAL
-========================================================= */
+/* =================================
+   ЗАГРУЗКА ИГРОКА
+================================= */
 
-const referralRewards = {
+async function loadPlayer() {
 
-    2: 500,
+    try {
 
-    4: 1000,
+        const data =
+            await apiRequest(
+                "/api/player"
+            );
 
-    6: 4000,
+        player =
+            data.player;
 
-    8: 7000,
+        balance =
+            Number(
+                player.balance || 0
+            );
 
-    10: 1000
+        income =
+            Number(
+                player.income || 0
+            );
 
-};
+        economyMultiplier =
+            Number(
+                player.economy_multiplier || 1
+            );
+
+        economyExpiresAt =
+            player.economy_expires_at ||
+            null;
+
+        updateScreen();
+
+        /*
+         * Проверяем админку именно после
+         * получения player.telegram_id.
+         */
+        showAdminButton();
+
+        document
+            .getElementById("loading")
+            .style.display = "none";
+
+        document
+            .getElementById("game")
+            .style.display = "block";
+
+        startMultiplierTimer();
+
+        await Promise.all([
+            loadGiftShop(),
+            loadInventory()
+        ]);
+
+        /*
+         * Повторная проверка после полной загрузки.
+         */
+        showAdminButton();
+
+    } catch (error) {
+
+        console.error(error);
+
+        document
+            .getElementById("loading")
+            .innerHTML = `
+
+                <div class="error">
+
+                    ❌ Ошибка
+
+                    <br><br>
+
+                    ${escapeHtml(
+                        error.message
+                    )}
+
+                    <br><br>
+
+                    Открой RaneGame
+                    через Telegram.
+
+                </div>
+
+            `;
+
+    }
+
+}
 
 
-async function processReferral(
-    inviterTelegramId,
-    invitedUser
-) {
+/* =================================
+   ЭКРАН
+================================= */
 
-    const inviterId =
-        Number(
-            inviterTelegramId
+function updateScreen() {
+
+    const balanceElement =
+        document.getElementById(
+            "balance"
         );
 
+    if (balanceElement) {
 
-    const invitedId =
-        Number(
-            invitedUser.id
+        balanceElement.textContent =
+            Math.floor(balance)
+                .toLocaleString("ru-RU");
+
+    }
+
+
+    const incomeElement =
+        document.getElementById(
+            "income"
         );
 
+    if (incomeElement) {
 
-    if (
-        !inviterId ||
-        !invitedId
-    ) {
+        incomeElement.textContent =
+            income;
+
+    }
+
+
+    if (!player) {
 
         return;
 
     }
 
 
-    if (
-        inviterId ===
-        invitedId
-    ) {
+    const usernameElement =
+        document.getElementById(
+            "username"
+        );
 
-        return;
+    if (usernameElement) {
+
+        usernameElement.textContent =
+            player.first_name ||
+            "Игрок";
 
     }
 
 
-    const {
-        data: existingReferral,
-        error: existingError
-    } =
-        await supabase
-            .from("referrals")
-            .select("*")
-            .eq(
-                "invited_telegram_id",
-                invitedId
+    const tgUsernameElement =
+        document.getElementById(
+            "tgusername"
+        );
+
+    if (tgUsernameElement) {
+
+        tgUsernameElement.textContent =
+            player.username
+                ? "@" +
+                  player.username
+                : "Telegram";
+
+    }
+
+
+    const avatar =
+        document.getElementById(
+            "avatar"
+        );
+
+    if (avatar) {
+
+        avatar.textContent =
+            (
+                player.first_name ||
+                "R"
             )
-            .maybeSingle();
+            .charAt(0)
+            .toUpperCase();
 
-
-    if (existingError) {
-        throw existingError;
     }
 
 
-    if (existingReferral) {
-        return;
+    const refId =
+        document.getElementById(
+            "refId"
+        );
+
+    if (refId) {
+
+        refId.textContent =
+            player.telegram_id ||
+            "";
+
     }
 
 
-    const invitedPlayer =
-        await getOrCreatePlayer(
-            invitedUser
+    updateEconomyScreen();
+
+}
+
+
+/* =================================
+   ЭКОНОМИКА
+================================= */
+
+function updateEconomyScreen() {
+
+    const multiplierElement =
+        document.getElementById(
+            "currentMultiplier"
+        );
+
+    const statusElement =
+        document.getElementById(
+            "economyStatus"
+        );
+
+    const timeElement =
+        document.getElementById(
+            "multiplierTime"
         );
 
 
-    await updatePlayer(
-        invitedId,
-        {
+    if (
+        economyExpiresAt &&
+        new Date(
+            economyExpiresAt
+        ).getTime() >
+        Date.now()
+    ) {
 
-            balance:
-                Number(
-                    invitedPlayer.balance
-                ) +
-                100
+        multiplierElement.textContent =
+            "x" +
+            Number(
+                economyMultiplier
+            ).toFixed(1);
+
+        statusElement.textContent =
+            "Активна";
+
+        statusElement.className =
+            "multiplier-active";
+
+        timeElement.textContent =
+            "Осталось: " +
+            formatTime(
+                new Date(
+                    economyExpiresAt
+                ).getTime() -
+                Date.now()
+            );
+
+        return;
+
+    }
+
+
+    economyMultiplier = 1.0;
+
+    economyExpiresAt = null;
+
+    multiplierElement.textContent =
+        "x1.0";
+
+    statusElement.textContent =
+        "Не активна";
+
+    statusElement.className =
+        "multiplier-none";
+
+    timeElement.textContent =
+        "Крути рулетку";
+
+}
+
+
+/* =================================
+   ТАЙМЕР
+================================= */
+
+function startMultiplierTimer() {
+
+    clearInterval(
+        window.multiplierTimer
+    );
+
+    window.multiplierTimer =
+        setInterval(
+            function() {
+
+                updateEconomyScreen();
+
+            },
+            1000
+        );
+
+}
+
+
+/* =================================
+   ФОРМАТ ВРЕМЕНИ
+================================= */
+
+function formatTime(ms) {
+
+    if (ms <= 0) {
+
+        return "00:00:00";
+
+    }
+
+    const totalSeconds =
+        Math.floor(
+            ms / 1000
+        );
+
+    const hours =
+        Math.floor(
+            totalSeconds / 3600
+        );
+
+    const minutes =
+        Math.floor(
+            (
+                totalSeconds % 3600
+            ) / 60
+        );
+
+    const seconds =
+        totalSeconds % 60;
+
+    return (
+        String(hours)
+            .padStart(2, "0") +
+        ":" +
+        String(minutes)
+            .padStart(2, "0") +
+        ":" +
+        String(seconds)
+            .padStart(2, "0")
+    );
+
+}
+
+
+/* =================================
+   АДМИН
+================================= */
+
+const DEV_TELEGRAM_ID =
+    "5370959021438146805";
+
+
+function isAdmin() {
+
+    try {
+
+        /*
+         * Главная проверка:
+         * ID берём из player, потому что
+         * Telegram ID может быть больше
+         * безопасного диапазона JavaScript Number.
+         */
+
+        if (
+            player &&
+            player.telegram_id !== undefined &&
+            player.telegram_id !== null
+        ) {
+
+            return String(
+                player.telegram_id
+            ) ===
+            DEV_TELEGRAM_ID;
+
+        }
+
+
+        return false;
+
+    } catch {
+
+        return false;
+
+    }
+
+}
+
+
+function showAdminButton() {
+
+    const button =
+        document.getElementById(
+            "adminButton"
+        );
+
+    if (!button) return;
+
+    if (isAdmin()) {
+
+        button.style.display =
+            "block";
+
+    } else {
+
+        button.style.display =
+            "none";
+
+    }
+
+}
+
+
+function openAdminPanel() {
+
+    if (!isAdmin()) {
+
+        showToast(
+            "❌ Доступ запрещён"
+        );
+
+        return;
+
+    }
+
+
+    pages.forEach(
+        function(page) {
+
+            page.classList.remove(
+                "active"
+            );
 
         }
     );
 
 
-    const {
-        count,
-        error: countError
-    } =
-        await supabase
-            .from("referrals")
-            .select(
-                "id",
-                {
+    const adminPage =
+        document.getElementById(
+            "admin"
+        );
 
-                    count:
-                        "exact",
 
-                    head:
-                        true
+    if (adminPage) {
+
+        adminPage.classList.add(
+            "active"
+        );
+
+    }
+
+
+    navButtons.forEach(
+        function(button) {
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    window.scrollTo(
+        0,
+        0
+    );
+
+}
+
+
+function closeAdminPanel() {
+
+    pages.forEach(
+        function(page) {
+
+            page.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    const home =
+        document.getElementById(
+            "home"
+        );
+
+
+    if (home) {
+
+        home.classList.add(
+            "active"
+        );
+
+    }
+
+
+    navButtons.forEach(
+        function(button) {
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+
+    const menuButton =
+        document.querySelector(
+            '.nav button[data-page="home"]'
+        );
+
+
+    if (menuButton) {
+
+        menuButton.classList.add(
+            "active"
+        );
+
+    }
+
+
+    window.scrollTo(
+        0,
+        0
+    );
+
+}
+
+
+/* =================================
+   СБРОС АККАУНТА
+================================= */
+
+async function resetMyAccount() {
+
+    if (!isAdmin()) {
+
+        showToast(
+            "❌ Доступ запрещён"
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            "⚠️ СБРОС АККАУНТА\n\n" +
+            "Удалятся все подарки и покупки.\n" +
+            "Баланс станет 0 ⭐.\n" +
+            "Доход станет 0 ⭐/час.\n\n" +
+            "Продолжить?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        showToast(
+            "⏳ Сбрасываем аккаунт..."
+        );
+
+
+        const data =
+            await apiRequest(
+                "/api/dev/reset-account"
+            );
+
+
+        if (data.player) {
+
+            player =
+                data.player;
+
+            balance =
+                Number(
+                    player.balance || 0
+                );
+
+            income =
+                Number(
+                    player.income || 0
+                );
+
+            economyMultiplier =
+                Number(
+                    player.economy_multiplier || 1
+                );
+
+            economyExpiresAt =
+                player.economy_expires_at ||
+                null;
+
+            inventory = [];
+
+            inventoryLoaded = true;
+
+            updateScreen();
+
+            renderInventory();
+
+            renderGiftShop();
+
+        }
+
+
+        showToast(
+            "✅ Аккаунт сброшен"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =================================
+   НАВИГАЦИЯ
+================================= */
+
+const navButtons =
+    document.querySelectorAll(
+        ".nav button"
+    );
+
+
+const pages =
+    document.querySelectorAll(
+        ".page"
+    );
+
+
+navButtons.forEach(
+    function(button) {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                const roulette =
+                    document.getElementById(
+                        "rouletteLock"
+                    );
+
+                if (
+                    roulette &&
+                    roulette.classList.contains(
+                        "show"
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                const pageName =
+                    button.getAttribute(
+                        "data-page"
+                    );
+
+
+                pages.forEach(
+                    function(page) {
+
+                        page.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+                navButtons.forEach(
+                    function(btn) {
+
+                        btn.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+                const selectedPage =
+                    document.getElementById(
+                        pageName
+                    );
+
+
+                if (selectedPage) {
+
+                    selectedPage
+                        .classList
+                        .add(
+                            "active"
+                        );
+
+                }
+
+
+                button.classList.add(
+                    "active"
+                );
+
+
+                window.scrollTo(
+                    0,
+                    0
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =================================
+   ВКЛАДКИ ПОДАРКОВ
+================================= */
+
+function showShopTab(tab) {
+
+    const shop =
+        document.getElementById(
+            "giftShop"
+        );
+
+    const inventoryElement =
+        document.getElementById(
+            "giftInventory"
+        );
+
+    const shopTab =
+        document.getElementById(
+            "shopTab"
+        );
+
+    const inventoryTab =
+        document.getElementById(
+            "inventoryTab"
+        );
+
+
+    if (tab === "shop") {
+
+        shop.style.display =
+            "block";
+
+        inventoryElement.style.display =
+            "none";
+
+        shopTab.classList.add(
+            "active"
+        );
+
+        inventoryTab.classList.remove(
+            "active"
+        );
+
+
+        if (!shopLoaded) {
+
+            loadGiftShop();
+
+        }
+
+    } else {
+
+        shop.style.display =
+            "none";
+
+        inventoryElement.style.display =
+            "block";
+
+        shopTab.classList.remove(
+            "active"
+        );
+
+        inventoryTab.classList.add(
+            "active"
+        );
+
+
+        if (!inventoryLoaded) {
+
+            loadInventory();
+
+        }
+
+    }
+
+}
+
+
+/* =================================
+   МАГАЗИН
+================================= */
+
+async function loadGiftShop(
+    forceReload = false
+) {
+
+    if (
+        shopLoaded &&
+        !forceReload
+    ) {
+
+        return;
+
+    }
+
+
+    const grid =
+        document.getElementById(
+            "shopGrid"
+        );
+
+
+    try {
+
+        if (!giftShop.length) {
+
+            grid.innerHTML = `
+
+                <div
+                    class="empty-inventory"
+                    style="grid-column:1/-1;">
+
+                    🔄 Загружаем магазин...
+
+                </div>
+
+            `;
+
+        }
+
+
+        const response =
+            await fetch(
+                API +
+                "/api/gifts"
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.ok) {
+
+            throw new Error(
+                data.error ||
+                "Не удалось загрузить магазин"
+            );
+
+        }
+
+
+        giftShop =
+            Array.isArray(
+                data.gifts
+            )
+                ? data.gifts
+                : [];
+
+
+        shopLoaded = true;
+
+
+        renderGiftShop();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        grid.innerHTML = `
+
+            <div
+                class="empty-inventory"
+                style="grid-column:1/-1;">
+
+                ❌ Не удалось загрузить магазин
+
+                <br><br>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =================================
+   ТИП АНИМАЦИИ
+================================= */
+
+function getGiftAnimationClass(
+    gift
+) {
+
+    const emoji =
+        String(
+            gift.emoji ||
+            ""
+        );
+
+
+    if (
+        [
+            "💝",
+            "💗",
+            "💖",
+            "💓",
+            "💞",
+            "💕"
+        ].includes(
+            emoji
+        )
+    ) {
+
+        return "gift-animation-heart";
+
+    }
+
+
+    if (
+        [
+            "💎",
+            "👑",
+            "⭐",
+            "🌟",
+            "✨",
+            "🏆",
+            "🏅",
+            "💰"
+        ].includes(
+            emoji
+        )
+    ) {
+
+        return "gift-animation-shine";
+
+    }
+
+
+    if (
+        emoji === "🚀" ||
+        emoji === "☄️"
+    ) {
+
+        return "gift-animation-rocket";
+
+    }
+
+
+    if (
+        [
+            "🔮",
+            "🔥",
+            "⚡",
+            "🌈",
+            "🎆",
+            "🌌",
+            "🪄"
+        ].includes(
+            emoji
+        )
+    ) {
+
+        return "gift-animation-magic";
+
+    }
+
+
+    return "gift-animation-bounce";
+
+}
+
+
+/* =================================
+   РЕНДЕР МАГАЗИНА
+================================= */
+
+function renderGiftShop() {
+
+    const grid =
+        document.getElementById(
+            "shopGrid"
+        );
+
+
+    if (!grid) return;
+
+
+    if (!giftShop.length) {
+
+        grid.innerHTML = `
+
+            <div
+                class="empty-inventory"
+                style="grid-column:1/-1;">
+
+                🎁 Сейчас подарков нет
+
+            </div>
+
+        `;
+
+        setupGiftAnimationObserver();
+
+        return;
+
+    }
+
+
+    grid.innerHTML =
+        giftShop
+            .map(
+                function(gift) {
+
+                    const owned =
+                        inventory.find(
+                            function(item) {
+
+                                return Number(
+                                    item.gift_id
+                                ) ===
+                                Number(
+                                    gift.id
+                                );
+
+                            }
+                        );
+
+
+                    const quantity =
+                        owned
+                            ? Number(
+                                owned.quantity || 0
+                            )
+                            : 0;
+
+
+                    const maxReached =
+                        quantity >= 5;
+
+
+                    const animationClass =
+                        getGiftAnimationClass(
+                            gift
+                        );
+
+
+                    return `
+
+                        <div
+                            class="gift-card">
+
+                            ${
+                                quantity > 0
+                                    ? `
+                                        <div
+                                            class="gift-count">
+
+                                            ${quantity}/5
+
+                                        </div>
+                                      `
+                                    : ""
+                            }
+
+                            <div
+                                class="gift-visual ${animationClass}">
+
+                                <span
+                                    class="gift-spark gift-spark-1">
+
+                                    ✦
+
+                                </span>
+
+                                <span
+                                    class="gift-spark gift-spark-2">
+
+                                    ✧
+
+                                </span>
+
+                                <span
+                                    class="gift-spark gift-spark-3">
+
+                                    ·
+
+                                </span>
+
+                                <span
+                                    class="gift-spark gift-spark-4">
+
+                                    ✦
+
+                                </span>
+
+                                <div
+                                    class="gift-emoji">
+
+                                    ${escapeHtml(
+                                        gift.emoji
+                                    )}
+
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="gift-name">
+
+                                ${escapeHtml(
+                                    gift.name
+                                )}
+
+                            </div>
+
+                            <div
+                                class="gift-income">
+
+                                +${
+                                    Number(
+                                        gift.income ||
+                                        1
+                                    )
+                                } ⭐/час
+
+                            </div>
+
+                            <div
+                                class="gift-price">
+
+                                ${Number(
+                                    gift.price
+                                )} ⭐
+
+                            </div>
+
+                            <button
+                                class="gift-buy"
+
+                                ${
+                                    maxReached
+                                        ? "disabled"
+                                        : ""
+                                }
+
+                                onclick="
+                                    buyGift(
+                                        ${Number(
+                                            gift.id
+                                        )}
+                                    )
+                                ">
+
+                                ${
+                                    maxReached
+                                        ? "Максимум"
+                                        : "Купить"
+                                }
+
+                            </button>
+
+                        </div>
+
+                    `;
 
                 }
             )
-            .eq(
-                "inviter_telegram_id",
-                inviterId
-            );
+            .join("");
 
 
-    if (countError) {
-        throw countError;
-    }
-
-
-    const inviteNumber =
-        Number(
-            count || 0
-        ) +
-        1;
-
-
-    const {
-        error: referralInsertError
-    } =
-        await supabase
-            .from("referrals")
-            .insert({
-
-                inviter_telegram_id:
-                    inviterId,
-
-                invited_telegram_id:
-                    invitedId,
-
-                reward_paid:
-                    true
-
-            });
-
-
-    if (referralInsertError) {
-        throw referralInsertError;
-    }
-
-
-    const reward =
-        referralRewards[
-            inviteNumber
-        ] || 0;
-
-
-    if (
-        reward > 0
-    ) {
-
-        const inviter =
-            await getPlayerByTelegramId(
-                inviterId
-            );
-
-
-        await updatePlayer(
-            inviterId,
-            {
-
-                balance:
-                    Number(
-                        inviter.balance
-                    ) +
-                    reward
-
-            }
-        );
-
-    }
+    setupGiftAnimationObserver();
 
 }
 
 
-/* =========================================================
-   TELEGRAM START
-========================================================= */
+/* =================================
+   ПОКУПКА
+================================= */
 
-async function handleTelegramUpdate(
-    update
-) {
+let selectedBuyGift = null;
 
-    const message =
-        update.message;
+let selectedBuyQuantity = 1;
 
 
-    if (!message) {
-        return;
-    }
+function buyGift(giftId) {
 
+    const gift =
+        giftShop.find(
+            function(item) {
 
-    const from =
-        message.from;
+                return Number(
+                    item.id
+                ) ===
+                Number(
+                    giftId
+                );
 
-
-    if (!from) {
-        return;
-    }
-
-
-    const text =
-        message.text ||
-        "";
-
-
-    if (
-        !text.startsWith(
-            "/start"
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    const parts =
-        text
-            .trim()
-            .split(
-                /\s+/
-            );
-
-
-    const startParam =
-        parts[1] ||
-        "";
-
-
-    const player =
-        await getOrCreatePlayer(
-            from
+            }
         );
 
 
-    if (
-        startParam.startsWith(
-            "ref_"
-        )
-    ) {
+    if (!gift) {
 
-        const inviterId =
-            Number(
-                startParam.substring(
-                    4
-                )
-            );
+        showToast(
+            "❌ Подарок не найден"
+        );
 
-
-        if (
-            inviterId &&
-            inviterId !==
-            Number(from.id)
-        ) {
-
-            try {
-
-                await processReferral(
-                    inviterId,
-                    from
-                );
-
-            } catch (error) {
-
-                console.error(
-                    "REFERRAL ERROR:",
-                    error
-                );
-
-            }
-
-        }
+        return;
 
     }
 
 
-    await telegramRequest(
-        "sendMessage",
-        {
+    const owned =
+        inventory.find(
+            function(item) {
 
-            chat_id:
-                message.chat.id,
-
-            text:
-                "🎮 RaneGame готов!",
-
-            reply_markup: {
-
-                inline_keyboard: [
-
-                    [
-
-                        {
-
-                            text:
-                                "🎮 Открыть RaneGame",
-
-                            web_app: {
-
-                                url:
-                                    "https://ranegame.onrender.com"
-
-                            }
-
-                        }
-
-                    ]
-
-                ]
+                return Number(
+                    item.gift_id
+                ) ===
+                Number(
+                    giftId
+                );
 
             }
+        );
 
-        }
+
+    const ownedQuantity =
+        owned
+            ? Number(
+                owned.quantity || 0
+            )
+            : 0;
+
+
+    const remaining =
+        Math.max(
+            0,
+            5 - ownedQuantity
+        );
+
+
+    if (remaining <= 0) {
+
+        showToast(
+            "❌ Максимум 5 одинаковых подарков"
+        );
+
+        return;
+
+    }
+
+
+    selectedBuyGift =
+        gift;
+
+    selectedBuyQuantity =
+        1;
+
+
+    const modal =
+        document.getElementById(
+            "buyModal"
+        );
+
+
+    document
+        .getElementById(
+            "buyModalGift"
+        )
+        .textContent =
+        gift.emoji || "🎁";
+
+
+    document
+        .getElementById(
+            "buyModalTitle"
+        )
+        .textContent =
+        gift.name;
+
+
+    document
+        .getElementById(
+            "buyModalPrice"
+        )
+        .textContent =
+        Number(gift.price) +
+        " ⭐ за 1 шт.";
+
+
+    document
+        .getElementById(
+            "buyQuantity"
+        )
+        .textContent =
+        "1";
+
+
+    updateBuyTotal();
+
+
+    modal.classList.add(
+        "show"
     );
 
 }
 
 
-/* =========================================================
-   TELEGRAM POLLING
-========================================================= */
+function changeBuyQuantity(
+    change
+) {
 
-async function telegramPolling() {
+    if (!selectedBuyGift) {
 
-    if (!BOT_TOKEN) {
+        return;
 
-        console.log(
-            "⚠️ BOT_TOKEN не задан — Telegram polling отключён"
+    }
+
+
+    const owned =
+        inventory.find(
+            function(item) {
+
+                return Number(
+                    item.gift_id
+                ) ===
+                Number(
+                    selectedBuyGift.id
+                );
+
+            }
+        );
+
+
+    const ownedQuantity =
+        owned
+            ? Number(
+                owned.quantity || 0
+            )
+            : 0;
+
+
+    const maxQuantity =
+        Math.min(
+            5,
+            Math.max(
+                1,
+                5 - ownedQuantity
+            )
+        );
+
+
+    selectedBuyQuantity +=
+        Number(change);
+
+
+    if (
+        selectedBuyQuantity < 1
+    ) {
+
+        selectedBuyQuantity =
+            1;
+
+    }
+
+
+    if (
+        selectedBuyQuantity >
+        maxQuantity
+    ) {
+
+        selectedBuyQuantity =
+            maxQuantity;
+
+    }
+
+
+    document
+        .getElementById(
+            "buyQuantity"
+        )
+        .textContent =
+        selectedBuyQuantity;
+
+
+    updateBuyTotal();
+
+}
+
+
+function updateBuyTotal() {
+
+    if (!selectedBuyGift) {
+
+        return;
+
+    }
+
+
+    const total =
+        Number(
+            selectedBuyGift.price
+        ) *
+        selectedBuyQuantity;
+
+
+    document
+        .getElementById(
+            "buyTotal"
+        )
+        .textContent =
+        total +
+        " ⭐";
+
+}
+
+
+function closeBuyModal() {
+
+    document
+        .getElementById(
+            "buyModal"
+        )
+        .classList.remove(
+            "show"
+        );
+
+
+    selectedBuyGift =
+        null;
+
+    selectedBuyQuantity =
+        1;
+
+}
+
+
+async function confirmBuyGift() {
+
+    if (!selectedBuyGift) {
+
+        return;
+
+    }
+
+
+    const gift =
+        selectedBuyGift;
+
+
+    const quantity =
+        selectedBuyQuantity;
+
+
+    const totalPrice =
+        Number(
+            gift.price
+        ) *
+        quantity;
+
+
+    if (
+        balance <
+        totalPrice
+    ) {
+
+        showToast(
+            "❌ Недостаточно ⭐"
         );
 
         return;
@@ -2934,100 +4090,1599 @@ async function telegramPolling() {
 
     try {
 
+        showToast(
+            "⏳ Покупаем..."
+        );
+
+
         const data =
-            await telegramRequest(
-                "getUpdates",
+            await apiRequest(
+                "/api/gifts/buy",
                 {
+                    gift_id:
+                        Number(
+                            gift.id
+                        ),
 
-                    offset:
-                        telegramOffset,
-
-                    timeout:
-                        25
-
+                    quantity:
+                        quantity
                 }
             );
 
 
-        for (
-            const update
-            of data.result
-        ) {
+        if (data.player) {
 
-            telegramOffset =
-                update.update_id +
-                1;
+            player =
+                data.player;
 
-
-            try {
-
-                await handleTelegramUpdate(
-                    update
+            balance =
+                Number(
+                    player.balance
                 );
 
-            } catch (error) {
-
-                console.error(
-                    "TELEGRAM UPDATE ERROR:",
-                    error
+            income =
+                Number(
+                    player.income
                 );
 
-            }
+            updateScreen();
 
         }
 
+
+        inventoryLoaded =
+            false;
+
+
+        await loadInventory(
+            true
+        );
+
+
+        renderGiftShop();
+
+        closeBuyModal();
+
+
+        showToast(
+            "🎁 Куплено: " +
+            quantity +
+            " × " +
+            gift.name
+        );
+
+
     } catch (error) {
 
-        console.error(
-            "TELEGRAM POLLING ERROR:",
+        console.error(error);
+
+        showToast(
+            "❌ " +
             error.message
         );
 
     }
 
+}
 
-    setTimeout(
-        telegramPolling,
-        1000
+
+/* =================================
+   ИНВЕНТАРЬ
+================================= */
+
+async function loadInventory(
+    forceReload = false
+) {
+
+    if (
+        inventoryLoaded &&
+        !forceReload
+    ) {
+
+        return;
+
+    }
+
+
+    const list =
+        document.getElementById(
+            "inventoryList"
+        );
+
+
+    try {
+
+        if (!inventory.length) {
+
+            list.innerHTML = `
+
+                <div class="empty-inventory">
+
+                    🔄 Загружаем инвентарь...
+
+                </div>
+
+            `;
+
+        }
+
+
+        const tgUser =
+            getTelegramUser();
+
+
+        const telegramId =
+            player &&
+            player.telegram_id
+                ? String(
+                    player.telegram_id
+                )
+                : String(
+                    tgUser.id
+                );
+
+
+        const response =
+            await fetch(
+                API +
+                "/api/inventory?telegram_id=" +
+                encodeURIComponent(
+                    telegramId
+                )
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.ok) {
+
+            throw new Error(
+                data.error ||
+                "Не удалось загрузить инвентарь"
+            );
+
+        }
+
+
+        inventory =
+            Array.isArray(
+                data.inventory
+            )
+                ? data.inventory
+                : [];
+
+
+        inventoryLoaded =
+            true;
+
+
+        renderInventory();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        list.innerHTML = `
+
+            <div class="empty-inventory">
+
+                ❌ Не удалось загрузить инвентарь
+
+                <br><br>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =================================
+   РЕНДЕР ИНВЕНТАРЯ
+================================= */
+
+function renderInventory() {
+
+    const list =
+        document.getElementById(
+            "inventoryList"
+        );
+
+
+    if (!list) return;
+
+
+    if (!inventory.length) {
+
+        list.innerHTML = `
+
+            <div class="empty-inventory">
+
+                🎒 Инвентарь пуст
+
+                <br><br>
+
+                Купи подарок в магазине.
+
+            </div>
+
+        `;
+
+        setupGiftAnimationObserver();
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        inventory
+            .map(
+                function(item) {
+
+                    const gift =
+                        item.gift ||
+                        item;
+
+
+                    const purchases =
+                        Array.isArray(
+                            item.purchases
+                        )
+                            ? item.purchases
+                            : [];
+
+
+                    const animationClass =
+                        getGiftAnimationClass(
+                            gift
+                        );
+
+
+                    return `
+
+                        <div
+                            class="inventory-card">
+
+                            <div
+                                class="inventory-top">
+
+                                <div
+                                    class="
+                                        inventory-emoji
+                                        ${animationClass}
+                                    ">
+
+                                    ${escapeHtml(
+                                        gift.emoji ||
+                                        "🎁"
+                                    )}
+
+                                </div>
+
+                                <div
+                                    class="inventory-info">
+
+                                    <div
+                                        class="inventory-name">
+
+                                        ${escapeHtml(
+                                            gift.name ||
+                                            "Подарок"
+                                        )}
+
+                                    </div>
+
+                                    <div
+                                        class="inventory-count">
+
+                                        Количество:
+                                        ${
+                                            Number(
+                                                item.quantity ||
+                                                0
+                                            )
+                                        }
+                                        / 5
+
+                                    </div>
+
+                                    <div
+                                        class="inventory-income">
+
+                                        +${
+                                            Number(
+                                                gift.income ||
+                                                1
+                                            ) *
+                                            Number(
+                                                item.quantity ||
+                                                0
+                                            )
+                                        }
+                                        ⭐/час
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            ${
+                                purchases.length
+                                    ? `
+
+                                        <div
+                                            class="
+                                                inventory-purchases
+                                            ">
+
+                                            ${purchases
+                                                .map(
+                                                    function(
+                                                        purchase
+                                                    ) {
+
+                                                        const purchasedAt =
+                                                            new Date(
+                                                                purchase.purchased_at
+                                                            );
+
+                                                        const canSellAt =
+                                                            purchasedAt.getTime() +
+                                                            5 *
+                                                            60 *
+                                                            60 *
+                                                            1000;
+
+                                                        const ready =
+                                                            Date.now() >=
+                                                            canSellAt;
+
+                                                        return `
+
+                                                            <div
+                                                                class="
+                                                                    purchase-row
+                                                                ">
+
+                                                                <div>
+
+                                                                    <div>
+                                                                        🎁 Покупка
+                                                                    </div>
+
+                                                                    <div
+                                                                        class="
+                                                                            purchase-time
+                                                                        ">
+
+                                                                        ${
+                                                                            purchasedAt.toLocaleString(
+                                                                                "ru-RU"
+                                                                            )
+                                                                        }
+
+                                                                    </div>
+
+                                                                    ${
+                                                                        ready
+                                                                            ? `
+                                                                                <div
+                                                                                    style="
+                                                                                        color:#72ff72;
+                                                                                        margin-top:4px;
+                                                                                    ">
+
+                                                                                    Можно продать
+
+                                                                                </div>
+                                                                            `
+                                                                            : `
+                                                                                <div
+                                                                                    style="
+                                                                                        color:#ff9999;
+                                                                                        margin-top:4px;
+                                                                                    ">
+
+                                                                                    Продажа через
+                                                                                    ${formatRemaining(
+                                                                                        canSellAt -
+                                                                                        Date.now()
+                                                                                    )}
+
+                                                                                </div>
+                                                                            `
+                                                                    }
+
+                                                                </div>
+
+                                                                <button
+                                                                    class="
+                                                                        sell-button
+                                                                        ${
+                                                                            ready
+                                                                                ? "ready"
+                                                                                : ""
+                                                                        }
+                                                                    "
+
+                                                                    ${
+                                                                        ready
+                                                                            ? ""
+                                                                            : "disabled"
+                                                                    }
+
+                                                                    onclick="
+                                                                        sellGift(
+                                                                            ${Number(
+                                                                                purchase.id
+                                                                            )}
+                                                                        )
+                                                                    ">
+
+                                                                    Продать
+                                                                    ${Number(
+                                                                        gift.price
+                                                                    )}
+                                                                    ⭐
+
+                                                                </button>
+
+                                                            </div>
+
+                                                        `;
+
+                                                    }
+                                                )
+                                                .join("")}
+
+                                        </div>
+
+                                      `
+                                    : ""
+                            }
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    setupGiftAnimationObserver();
+
+}
+
+
+/* =================================
+   ПРОДАЖА
+================================= */
+
+async function sellGift(
+    purchaseId
+) {
+
+    try {
+
+        if (
+            !confirm(
+                "Продать этот подарок?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        showToast(
+            "⏳ Продаём..."
+        );
+
+
+        const data =
+            await apiRequest(
+                "/api/gifts/sell",
+                {
+                    purchase_id:
+                        Number(
+                            purchaseId
+                        )
+                }
+            );
+
+
+        if (data.player) {
+
+            player =
+                data.player;
+
+            balance =
+                Number(
+                    player.balance
+                );
+
+            income =
+                Number(
+                    player.income
+                );
+
+            updateScreen();
+
+        }
+
+
+        showToast(
+            "💰 Подарок продан"
+        );
+
+
+        inventoryLoaded =
+            false;
+
+
+        await loadInventory();
+
+        renderGiftShop();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =================================
+   ТАЙМЕР ПРОДАЖИ
+================================= */
+
+function formatRemaining(ms) {
+
+    if (ms <= 0) {
+
+        return "00:00:00";
+
+    }
+
+
+    const totalSeconds =
+        Math.floor(
+            ms / 1000
+        );
+
+
+    const hours =
+        Math.floor(
+            totalSeconds / 3600
+        );
+
+
+    const minutes =
+        Math.floor(
+            (
+                totalSeconds % 3600
+            ) / 60
+        );
+
+
+    const seconds =
+        totalSeconds % 60;
+
+
+    return (
+        String(hours)
+            .padStart(2, "0") +
+        ":" +
+        String(minutes)
+            .padStart(2, "0") +
+        ":" +
+        String(seconds)
+            .padStart(2, "0")
     );
 
 }
 
 
-/* =========================================================
-   START SERVER
-========================================================= */
+/* =================================
+   ОПТИМИЗАЦИЯ
+================================= */
 
-app.listen(
-    PORT,
-    "0.0.0.0",
-    () => {
+function setupGiftAnimationObserver() {
 
-        console.log(
-            `🚀 RaneGame запущен на порту ${PORT}`
-        );
+    if (giftObserver) {
 
-        console.log(
-            "🎁 Магазин подарков: OK"
-        );
-
-        console.log(
-            "🎒 Инвентарь: OK"
-        );
-
-        console.log(
-            "⏳ Продажа через 5 часов: OK"
-        );
-
-        console.log(
-            "🔄 Обновление магазина каждые 3 часа: OK"
-        );
-
-        console.log(
-            "🛠️ Admin Panel: OK"
-        );
-
-        telegramPolling();
+        giftObserver.disconnect();
 
     }
-);
+
+
+    if (
+        !(
+            "IntersectionObserver"
+            in window
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    giftObserver =
+        new IntersectionObserver(
+            function(entries) {
+
+                entries.forEach(
+                    function(entry) {
+
+                        const element =
+                            entry.target;
+
+
+                        if (
+                            entry.isIntersecting
+                        ) {
+
+                            element.classList.remove(
+                                "gift-paused"
+                            );
+
+                            element.classList.remove(
+                                "inventory-paused"
+                            );
+
+                        } else {
+
+                            element.classList.add(
+                                "gift-paused"
+                            );
+
+                            element.classList.add(
+                                "inventory-paused"
+                            );
+
+                        }
+
+                    }
+                );
+
+            },
+            {
+                root: null,
+
+                rootMargin:
+                    "100px 0px 100px 0px",
+
+                threshold: 0.01
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            ".gift-card, .inventory-card"
+        )
+        .forEach(
+            function(element) {
+
+                giftObserver.observe(
+                    element
+                );
+
+            }
+        );
+
+}
+
+
+/* =================================
+   РУЛЕТКА
+================================= */
+
+function openRoulette() {
+
+    if (
+        economyExpiresAt &&
+        new Date(
+            economyExpiresAt
+        ).getTime() >
+        Date.now()
+    ) {
+
+        showToast(
+            "⚡ Множитель уже активен"
+        );
+
+        return;
+
+    }
+
+
+    rouletteResult = null;
+
+    rouletteIssuedAt = null;
+
+    rouletteSignature = null;
+
+    rouletteSpinning = false;
+
+
+    const lock =
+        document.getElementById(
+            "rouletteLock"
+        );
+
+
+    const spinButton =
+        document.getElementById(
+            "rouletteSpinButton"
+        );
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    const resultText =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    spinButton.disabled =
+        false;
+
+    spinButton.style.display =
+        "block";
+
+    spinButton.textContent =
+        "🎰 Крутить";
+
+
+    claimButton.classList.remove(
+        "show"
+    );
+
+
+    resultText.textContent =
+        "Выбери свой множитель";
+
+
+    buildRoulette();
+
+
+    lock.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =================================
+   ПОСТРОЕНИЕ РУЛЕТКИ
+================================= */
+
+function buildRoulette() {
+
+    const track =
+        document.getElementById(
+            "rouletteTrack"
+        );
+
+
+    track.innerHTML = "";
+
+
+    const values = [];
+
+
+    for (
+        let repeat = 0;
+        repeat < 7;
+        repeat++
+    ) {
+
+        for (
+            let i = 1;
+            i <= 20;
+            i++
+        ) {
+
+            values.push(
+                (i / 10).toFixed(1)
+            );
+
+        }
+
+    }
+
+
+    values.forEach(
+        function(value) {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "roulette-item";
+
+
+            item.textContent =
+                "x" +
+                value;
+
+
+            track.appendChild(
+                item
+            );
+
+        }
+    );
+
+
+    track.style.transition =
+        "none";
+
+
+    track.style.transform =
+        "translateX(0)";
+
+}
+
+
+/* =================================
+   КРУТИТЬ
+================================= */
+
+async function spinRoulette() {
+
+    if (rouletteSpinning) {
+
+        return;
+
+    }
+
+
+    rouletteSpinning =
+        true;
+
+
+    const spinButton =
+        document.getElementById(
+            "rouletteSpinButton"
+        );
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    const resultText =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    spinButton.disabled =
+        true;
+
+
+    spinButton.textContent =
+        "⏳ Крутим...";
+
+
+    claimButton.classList.remove(
+        "show"
+    );
+
+
+    resultText.textContent =
+        "Рулетка вращается...";
+
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/roulette/spin"
+            );
+
+
+        rouletteResult =
+            Number(
+                data.multiplier
+            );
+
+
+        rouletteIssuedAt =
+            Number(
+                data.issuedAt
+            );
+
+
+        rouletteSignature =
+            data.signature;
+
+
+        animateRoulette(
+            rouletteResult
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        rouletteSpinning =
+            false;
+
+
+        spinButton.disabled =
+            false;
+
+
+        spinButton.textContent =
+            "🎰 Крутить";
+
+
+        resultText.textContent =
+            "Ошибка";
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =================================
+   АНИМАЦИЯ РУЛЕТКИ
+================================= */
+
+function animateRoulette(
+    result
+) {
+
+    const track =
+        document.getElementById(
+            "rouletteTrack"
+        );
+
+
+    const items =
+        track.querySelectorAll(
+            ".roulette-item"
+        );
+
+
+    const resultIndex =
+        120 +
+        Math.floor(
+            Math.random() * 8
+        );
+
+
+    let targetIndex =
+        resultIndex;
+
+
+    for (
+        let i = resultIndex;
+        i < items.length;
+        i++
+    ) {
+
+        if (
+            Number(
+                items[i]
+                    .textContent
+                    .replace(
+                        "x",
+                        ""
+                    )
+            ) === result
+        ) {
+
+            targetIndex =
+                i;
+
+            break;
+
+        }
+
+    }
+
+
+    const item =
+        items[targetIndex];
+
+
+    if (!item) {
+
+        finishRoulette();
+
+        return;
+
+    }
+
+
+    const container =
+        document.querySelector(
+            ".roulette-window"
+        );
+
+
+    const containerCenter =
+        container.offsetWidth / 2;
+
+
+    const itemCenter =
+        item.offsetLeft +
+        item.offsetWidth / 2;
+
+
+    const offset =
+        containerCenter -
+        itemCenter;
+
+
+    track.style.transition =
+        "transform 5s cubic-bezier(.08,.72,.12,1)";
+
+
+    track.style.transform =
+        "translateX(" +
+        offset +
+        "px)";
+
+
+    setTimeout(
+        function() {
+
+            items.forEach(
+                function(el) {
+
+                    el.classList.remove(
+                        "selected"
+                    );
+
+                }
+            );
+
+
+            item.classList.add(
+                "selected"
+            );
+
+
+            finishRoulette();
+
+        },
+        5100
+    );
+
+}
+
+
+/* =================================
+   РЕЗУЛЬТАТ РУЛЕТКИ
+================================= */
+
+function finishRoulette() {
+
+    rouletteSpinning =
+        false;
+
+
+    const spinButton =
+        document.getElementById(
+            "rouletteSpinButton"
+        );
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    const resultText =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    spinButton.style.display =
+        "none";
+
+
+    resultText.textContent =
+        "Выпало: x" +
+        rouletteResult.toFixed(1);
+
+
+    claimButton.textContent =
+        "Забрать x" +
+        rouletteResult.toFixed(1);
+
+
+    claimButton.classList.add(
+        "show"
+    );
+
+}
+
+
+/* =================================
+   ЗАБРАТЬ РУЛЕТКУ
+================================= */
+
+async function claimRoulette() {
+
+    if (
+        rouletteResult === null ||
+        rouletteIssuedAt === null ||
+        !rouletteSignature
+    ) {
+
+        return;
+
+    }
+
+
+    const claimButton =
+        document.getElementById(
+            "rouletteClaimButton"
+        );
+
+
+    claimButton.disabled =
+        true;
+
+
+    claimButton.textContent =
+        "⏳ Активируем...";
+
+
+    try {
+
+        const data =
+            await apiRequest(
+                "/api/roulette/claim",
+                {
+                    multiplier:
+                        rouletteResult,
+
+                    issuedAt:
+                        rouletteIssuedAt,
+
+                    signature:
+                        rouletteSignature
+                }
+            );
+
+
+        player =
+            data.player;
+
+
+        balance =
+            Number(
+                player.balance
+            );
+
+
+        income =
+            Number(
+                player.income
+            );
+
+
+        economyMultiplier =
+            Number(
+                player.economy_multiplier ||
+                1
+            );
+
+
+        economyExpiresAt =
+            player.economy_expires_at ||
+            null;
+
+
+        updateScreen();
+
+
+        document
+            .getElementById(
+                "rouletteLock"
+            )
+            .classList
+            .remove(
+                "show"
+            );
+
+
+        rouletteResult = null;
+
+        rouletteIssuedAt = null;
+
+        rouletteSignature = null;
+
+
+        showToast(
+            "🔥 Множитель активирован"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        claimButton.disabled =
+            false;
+
+
+        claimButton.textContent =
+            "Забрать x" +
+            rouletteResult.toFixed(1);
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =================================
+   БОНУС
+================================= */
+
+async function collect() {
+
+    try {
+
+        const button =
+            document.getElementById(
+                "bonusButton"
+            );
+
+
+        button.disabled =
+            true;
+
+
+        button.textContent =
+            "⏳ Получаем...";
+
+
+        const data =
+            await apiRequest(
+                "/api/collect"
+            );
+
+
+        player =
+            data.player;
+
+
+        balance =
+            Number(
+                player.balance
+            );
+
+
+        income =
+            Number(
+                player.income
+            );
+
+
+        updateScreen();
+
+
+        showToast(
+            "🔥 +1000 ⭐"
+        );
+
+
+        button.textContent =
+            "✅ Получено";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        showToast(
+            "❌ " +
+            error.message
+        );
+
+
+        const button =
+            document.getElementById(
+                "bonusButton"
+            );
+
+
+        button.disabled =
+            false;
+
+
+        button.textContent =
+            "Забрать +1000 ⭐";
+
+    }
+
+}
+
+
+/* =================================
+   ПРИГЛАСИТЬ
+================================= */
+
+function inviteFriend() {
+
+    try {
+
+        const tgUser =
+            getTelegramUser();
+
+
+        const telegramId =
+            player &&
+            player.telegram_id
+                ? String(
+                    player.telegram_id
+                )
+                : String(
+                    tgUser.id
+                );
+
+
+        const link =
+            "https://" +
+            "t.me/" +
+            "RaneGameBot" +
+            "?start=ref_" +
+            telegramId;
+
+
+        const shareUrl =
+            "https://t.me/share/url" +
+            "?url=" +
+            encodeURIComponent(
+                link
+            ) +
+            "&text=" +
+            encodeURIComponent(
+                "Залетай в RaneGame!"
+            );
+
+
+        if (
+            tg &&
+            tg.openTelegramLink
+        ) {
+
+            tg.openTelegramLink(
+                shareUrl
+            );
+
+        } else {
+
+            navigator.clipboard
+                .writeText(
+                    link
+                )
+                .then(
+                    function() {
+
+                        showToast(
+                            "🔗 Ссылка скопирована"
+                        );
+
+                    }
+                );
+
+        }
+
+    } catch (error) {
+
+        showToast(
+            "❌ Открой игру через Telegram"
+        );
+
+    }
+
+}
+
+
+/* =================================
+   КОПИРОВАТЬ
+================================= */
+
+function copyInviteLink() {
+
+    try {
+
+        const tgUser =
+            getTelegramUser();
+
+
+        const telegramId =
+            player &&
+            player.telegram_id
+                ? String(
+                    player.telegram_id
+                )
+                : String(
+                    tgUser.id
+                );
+
+
+        const link =
+            "https://t.me/RaneGameBot?start=ref_" +
+            telegramId;
+
+
+        navigator.clipboard
+            .writeText(
+                link
+            )
+            .then(
+                function() {
+
+                    showToast(
+                        "🔗 Ссылка скопирована"
+                    );
+
+                }
+            )
+            .catch(
+                function() {
+
+                    showToast(
+                        "❌ Не удалось скопировать"
+                    );
+
+                }
+            );
+
+    } catch (error) {
+
+        showToast(
+            "❌ Открой игру через Telegram"
+        );
+
+    }
+
+}
+
+
+/* =================================
+   TOAST
+================================= */
+
+function showToast(text) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        text;
+
+
+    toast.style.display =
+        "block";
+
+
+    clearTimeout(
+        window.toastTimer
+    );
+
+
+    window.toastTimer =
+        setTimeout(
+            function() {
+
+                toast.style.display =
+                    "none";
+
+            },
+            2500
+        );
+
+}
+
+
+/* =================================
+   ESCAPE HTML
+================================= */
+
+function escapeHtml(text) {
+
+    return String(text)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =================================
+   ЗАПУСК
+================================= */
+
+loadPlayer();
+
+</script>
+
+</body>
+</html>
