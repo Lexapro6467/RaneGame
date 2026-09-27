@@ -67,6 +67,36 @@ const ROULETTE_DURATION_MS =
 
 
 /* =========================================================
+   FRONTEND — INDEX.HTML
+========================================================= */
+
+/*
+   ВАЖНО:
+   Render должен отдавать index.html при открытии сайта.
+*/
+
+app.use(
+    express.static(
+        path.join(__dirname)
+    )
+);
+
+app.get(
+    "/",
+    (req, res) => {
+
+        res.sendFile(
+            path.join(
+                __dirname,
+                "index.html"
+            )
+        );
+
+    }
+);
+
+
+/* =========================================================
    TELEGRAM USER
 ========================================================= */
 
@@ -264,8 +294,6 @@ app.post(
                 DEV_TELEGRAM_ID;
 
 
-            /* Удаляем покупки */
-
             const {
                 error: purchasesError
             } =
@@ -283,8 +311,6 @@ app.post(
             }
 
 
-            /* Удаляем инвентарь */
-
             const {
                 error: giftsError
             } =
@@ -301,8 +327,6 @@ app.post(
                 throw giftsError;
             }
 
-
-            /* Сбрасываем игрока */
 
             const {
                 data: player,
@@ -507,16 +531,6 @@ async function getShopState() {
 ========================================================= */
 
 async function refreshGiftShop() {
-
-    /*
-       20 подарков:
-
-       10 × 15 ⭐
-       5 × 18 ⭐
-       3 × 22 ⭐
-       2 × 33 ⭐
-    */
-
 
     const {
         data: allGifts,
