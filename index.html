@@ -311,7 +311,7 @@ button:disabled {
 }
 
 /* =========================
-   МАГАЗИН ПОДАРКОВ
+   МАГАЗИН
 ========================= */
 
 .shop-tabs {
@@ -355,10 +355,14 @@ button:disabled {
     gap: 12px;
 }
 
+/* =========================
+   КАРТОЧКА ПОДАРКА
+========================= */
+
 .gift-card {
     position: relative;
     overflow: hidden;
-    min-height: 250px;
+    min-height: 285px;
     padding: 14px 12px 12px;
 
     background:
@@ -391,6 +395,7 @@ button:disabled {
 
 .gift-card::before {
     content: "";
+
     position: absolute;
 
     top: -70px;
@@ -408,6 +413,47 @@ button:disabled {
     pointer-events: none;
 }
 
+.gift-card::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: -120%;
+
+    width: 70%;
+    height: 100%;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.08),
+        transparent
+    );
+
+    transform: skewX(-18deg);
+
+    animation: cardShimmer 5s ease-in-out infinite;
+
+    pointer-events: none;
+}
+
+@keyframes cardShimmer {
+
+    0%, 55% {
+        left: -120%;
+    }
+
+    75% {
+        left: 140%;
+    }
+
+    100% {
+        left: 140%;
+    }
+
+}
+
 .gift-card:active {
     transform: scale(.97);
 }
@@ -420,51 +466,423 @@ button:disabled {
         0 0 25px rgba(255,60,60,.08);
 }
 
-.gift-emoji {
+/* =========================
+   АНИМАЦИЯ ПОДАРКА
+========================= */
+
+.gift-visual {
     position: relative;
-    z-index: 2;
 
-    width: 100px;
-    height: 100px;
+    width: 112px;
+    height: 112px;
 
-    margin: 5px auto 10px;
+    margin: 4px auto 10px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    font-size: 64px;
-    line-height: 1;
-
-    border-radius: 30px;
+    border-radius: 34px;
 
     background:
         radial-gradient(
             circle at 50% 35%,
-            rgba(255,255,255,.12),
-            rgba(255,70,70,.05) 45%,
-            transparent 70%
+            rgba(255,255,255,.18),
+            rgba(255,80,80,.09) 38%,
+            rgba(255,30,30,.02) 68%,
+            transparent 75%
         );
 
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.08),
-        0 8px 25px rgba(0,0,0,.25);
+        inset 0 1px 2px rgba(255,255,255,.12),
+        inset 0 -12px 25px rgba(0,0,0,.18),
+        0 12px 28px rgba(0,0,0,.35);
 
-    filter:
-        drop-shadow(0 8px 12px rgba(0,0,0,.45));
-
-    animation: giftFloat 3s ease-in-out infinite;
+    overflow: hidden;
 }
 
-@keyframes giftFloat {
+/* Свет вокруг подарка */
+
+.gift-visual::before {
+    content: "";
+
+    position: absolute;
+
+    width: 76px;
+    height: 76px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,90,90,.38),
+            transparent 70%
+        );
+
+    filter: blur(12px);
+
+    animation: giftGlow 2.8s ease-in-out infinite;
+
+    pointer-events: none;
+}
+
+/* Двигающийся блик */
+
+.gift-visual::after {
+    content: "";
+
+    position: absolute;
+
+    top: -50%;
+    left: -80%;
+
+    width: 42%;
+    height: 200%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.32),
+            transparent
+        );
+
+    transform: rotate(20deg);
+
+    animation: giftShine 3.8s ease-in-out infinite;
+
+    pointer-events: none;
+
+    z-index: 4;
+}
+
+.gift-emoji {
+    position: relative;
+
+    z-index: 3;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    font-size: 66px;
+    line-height: 1;
+
+    filter:
+        drop-shadow(0 8px 7px rgba(0,0,0,.45))
+        drop-shadow(0 0 10px rgba(255,70,70,.20));
+
+    transform-origin: center;
+
+    user-select: none;
+}
+
+/* =========================
+   ОБЩЕЕ СВЕЧЕНИЕ
+========================= */
+
+@keyframes giftGlow {
+
     0%, 100% {
-        transform: translateY(0);
+        opacity: .40;
+        transform: scale(.82);
     }
 
     50% {
-        transform: translateY(-4px);
+        opacity: .95;
+        transform: scale(1.18);
     }
+
 }
+
+@keyframes giftShine {
+
+    0% {
+        left: -80%;
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0;
+    }
+
+    40% {
+        opacity: .9;
+    }
+
+    65% {
+        left: 140%;
+        opacity: 0;
+    }
+
+    100% {
+        left: 140%;
+        opacity: 0;
+    }
+
+}
+
+/* =========================
+   СЕРДЦА
+========================= */
+
+.gift-animation-heart .gift-emoji {
+    animation: giftHeart 1.55s ease-in-out infinite;
+
+    filter:
+        drop-shadow(0 8px 7px rgba(0,0,0,.45))
+        drop-shadow(0 0 17px rgba(255,50,100,.65));
+}
+
+.gift-animation-heart {
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,55,105,.22),
+            rgba(255,40,70,.04) 60%,
+            transparent 75%
+        );
+}
+
+@keyframes giftHeart {
+
+    0%, 100% {
+        transform:
+            scale(1)
+            rotate(-2deg);
+    }
+
+    20% {
+        transform:
+            scale(1.10)
+            rotate(2deg);
+    }
+
+    38% {
+        transform:
+            scale(.96)
+            rotate(-1deg);
+    }
+
+    55% {
+        transform:
+            scale(1.15)
+            rotate(2deg);
+    }
+
+    72% {
+        transform:
+            scale(1.02)
+            rotate(-2deg);
+    }
+
+}
+
+/* =========================
+   АЛМАЗЫ / КОРОНЫ / ЗВЁЗДЫ
+========================= */
+
+.gift-animation-shine .gift-emoji {
+    animation: giftShineFloat 2.25s ease-in-out infinite;
+
+    filter:
+        drop-shadow(0 8px 7px rgba(0,0,0,.45))
+        drop-shadow(0 0 16px rgba(255,210,70,.65));
+}
+
+.gift-animation-shine {
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,215,80,.20),
+            rgba(255,170,30,.04) 62%,
+            transparent 78%
+        );
+}
+
+@keyframes giftShineFloat {
+
+    0%, 100% {
+        transform:
+            translateY(0)
+            rotate(-4deg)
+            scale(1);
+    }
+
+    25% {
+        transform:
+            translateY(-4px)
+            rotate(2deg)
+            scale(1.04);
+    }
+
+    50% {
+        transform:
+            translateY(-9px)
+            rotate(5deg)
+            scale(1.11);
+    }
+
+    75% {
+        transform:
+            translateY(-3px)
+            rotate(-2deg)
+            scale(1.04);
+    }
+
+}
+
+/* =========================
+   РАКЕТА / КОМЕТА
+========================= */
+
+.gift-animation-rocket .gift-emoji {
+    animation: giftRocket 1.8s ease-in-out infinite;
+
+    filter:
+        drop-shadow(0 8px 7px rgba(0,0,0,.45))
+        drop-shadow(0 0 17px rgba(70,170,255,.65));
+}
+
+.gift-animation-rocket {
+    background:
+        radial-gradient(
+            circle,
+            rgba(50,150,255,.20),
+            rgba(30,100,255,.04) 62%,
+            transparent 78%
+        );
+}
+
+@keyframes giftRocket {
+
+    0%, 100% {
+        transform:
+            translateY(5px)
+            rotate(-5deg)
+            scale(1);
+    }
+
+    20% {
+        transform:
+            translateY(0)
+            rotate(-2deg)
+            scale(1.03);
+    }
+
+    50% {
+        transform:
+            translateY(-13px)
+            rotate(5deg)
+            scale(1.09);
+    }
+
+    75% {
+        transform:
+            translateY(-5px)
+            rotate(2deg)
+            scale(1.04);
+    }
+
+}
+
+/* =========================
+   МАГИЯ
+========================= */
+
+.gift-animation-magic .gift-emoji {
+    animation: giftMagic 1.75s ease-in-out infinite;
+
+    filter:
+        drop-shadow(0 8px 7px rgba(0,0,0,.45))
+        drop-shadow(0 0 18px rgba(180,90,255,.70));
+}
+
+.gift-animation-magic {
+    background:
+        radial-gradient(
+            circle,
+            rgba(170,80,255,.22),
+            rgba(100,50,255,.04) 62%,
+            transparent 78%
+        );
+}
+
+@keyframes giftMagic {
+
+    0%, 100% {
+        transform:
+            scale(1)
+            rotate(-3deg);
+    }
+
+    25% {
+        transform:
+            scale(1.06)
+            rotate(2deg);
+    }
+
+    50% {
+        transform:
+            scale(1.13)
+            rotate(4deg);
+    }
+
+    75% {
+        transform:
+            scale(1.05)
+            rotate(-2deg);
+    }
+
+}
+
+/* =========================
+   ОБЫЧНЫЕ ПОДАРКИ
+========================= */
+
+.gift-animation-bounce .gift-emoji {
+    animation: giftBounce 2.4s ease-in-out infinite;
+}
+
+@keyframes giftBounce {
+
+    0%, 100% {
+        transform:
+            translateY(0)
+            rotate(-2deg)
+            scale(1);
+    }
+
+    25% {
+        transform:
+            translateY(-3px)
+            rotate(1deg)
+            scale(1.02);
+    }
+
+    50% {
+        transform:
+            translateY(-8px)
+            rotate(2deg)
+            scale(1.055);
+    }
+
+    75% {
+        transform:
+            translateY(-3px)
+            rotate(-1deg)
+            scale(1.02);
+    }
+
+}
+
+/* =========================
+   НАЗВАНИЕ / ЦЕНА
+========================= */
 
 .gift-name {
     position: relative;
@@ -501,7 +919,7 @@ button:disabled {
 
     border-radius: 8px;
 
-    background: rgba(70, 255, 120, .07);
+    background: rgba(70,255,120,.07);
 }
 
 .gift-price {
@@ -578,7 +996,7 @@ button:disabled {
     border-radius: 10px;
 
     background:
-        rgba(120, 17, 30, .9);
+        rgba(120,17,30,.9);
 
     border: 1px solid rgba(255,100,100,.18);
 
@@ -591,49 +1009,9 @@ button:disabled {
         0 4px 12px rgba(0,0,0,.3);
 }
 
-.gift-emoji {
-    font-size: 48px;
-    line-height: 1;
-    margin: 8px 0 12px;
-}
-
-.gift-name {
-    font-size: 15px;
-    font-weight: bold;
-    min-height: 36px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.gift-income {
-    color: #72ff72;
-    font-size: 12px;
-    margin: 7px 0;
-}
-
-.gift-price {
-    color: #ffd84d;
-    font-weight: bold;
-    margin-bottom: 9px;
-}
-
-.gift-buy {
-    width: 100%;
-    padding: 10px 7px;
-    font-size: 13px;
-}
-
-.gift-count {
-    position: absolute;
-    top: 9px;
-    right: 9px;
-    background: #7b1111;
-    border-radius: 9px;
-    min-width: 26px;
-    padding: 5px;
-    font-size: 11px;
-}
+/* =========================
+   ИНВЕНТАРЬ
+========================= */
 
 .inventory-list {
     display: flex;
@@ -655,7 +1033,37 @@ button:disabled {
 }
 
 .inventory-emoji {
+    width: 55px;
+    height: 55px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     font-size: 40px;
+
+    border-radius: 16px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,80,80,.14),
+            transparent 70%
+        );
+
+    animation: inventoryFloat 2.8s ease-in-out infinite;
+}
+
+@keyframes inventoryFloat {
+
+    0%, 100% {
+        transform: translateY(0) rotate(-2deg);
+    }
+
+    50% {
+        transform: translateY(-4px) rotate(2deg);
+    }
+
 }
 
 .inventory-info {
@@ -724,8 +1132,6 @@ button:disabled {
     margin-bottom: 12px;
 }
 
-/* ========================= */
-
 .shop-item {
     display: flex;
     justify-content: space-between;
@@ -737,6 +1143,10 @@ button:disabled {
     color: #ffd84d;
     margin-top: 6px;
 }
+
+/* =========================
+   НАВИГАЦИЯ
+========================= */
 
 .nav {
     position: fixed;
@@ -776,6 +1186,28 @@ button:disabled {
     display: none;
     z-index: 2000;
     white-space: nowrap;
+}
+
+@media (max-width: 360px) {
+
+    .shop-grid {
+        gap: 8px;
+    }
+
+    .gift-card {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .gift-visual {
+        width: 96px;
+        height: 96px;
+    }
+
+    .gift-emoji {
+        font-size: 56px;
+    }
+
 }
 
 </style>
@@ -1282,7 +1714,7 @@ function getTelegramUser() {
 
 
 /* =========================
-   ЗАПРОС К API
+   API
 ========================= */
 
 async function apiRequest(
@@ -1292,7 +1724,6 @@ async function apiRequest(
 
     const tgUser =
         getTelegramUser();
-
 
     const response =
         await fetch(
@@ -1312,7 +1743,6 @@ async function apiRequest(
             }
         );
 
-
     let data;
 
     try {
@@ -1328,7 +1758,6 @@ async function apiRequest(
 
     }
 
-
     if (!data.ok) {
 
         throw new Error(
@@ -1337,7 +1766,6 @@ async function apiRequest(
         );
 
     }
-
 
     return data;
 
@@ -1356,7 +1784,6 @@ async function loadPlayer() {
             await apiRequest(
                 "/api/player"
             );
-
 
         player =
             data.player;
@@ -1381,34 +1808,27 @@ async function loadPlayer() {
             player.economy_expires_at ||
             null;
 
-
         updateScreen();
-
 
         document
             .getElementById("loading")
             .style.display =
             "none";
 
-
         document
             .getElementById("game")
             .style.display =
             "block";
 
-
         startMultiplierTimer();
-
 
         await loadGiftShop();
 
         await loadInventory();
 
-
     } catch (error) {
 
         console.error(error);
-
 
         document
             .getElementById("loading")
@@ -1450,17 +1870,14 @@ function updateScreen() {
         Math.floor(balance)
             .toLocaleString("ru-RU");
 
-
     document
         .getElementById("income")
         .textContent =
         income;
 
-
     if (!player) {
         return;
     }
-
 
     document
         .getElementById("username")
@@ -1468,14 +1885,12 @@ function updateScreen() {
         player.first_name ||
         "Игрок";
 
-
     document
         .getElementById("tgusername")
         .textContent =
         player.username
             ? "@" + player.username
             : "Telegram";
-
 
     document
         .getElementById("avatar")
@@ -1487,12 +1902,10 @@ function updateScreen() {
         .charAt(0)
         .toUpperCase();
 
-
     document
         .getElementById("refId")
         .textContent =
         player.telegram_id || "";
-
 
     updateEconomyScreen();
 
@@ -1520,7 +1933,6 @@ function updateEconomyScreen() {
             "multiplierTime"
         );
 
-
     if (
         economyExpiresAt &&
         new Date(
@@ -1534,14 +1946,11 @@ function updateEconomyScreen() {
                 economyMultiplier
             ).toFixed(1);
 
-
         statusElement.textContent =
             "Активна";
 
-
         statusElement.className =
             "multiplier-active";
-
 
         timeElement.textContent =
             "Осталось: " +
@@ -1552,28 +1961,22 @@ function updateEconomyScreen() {
                 Date.now()
             );
 
-
         return;
 
     }
-
 
     economyMultiplier = 1.0;
 
     economyExpiresAt = null;
 
-
     multiplierElement.textContent =
         "x1.0";
-
 
     statusElement.textContent =
         "Не активна";
 
-
     statusElement.className =
         "multiplier-none";
-
 
     timeElement.textContent =
         "Крути рулетку";
@@ -1590,7 +1993,6 @@ function startMultiplierTimer() {
     clearInterval(
         window.multiplierTimer
     );
-
 
     window.multiplierTimer =
         setInterval(
@@ -1615,28 +2017,23 @@ function formatTime(ms) {
         return "00:00:00";
     }
 
-
     const totalSeconds =
         Math.floor(
             ms / 1000
         );
-
 
     const hours =
         Math.floor(
             totalSeconds / 3600
         );
 
-
     const minutes =
         Math.floor(
             (totalSeconds % 3600) / 60
         );
 
-
     const seconds =
         totalSeconds % 60;
-
 
     return (
         String(hours).padStart(2, "0") +
@@ -1663,7 +2060,6 @@ const pages =
         ".page"
     );
 
-
 navButtons.forEach(
     function(button) {
 
@@ -1684,12 +2080,10 @@ navButtons.forEach(
 
                 }
 
-
                 const pageName =
                     button.getAttribute(
                         "data-page"
                     );
-
 
                 pages.forEach(
                     function(page) {
@@ -1701,7 +2095,6 @@ navButtons.forEach(
                     }
                 );
 
-
                 navButtons.forEach(
                     function(btn) {
 
@@ -1712,12 +2105,10 @@ navButtons.forEach(
                     }
                 );
 
-
                 const selectedPage =
                     document.getElementById(
                         pageName
                     );
-
 
                 if (selectedPage) {
 
@@ -1727,11 +2118,9 @@ navButtons.forEach(
 
                 }
 
-
                 button.classList.add(
                     "active"
                 );
-
 
                 if (pageName === "shop") {
 
@@ -1740,7 +2129,6 @@ navButtons.forEach(
                     loadInventory();
 
                 }
-
 
                 window.scrollTo(
                     0,
@@ -1755,7 +2143,7 @@ navButtons.forEach(
 
 
 /* =========================
-   ВКЛАДКИ МАГАЗИНА
+   ВКЛАДКИ
 ========================= */
 
 function showShopTab(tab) {
@@ -1779,7 +2167,6 @@ function showShopTab(tab) {
         document.getElementById(
             "inventoryTab"
         );
-
 
     if (tab === "shop") {
 
@@ -1823,7 +2210,7 @@ function showShopTab(tab) {
 
 
 /* =========================
-   МАГАЗИН ПОДАРКОВ
+   МАГАЗИН
 ========================= */
 
 async function loadGiftShop() {
@@ -1832,7 +2219,6 @@ async function loadGiftShop() {
         document.getElementById(
             "shopGrid"
         );
-
 
     try {
 
@@ -1847,16 +2233,13 @@ async function loadGiftShop() {
 
         `;
 
-
         const response =
             await fetch(
                 API + "/api/gifts"
             );
 
-
         const data =
             await response.json();
-
 
         if (!data.ok) {
 
@@ -1867,7 +2250,6 @@ async function loadGiftShop() {
 
         }
 
-
         giftShop =
             Array.isArray(
                 data.gifts
@@ -1875,14 +2257,11 @@ async function loadGiftShop() {
                 ? data.gifts
                 : [];
 
-
         renderGiftShop();
-
 
     } catch (error) {
 
         console.error(error);
-
 
         grid.innerHTML = `
 
@@ -1907,6 +2286,73 @@ async function loadGiftShop() {
 
 
 /* =========================
+   ТИП АНИМАЦИИ ПОДАРКА
+========================= */
+
+function getGiftAnimationClass(gift) {
+
+    const emoji =
+        String(
+            gift.emoji || ""
+        );
+
+    if (
+        [
+            "💝",
+            "💗"
+        ].includes(emoji)
+    ) {
+
+        return "gift-animation-heart";
+
+    }
+
+    if (
+        [
+            "💎",
+            "👑",
+            "⭐",
+            "🌟",
+            "✨",
+            "🏆",
+            "🏅"
+        ].includes(emoji)
+    ) {
+
+        return "gift-animation-shine";
+
+    }
+
+    if (
+        emoji === "🚀" ||
+        emoji === "☄️"
+    ) {
+
+        return "gift-animation-rocket";
+
+    }
+
+    if (
+        [
+            "🔮",
+            "🔥",
+            "⚡",
+            "🌈",
+            "🎆",
+            "🌌"
+        ].includes(emoji)
+    ) {
+
+        return "gift-animation-magic";
+
+    }
+
+    return "gift-animation-bounce";
+
+}
+
+
+/* =========================
    ОТРИСОВКА МАГАЗИНА
 ========================= */
 
@@ -1916,7 +2362,6 @@ function renderGiftShop() {
         document.getElementById(
             "shopGrid"
         );
-
 
     if (!giftShop.length) {
 
@@ -1934,7 +2379,6 @@ function renderGiftShop() {
         return;
 
     }
-
 
     grid.innerHTML =
         giftShop
@@ -1954,7 +2398,6 @@ function renderGiftShop() {
                             }
                         );
 
-
                     const quantity =
                         owned
                             ? Number(
@@ -1962,10 +2405,13 @@ function renderGiftShop() {
                             )
                             : 0;
 
-
                     const maxReached =
                         quantity >= 5;
 
+                    const animationClass =
+                        getGiftAnimationClass(
+                            gift
+                        );
 
                     return `
 
@@ -1981,10 +2427,14 @@ function renderGiftShop() {
                                     : ""
                             }
 
-                            <div class="gift-emoji">
-                                ${escapeHtml(
-                                    gift.emoji
-                                )}
+                            <div class="gift-visual ${animationClass}">
+
+                                <div class="gift-emoji">
+                                    ${escapeHtml(
+                                        gift.emoji
+                                    )}
+                                </div>
+
                             </div>
 
                             <div class="gift-name">
@@ -2056,7 +2506,6 @@ async function buyGift(giftId) {
                 }
             );
 
-
         if (!gift) {
 
             showToast(
@@ -2066,7 +2515,6 @@ async function buyGift(giftId) {
             return;
 
         }
-
 
         const owned =
             inventory.find(
@@ -2081,14 +2529,12 @@ async function buyGift(giftId) {
                 }
             );
 
-
         const quantity =
             owned
                 ? Number(
                     owned.quantity || 0
                 )
                 : 0;
-
 
         if (quantity >= 5) {
 
@@ -2099,7 +2545,6 @@ async function buyGift(giftId) {
             return;
 
         }
-
 
         if (
             balance <
@@ -2114,11 +2559,9 @@ async function buyGift(giftId) {
 
         }
 
-
         showToast(
             "⏳ Покупаем..."
         );
-
 
         const data =
             await apiRequest(
@@ -2128,7 +2571,6 @@ async function buyGift(giftId) {
                         Number(giftId)
                 }
             );
-
 
         if (data.player) {
 
@@ -2149,23 +2591,19 @@ async function buyGift(giftId) {
 
         }
 
-
         showToast(
             "🎁 " +
             gift.name +
             " куплен!"
         );
 
-
         await loadInventory();
 
         renderGiftShop();
 
-
     } catch (error) {
 
         console.error(error);
-
 
         showToast(
             "❌ " +
@@ -2188,7 +2626,6 @@ async function loadInventory() {
             "inventoryList"
         );
 
-
     try {
 
         list.innerHTML = `
@@ -2201,10 +2638,8 @@ async function loadInventory() {
 
         `;
 
-
         const tgUser =
             getTelegramUser();
-
 
         const response =
             await fetch(
@@ -2215,10 +2650,8 @@ async function loadInventory() {
                 )
             );
 
-
         const data =
             await response.json();
-
 
         if (!data.ok) {
 
@@ -2229,7 +2662,6 @@ async function loadInventory() {
 
         }
 
-
         inventory =
             Array.isArray(
                 data.inventory
@@ -2237,14 +2669,11 @@ async function loadInventory() {
                 ? data.inventory
                 : [];
 
-
         renderInventory();
-
 
     } catch (error) {
 
         console.error(error);
-
 
         list.innerHTML = `
 
@@ -2278,7 +2707,6 @@ function renderInventory() {
             "inventoryList"
         );
 
-
     if (!inventory.length) {
 
         list.innerHTML = `
@@ -2299,7 +2727,6 @@ function renderInventory() {
 
     }
 
-
     list.innerHTML =
         inventory
             .map(
@@ -2309,14 +2736,12 @@ function renderInventory() {
                         item.gift ||
                         item;
 
-
                     const purchases =
                         Array.isArray(
                             item.purchases
                         )
                             ? item.purchases
                             : [];
-
 
                     return `
 
@@ -2375,7 +2800,6 @@ function renderInventory() {
 
                             </div>
 
-
                             ${
                                 purchases.length
                                     ? `
@@ -2403,7 +2827,6 @@ function renderInventory() {
                                                         const ready =
                                                             Date.now() >=
                                                             canSellAt;
-
 
                                                         return `
 
@@ -2493,7 +2916,7 @@ function renderInventory() {
 
 
 /* =========================
-   ПРОДАЖА ПОДАРКА
+   ПРОДАЖА
 ========================= */
 
 async function sellGift(
@@ -2510,11 +2933,9 @@ async function sellGift(
 
         }
 
-
         showToast(
             "⏳ Продаём..."
         );
-
 
         const data =
             await apiRequest(
@@ -2526,7 +2947,6 @@ async function sellGift(
                         )
                 }
             );
-
 
         if (data.player) {
 
@@ -2547,21 +2967,17 @@ async function sellGift(
 
         }
 
-
         showToast(
             "💰 Подарок продан"
         );
-
 
         await loadInventory();
 
         renderGiftShop();
 
-
     } catch (error) {
 
         console.error(error);
-
 
         showToast(
             "❌ " +
@@ -2574,7 +2990,7 @@ async function sellGift(
 
 
 /* =========================
-   ТАЙМЕРЫ ПРОДАЖИ
+   ТАЙМЕР ПРОДАЖИ
 ========================= */
 
 function formatRemaining(ms) {
@@ -2585,28 +3001,23 @@ function formatRemaining(ms) {
 
     }
 
-
     const totalSeconds =
         Math.floor(
             ms / 1000
         );
-
 
     const hours =
         Math.floor(
             totalSeconds / 3600
         );
 
-
     const minutes =
         Math.floor(
             (totalSeconds % 3600) / 60
         );
 
-
     const seconds =
         totalSeconds % 60;
-
 
     return (
         String(hours).padStart(2, "0") +
@@ -2640,7 +3051,6 @@ function openRoulette() {
 
     }
 
-
     rouletteResult = null;
 
     rouletteIssuedAt = null;
@@ -2648,7 +3058,6 @@ function openRoulette() {
     rouletteSignature = null;
 
     rouletteSpinning = false;
-
 
     const lock =
         document.getElementById(
@@ -2670,7 +3079,6 @@ function openRoulette() {
             "rouletteResult"
         );
 
-
     spinButton.disabled = false;
 
     spinButton.style.display =
@@ -2679,18 +3087,14 @@ function openRoulette() {
     spinButton.textContent =
         "🎰 Крутить";
 
-
     claimButton.classList.remove(
         "show"
     );
 
-
     resultText.textContent =
         "Выбери свой множитель";
 
-
     buildRoulette();
-
 
     lock.classList.add(
         "show"
@@ -2710,12 +3114,9 @@ function buildRoulette() {
             "rouletteTrack"
         );
 
-
     track.innerHTML = "";
 
-
     const values = [];
-
 
     for (
         let repeat = 0;
@@ -2737,7 +3138,6 @@ function buildRoulette() {
 
     }
 
-
     values.forEach(
         function(value) {
 
@@ -2746,14 +3146,11 @@ function buildRoulette() {
                     "div"
                 );
 
-
             item.className =
                 "roulette-item";
 
-
             item.textContent =
                 "x" + value;
-
 
             track.appendChild(
                 item
@@ -2761,7 +3158,6 @@ function buildRoulette() {
 
         }
     );
-
 
     track.style.transition =
         "none";
@@ -2773,7 +3169,7 @@ function buildRoulette() {
 
 
 /* =========================
-   КРУТИТЬ РУЛЕТКУ
+   КРУТИТЬ
 ========================= */
 
 async function spinRoulette() {
@@ -2782,9 +3178,7 @@ async function spinRoulette() {
         return;
     }
 
-
     rouletteSpinning = true;
-
 
     const spinButton =
         document.getElementById(
@@ -2801,22 +3195,18 @@ async function spinRoulette() {
             "rouletteResult"
         );
 
-
     spinButton.disabled =
         true;
 
     spinButton.textContent =
         "⏳ Крутим...";
 
-
     claimButton.classList.remove(
         "show"
     );
 
-
     resultText.textContent =
         "Рулетка вращается...";
-
 
     try {
 
@@ -2825,48 +3215,38 @@ async function spinRoulette() {
                 "/api/roulette/spin"
             );
 
-
         rouletteResult =
             Number(
                 data.multiplier
             );
-
 
         rouletteIssuedAt =
             Number(
                 data.issuedAt
             );
 
-
         rouletteSignature =
             data.signature;
-
 
         animateRoulette(
             rouletteResult
         );
 
-
     } catch (error) {
 
         console.error(error);
 
-
         rouletteSpinning =
             false;
-
 
         spinButton.disabled =
             false;
 
-
         spinButton.textContent =
             "🎰 Крутить";
 
-
         resultText.textContent =
             "Ошибка";
-
 
         showToast(
             "❌ " +
@@ -2889,12 +3269,10 @@ function animateRoulette(result) {
             "rouletteTrack"
         );
 
-
     const items =
         track.querySelectorAll(
             ".roulette-item"
         );
-
 
     const resultIndex =
         120 +
@@ -2902,10 +3280,8 @@ function animateRoulette(result) {
             Math.random() * 8
         );
 
-
     let targetIndex =
         resultIndex;
-
 
     for (
         let i = resultIndex;
@@ -2929,10 +3305,8 @@ function animateRoulette(result) {
 
     }
 
-
     const item =
         items[targetIndex];
-
 
     if (!item) {
 
@@ -2942,36 +3316,29 @@ function animateRoulette(result) {
 
     }
 
-
     const container =
         document.querySelector(
             ".roulette-window"
         );
 
-
     const containerCenter =
         container.offsetWidth / 2;
-
 
     const itemCenter =
         item.offsetLeft +
         item.offsetWidth / 2;
 
-
     const offset =
         containerCenter -
         itemCenter;
 
-
     track.style.transition =
         "transform 5s cubic-bezier(.08,.72,.12,1)";
-
 
     track.style.transform =
         "translateX(" +
         offset +
         "px)";
-
 
     setTimeout(
         function() {
@@ -2986,11 +3353,9 @@ function animateRoulette(result) {
                 }
             );
 
-
             item.classList.add(
                 "selected"
             );
-
 
             finishRoulette();
 
@@ -3010,7 +3375,6 @@ function finishRoulette() {
     rouletteSpinning =
         false;
 
-
     const spinButton =
         document.getElementById(
             "rouletteSpinButton"
@@ -3026,20 +3390,16 @@ function finishRoulette() {
             "rouletteResult"
         );
 
-
     spinButton.style.display =
         "none";
-
 
     resultText.textContent =
         "Выпало: x" +
         rouletteResult.toFixed(1);
 
-
     claimButton.textContent =
         "Забрать x" +
         rouletteResult.toFixed(1);
-
 
     claimButton.classList.add(
         "show"
@@ -3064,19 +3424,16 @@ async function claimRoulette() {
 
     }
 
-
     const claimButton =
         document.getElementById(
             "rouletteClaimButton"
         );
-
 
     claimButton.disabled =
         true;
 
     claimButton.textContent =
         "⏳ Активируем...";
-
 
     try {
 
@@ -3095,22 +3452,18 @@ async function claimRoulette() {
                 }
             );
 
-
         player =
             data.player;
-
 
         balance =
             Number(
                 player.balance
             );
 
-
         income =
             Number(
                 player.income
             );
-
 
         economyMultiplier =
             Number(
@@ -3118,14 +3471,11 @@ async function claimRoulette() {
                 1
             );
 
-
         economyExpiresAt =
             player.economy_expires_at ||
             null;
 
-
         updateScreen();
-
 
         document
             .getElementById(
@@ -3134,32 +3484,26 @@ async function claimRoulette() {
             .classList
             .remove("show");
 
-
         rouletteResult = null;
 
         rouletteIssuedAt = null;
 
         rouletteSignature = null;
 
-
         showToast(
             "🔥 Множитель активирован"
         );
-
 
     } catch (error) {
 
         console.error(error);
 
-
         claimButton.disabled =
             false;
-
 
         claimButton.textContent =
             "Забрать x" +
             rouletteResult.toFixed(1);
-
 
         showToast(
             "❌ " +
@@ -3184,69 +3528,55 @@ async function collect() {
                 "bonusButton"
             );
 
-
         button.disabled =
             true;
 
-
         button.textContent =
             "⏳ Получаем...";
-
 
         const data =
             await apiRequest(
                 "/api/collect"
             );
 
-
         player =
             data.player;
-
 
         balance =
             Number(
                 player.balance
             );
 
-
         income =
             Number(
                 player.income
             );
 
-
         updateScreen();
-
 
         showToast(
             "🔥 +1000 ⭐"
         );
 
-
         button.textContent =
             "✅ Получено";
-
 
     } catch (error) {
 
         console.error(error);
-
 
         showToast(
             "❌ " +
             error.message
         );
 
-
         const button =
             document.getElementById(
                 "bonusButton"
             );
 
-
         button.disabled =
             false;
-
 
         button.textContent =
             "Забрать +1000 ⭐";
@@ -3267,13 +3597,11 @@ function inviteFriend() {
         const tgUser =
             getTelegramUser();
 
-
         const link =
             "https://t.me/" +
             "RaneGameBot" +
             "?start=ref_" +
             tgUser.id;
-
 
         const shareUrl =
             "https://t.me/share/url" +
@@ -3283,7 +3611,6 @@ function inviteFriend() {
             encodeURIComponent(
                 "Залетай в RaneGame, по моей ссылке +100 звёзд на старте"
             );
-
 
         if (tg && tg.openTelegramLink) {
 
@@ -3319,7 +3646,7 @@ function inviteFriend() {
 
 
 /* =========================
-   КОПИРОВАТЬ ССЫЛКУ
+   КОПИРОВАТЬ
 ========================= */
 
 function copyInviteLink() {
@@ -3329,11 +3656,9 @@ function copyInviteLink() {
         const tgUser =
             getTelegramUser();
 
-
         const link =
             "https://t.me/RaneGameBot?start=ref_" +
             tgUser.id;
-
 
         navigator.clipboard
             .writeText(link)
@@ -3378,19 +3703,15 @@ function showToast(text) {
             "toast"
         );
 
-
     toast.textContent =
         text;
-
 
     toast.style.display =
         "block";
 
-
     clearTimeout(
         window.toastTimer
     );
-
 
     window.toastTimer =
         setTimeout(
