@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>RaneGame</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#24090b;color:#f7eeee;font-family:Arial,sans-serif}
+body{min-height:100vh}
+.app{width:min(470px,100%);margin:auto;padding:14px 12px 80px}
+.top{display:flex;align-items:center;gap:10px;margin:4px 2px 18px}
+.avatar{width:38px;height:38px;border-radius:50%;background:#ef6b00;display:grid;place-items:center;font-size:20px}
+.user{font-weight:700}.user small{display:block;color:#a98e8e;font-weight:400;margin-top:2px}
+.points{text-align:center;margin:8px 0 18px}
+.points .big{font-size:52px;font-weight:800}
+.points .rate{color:#9f8585;margin-top:5px}
+.mult{display:inline-block;border:1px solid #9b5900;color:#ffad00;border-radius:18px;padding:7px 13px;font-weight:700;margin-top:16px;background:#32130e}
+.invite{margin:14px 0 22px;padding:15px 17px;border-radius:13px;background:#3b1719;border-left:5px solid #ffad00}
+.invite b{color:#ffad00}
+.section{margin-top:20px}.head{display:flex;justify-content:space-between;align-items:center;margin:0 2px 10px;font-size:17px;font-weight:700}.head span{color:#ff6256;font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.card{height:80px;border-radius:13px;background:linear-gradient(145deg,#4b7b3e,#253b26);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:12px;box-shadow:inset 0 0 0 1px #ffffff18}
+.card:nth-child(2){background:linear-gradient(145deg,#31477b,#24284f)}
+.card:nth-child(3){background:linear-gradient(145deg,#7b4a34,#3c241c)}
+.card:nth-child(4){background:linear-gradient(145deg,#9b691f,#49300d)}
+.card:nth-child(5){background:linear-gradient(145deg,#7a4b89,#302044)}
+.card .emoji{font-size:25px}.card b{font-size:11px;margin-top:5px}
+.boiler{margin-top:28px;background:#3a181a;border:1px solid #633335;border-radius:18px;padding:14px}
+.boiler h3{margin:0}.timer{float:right;color:#ffad00;font-weight:700}
+.boilnum{text-align:center;font-size:32px;font-weight:800;margin-top:8px}.sub{text-align:center;color:#9f8585;font-size:12px}
+.bar{height:9px;background:#543a3a;border-radius:8px;margin:12px 0;overflow:hidden}.bar i{display:block;width:64%;height:100%;background:#ff9e00}
+.nav{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);width:min(470px,calc(100% - 24px));background:#351517;border:1px solid #5b2a2b;border-radius:18px;padding:8px;display:grid;grid-template-columns:repeat(4,1fr);box-shadow:0 8px 30px #0008}
+.nav button{border:0;background:none;color:#9d8989;padding:8px 2px;border-radius:13px;font-weight:700}.nav button.active{background:#5a2020;color:#ff6d5e}
+.footer{text-align:center;color:#b29a9a;font-size:11px;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="avatar">🎮</div>
+    <div class="user">RaneGame<small>@RaneGame</small></div>
+  </div>
+
+  <div class="points">
+    <div class="big">⭐ 3 918</div>
+    <div class="rate">+201 в час</div>
+    <div class="mult">×1.00 &nbsp; Крутить</div>
+  </div>
+
+  <div class="invite">🤝 &nbsp; <b>Позови 2 друзей</b><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 из 2. Награда: 500 звёзд и доход ×1.15
+  </div>
+
+  <div class="section">
+    <div class="head">Инвентарь <span>154 шт.</span><span>Все ›</span></div>
+    <div class="cards">
+      <div class="card"><div class="emoji">🦌</div><b>№3</b><small>+6/ч</small></div>
+      <div class="card"><div class="emoji">🦐</div><b>Продаётся</b></div>
+      <div class="card"><div class="emoji">🦐</div><b>Продаётся</b></div>
+      <div class="card"><div class="emoji">🍵</div><b>Продаётся</b></div>
+      <div class="card"><div class="emoji">🫙</div><b>№453</b></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="head">Магазин <span>34 шт.</span><span>Все ›</span></div>
+    <div class="cards">
+      <div class="card"><div class="emoji">🐋</div><b>⭐15</b><small>+1/ч</small></div>
+      <div class="card"><div class="emoji">🦀</div><b>⭐15</b><small>+1/ч</small></div>
+      <div class="card"><div class="emoji">🦏</div><b>⭐15</b><small>+1/ч</small></div>
+      <div class="card"><div class="emoji">🐍</div><b>⭐15</b><small>+1/ч</small></div>
+      <div class="card"><div class="emoji">🔵</div><b>⭐15</b><small>+1/ч</small></div>
+    </div>
+  </div>
+
+  <div class="boiler">
+    <span class="timer">6:24</span><h3>Котёл</h3>
+    <div class="boilnum">557</div>
+    <div class="sub">забирает один: 446</div>
+    <div class="bar"><i></i></div>
+    <div class="sub">64.1% &nbsp;&nbsp;&nbsp; 357</div>
+  </div>
+
+  <div class="footer">@RaneGameBot</div>
+</div>
+
+<div class="nav">
+  <button class="active">⌂<br>Дом</button>
+  <button>🎰<br>Аукцион</button>
+  <button>🛒<br>Товары</button>
+  <button>▥<br>Топ</button>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+</script>
+</body>
+</html>
