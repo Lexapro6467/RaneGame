@@ -2,14 +2,19 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+          content="width=device-width,
+                   initial-scale=1.0,
+                   maximum-scale=1.0,
+                   user-scalable=no">
 
     <title>RaneGame</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
+
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -20,24 +25,63 @@
             background: #100606;
             color: white;
             font-family: Arial, sans-serif;
-            padding-bottom: 85px;
+            padding-bottom: 90px;
         }
 
-        .top {
+        button {
+            border: 0;
+            border-radius: 14px;
+            padding: 13px 18px;
+            background: #8f1717;
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:active {
+            transform: scale(.96);
+        }
+
+        /* ЗАГРУЗКА */
+
+        .loading {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #aaa;
             padding: 20px;
+        }
+
+        .error {
+            background: #350b0b;
+            border: 1px solid #761717;
+            padding: 18px;
+            border-radius: 16px;
+            max-width: 400px;
+        }
+
+        /* ВЕРХ */
+
+        .top {
+            padding: 20px 18px;
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
         .avatar {
-            width: 50px;
-            height: 50px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             background: #7b1111;
+
             display: flex;
             align-items: center;
             justify-content: center;
+
             font-size: 22px;
             font-weight: bold;
         }
@@ -50,8 +94,10 @@
         .username {
             color: #999;
             font-size: 14px;
-            margin-top: 3px;
+            margin-top: 4px;
         }
+
+        /* СТРАНИЦЫ */
 
         .page {
             display: none;
@@ -62,12 +108,25 @@
             display: block;
         }
 
+        /* БАЛАНС */
+
         .balance-card {
-            background: linear-gradient(135deg, #7d1111, #3b0808);
-            border-radius: 22px;
-            padding: 25px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #7d1111,
+                    #3b0808
+                );
+
+            border-radius: 24px;
+            padding: 28px 20px;
+
             text-align: center;
+
             margin-bottom: 15px;
+
+            box-shadow:
+                0 10px 30px rgba(0,0,0,.3);
         }
 
         .balance-title {
@@ -76,7 +135,7 @@
         }
 
         .balance {
-            font-size: 42px;
+            font-size: 44px;
             font-weight: bold;
             margin: 10px 0;
         }
@@ -85,474 +144,1111 @@
             color: #72ff72;
         }
 
+        /* КАРТОЧКИ */
+
         .card {
             background: #1c0b0b;
             border: 1px solid #351515;
+
             border-radius: 18px;
+
             padding: 18px;
             margin-bottom: 14px;
         }
 
+        .card h2,
         .card h3 {
             margin-top: 0;
         }
 
-        button {
-            border: 0;
-            border-radius: 13px;
-            padding: 13px 18px;
-            background: #8f1717;
-            color: white;
-            font-weight: bold;
-            font-size: 15px;
-            cursor: pointer;
+        .card p {
+            color: #aaa;
+            line-height: 1.5;
         }
 
-        button:active {
-            transform: scale(.97);
-        }
+        /* МАГАЗИН */
 
         .shop-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+
+            gap: 12px;
         }
 
         .price {
             color: #ffd84d;
-            margin-top: 5px;
+            margin-top: 6px;
         }
+
+        /* НИЖНЕЕ МЕНЮ */
 
         .nav {
             position: fixed;
+
             bottom: 0;
             left: 0;
             right: 0;
-            height: 75px;
+
+            height: 78px;
+
             background: #180707;
             border-top: 1px solid #351515;
+
             display: flex;
             justify-content: space-around;
             align-items: center;
+
             z-index: 100;
         }
 
         .nav button {
             background: transparent;
-            color: #888;
-            padding: 8px;
+
+            color: #777;
+
+            padding: 8px 12px;
+
             font-size: 12px;
+
+            min-width: 70px;
         }
 
         .nav button.active {
             color: white;
         }
 
+        /* УВЕДОМЛЕНИЕ */
+
         .toast {
             position: fixed;
-            bottom: 90px;
+
+            bottom: 95px;
             left: 50%;
+
             transform: translateX(-50%);
+
             background: #271010;
             border: 1px solid #5c1a1a;
+
             padding: 12px 18px;
+
             border-radius: 12px;
+
             display: none;
+
             z-index: 200;
+
+            white-space: nowrap;
         }
 
-        .loading {
-            text-align: center;
-            padding: 50px 20px;
-            color: #aaa;
-        }
-
-        .error {
-            background: #350b0b;
-            border: 1px solid #761717;
-            padding: 15px;
-            border-radius: 15px;
-            margin: 15px;
-            text-align: center;
-        }
     </style>
 </head>
 
 <body>
 
+
+<!-- =========================
+     ЗАГРУЗКА
+========================= -->
+
 <div id="loading" class="loading">
     Загрузка RaneGame...
 </div>
 
+
+<!-- =========================
+     ИГРА
+========================= -->
+
 <div id="game" style="display:none;">
 
+
+    <!-- ПРОФИЛЬ -->
+
     <div class="top">
-        <div class="avatar" id="avatar">R</div>
+
+        <div class="avatar" id="avatar">
+            R
+        </div>
 
         <div>
-            <div class="name" id="username">Игрок</div>
-            <div class="username" id="tgusername">@Telegram</div>
+
+            <div class="name" id="username">
+                Игрок
+            </div>
+
+            <div class="username" id="tgusername">
+                @Telegram
+            </div>
+
         </div>
+
     </div>
 
-    <!-- ГЛАВНАЯ -->
+
+    <!-- =========================
+         ГЛАВНАЯ
+    ========================= -->
+
     <section id="home" class="page active">
 
+
+        <!-- БАЛАНС -->
+
         <div class="balance-card">
-            <div class="balance-title">Твой баланс</div>
+
+            <div class="balance-title">
+                Твой баланс
+            </div>
 
             <div class="balance" id="balance">
                 0
             </div>
 
             <div>
+
                 Доход:
-                <span class="income">+<span id="income">0</span> ⭐/час</span>
+
+                <span class="income">
+                    +<span id="income">0</span> ⭐/час
+                </span>
+
             </div>
+
         </div>
 
+
+        <!-- ПРИГЛАСИТЬ -->
+
         <div class="card">
-            <h3>🎁 Пригласи друга</h3>
-            <p>Приглашай игроков и получай награды.</p>
+
+            <h3>
+                🎁 Пригласи друга
+            </h3>
+
+            <p>
+                Приглашай игроков в RaneGame
+                и получай награды.
+            </p>
 
             <button onclick="inviteFriend()">
                 Пригласить
             </button>
+
         </div>
+
+
+        <!-- БОНУС -->
 
         <div class="card">
-            <h3>🔥 Бонус</h3>
-            <p>Забери ежедневную награду.</p>
 
-            <button onclick="collect()">
+            <h3>
+                🔥 Ежедневный бонус
+            </h3>
+
+            <p>
+                Забери ежедневную награду.
+            </p>
+
+            <button
+                id="bonusButton"
+                onclick="collect()">
+
                 Забрать +446 ⭐
+
             </button>
+
         </div>
+
 
     </section>
 
-    <!-- АУКЦИОН -->
+
+    <!-- =========================
+         АУКЦИОН
+    ========================= -->
+
     <section id="auction" class="page">
 
         <div class="card">
-            <h2>🔨 Аукцион</h2>
-            <p>Здесь будут предметы игроков.</p>
 
-            <button onclick="showToast('🔨 Аукцион скоро будет доступен')">
+            <h2>
+                🔨 Аукцион
+            </h2>
+
+            <p>
+                Здесь игроки смогут
+                выставлять свои предметы
+                на продажу.
+            </p>
+
+            <button
+                onclick="showToast('🔨 Аукцион скоро будет доступен')">
+
                 Открыть
+
             </button>
+
         </div>
 
     </section>
 
-    <!-- МАГАЗИН -->
+
+    <!-- =========================
+         МАГАЗИН
+    ========================= -->
+
     <section id="shop" class="page">
 
         <div class="card">
-            <h2>🛒 Магазин</h2>
+
+            <h2>
+                🛒 Магазин
+            </h2>
+
+            <p>
+                Покупай улучшения
+                за ⭐.
+            </p>
+
         </div>
 
+
+        <!-- ПРЕДМЕТ 1 -->
+
         <div class="card shop-item">
+
             <div>
-                <b>⚡ Улучшение дохода</b>
-                <div class="price">500 ⭐</div>
+
+                <b>
+                    ⚡ Улучшение дохода
+                </b>
+
+                <div class="price">
+                    500 ⭐
+                </div>
+
             </div>
 
-            <button onclick="buy(500, 'Улучшение дохода')">
+            <button
+                onclick="buy(500, 'Улучшение дохода')">
+
                 Купить
+
             </button>
+
         </div>
 
+
+        <!-- ПРЕДМЕТ 2 -->
+
         <div class="card shop-item">
+
             <div>
-                <b>🔥 Супер-бонус</b>
-                <div class="price">1000 ⭐</div>
+
+                <b>
+                    🔥 Супер-бонус
+                </b>
+
+                <div class="price">
+                    1000 ⭐
+                </div>
+
             </div>
 
-            <button onclick="buy(1000, 'Супер-бонус')">
+            <button
+                onclick="buy(1000, 'Супер-бонус')">
+
                 Купить
+
             </button>
+
         </div>
 
+
+        <!-- ПРЕДМЕТ 3 -->
+
         <div class="card shop-item">
+
             <div>
-                <b>💎 Премиум</b>
-                <div class="price">2500 ⭐</div>
+
+                <b>
+                    💎 Премиум
+                </b>
+
+                <div class="price">
+                    2500 ⭐
+                </div>
+
             </div>
 
-            <button onclick="buy(2500, 'Премиум')">
+            <button
+                onclick="buy(2500, 'Премиум')">
+
                 Купить
+
             </button>
+
         </div>
 
     </section>
 
-    <!-- ТОП -->
+
+    <!-- =========================
+         ТОП
+    ========================= -->
+
     <section id="top" class="page">
 
         <div class="card">
-            <h2>🏆 Топ игроков</h2>
-            <p>Таблица лидеров появится здесь.</p>
 
-            <button onclick="showToast('🏆 Скоро появится топ игроков')">
+            <h2>
+                🏆 Топ игроков
+            </h2>
+
+            <p>
+                Таблица лидеров появится здесь.
+            </p>
+
+            <button
+                onclick="showToast('🏆 Топ скоро появится')">
+
                 Обновить
+
             </button>
+
         </div>
 
     </section>
 
-    <!-- НАВИГАЦИЯ -->
+
+    <!-- =========================
+         НИЖНЕЕ МЕНЮ
+    ========================= -->
+
     <div class="nav">
 
-        <button class="active" data-page="home">
-            🏠<br>
+        <button
+            class="active"
+            data-page="home">
+
+            🏠
+            <br>
             Главная
+
         </button>
 
-        <button data-page="auction">
-            🔨<br>
+        <button
+            data-page="auction">
+
+            🔨
+            <br>
             Аукцион
+
         </button>
 
-        <button data-page="shop">
-            🛒<br>
+        <button
+            data-page="shop">
+
+            🛒
+            <br>
             Магазин
+
         </button>
 
-        <button data-page="top">
-            🏆<br>
+        <button
+            data-page="top">
+
+            🏆
+            <br>
             Топ
+
         </button>
 
     </div>
 
+
 </div>
+
+
+<!-- TOAST -->
 
 <div id="toast" class="toast"></div>
 
+
 <script>
 
-const tg = window.Telegram && window.Telegram.WebApp;
 
-let player = null;
-let balance = 0;
-let income = 0;
+/* =========================
+   TELEGRAM
+========================= */
 
+const tg =
+    window.Telegram &&
+    window.Telegram.WebApp;
 
-/* TELEGRAM */
 
 if (tg) {
+
     tg.ready();
+
     tg.expand();
+
 }
 
 
-/* ЗАПРОС К СЕРВЕРУ */
+/* =========================
+   ДАННЫЕ ИГРОКА
+========================= */
+
+let player = null;
+
+let balance = 0;
+
+let income = 0;
+
+
+/* =========================
+   ЗАГРУЗКА ИГРОКА
+========================= */
 
 async function loadPlayer() {
 
     try {
 
+
         if (!tg || !tg.initData) {
-            throw new Error("Игра должна быть открыта через Telegram");
+
+            throw new Error(
+                "Открой игру через Telegram"
+            );
+
         }
 
-        const response = await fetch("/api/player", {
 
-            method: "POST",
+        const response = await fetch(
+            "/api/player",
+            {
+                method: "POST",
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
 
-            body: JSON.stringify({
-                initData: tg.initData
-            })
+                body: JSON.stringify({
 
-        });
+                    initData:
+                        tg.initData
 
-        const data = await response.json();
+                })
+
+            }
+        );
+
+
+        const data =
+            await response.json();
+
 
         if (!data.ok) {
-            throw new Error(data.error || "Ошибка загрузки игрока");
+
+            throw new Error(
+                data.error ||
+                "Ошибка загрузки игрока"
+            );
+
         }
+
 
         player = data.player;
 
-        balance = Number(player.balance);
-        income = Number(player.income);
+
+        balance =
+            Number(player.balance);
+
+
+        income =
+            Number(player.income);
+
 
         updateScreen();
 
+
+        document
+            .getElementById("loading")
+            .style.display = "none";
+
+
+        document
+            .getElementById("game")
+            .style.display = "block";
+
+
     } catch (error) {
+
 
         console.error(error);
 
-        document.getElementById("loading").innerHTML = `
-            <div class="error">
-                ❌ Не удалось загрузить игрока.<br><br>
-                ${error.message}
-            </div>
-        `;
 
-        return;
+        document
+            .getElementById("loading")
+            .innerHTML = `
+
+                <div class="error">
+
+                    ❌ Ошибка
+
+                    <br><br>
+
+                    ${escapeHtml(
+                        error.message
+                    )}
+
+                    <br><br>
+
+                    Открой RaneGame
+                    через Telegram.
+
+                </div>
+
+            `;
+
     }
 
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("game").style.display = "block";
 }
 
 
-/* ЭКРАН */
+/* =========================
+   ЭКРАН
+========================= */
 
 function updateScreen() {
 
-    document.getElementById("balance").textContent =
-        Math.floor(balance).toLocaleString("ru-RU");
 
-    document.getElementById("income").textContent =
+    document
+        .getElementById("balance")
+        .textContent =
+        Math.floor(balance)
+            .toLocaleString("ru-RU");
+
+
+    document
+        .getElementById("income")
+        .textContent =
         income;
 
-    if (player) {
 
-        document.getElementById("username").textContent =
-            player.first_name || "Игрок";
-
-        document.getElementById("tgusername").textContent =
-            player.username
-                ? "@" + player.username
-                : "Telegram";
-
-        document.getElementById("avatar").textContent =
-            (player.first_name || "R").charAt(0).toUpperCase();
-    }
-}
-
-
-/* НАВИГАЦИЯ */
-
-const navButtons = document.querySelectorAll(".nav button");
-const pages = document.querySelectorAll(".page");
-
-navButtons.forEach(function(button) {
-
-    button.addEventListener("click", function() {
-
-        const pageName =
-            button.getAttribute("data-page");
-
-        pages.forEach(function(page) {
-            page.classList.remove("active");
-        });
-
-        navButtons.forEach(function(btn) {
-            btn.classList.remove("active");
-        });
-
-        const selectedPage =
-            document.getElementById(pageName);
-
-        if (selectedPage) {
-            selectedPage.classList.add("active");
-        }
-
-        button.classList.add("active");
-
-        window.scrollTo(0, 0);
-    });
-
-});
-
-
-/* ПОКУПКА */
-
-function buy(price, name) {
-
-    if (balance < price) {
-
-        showToast("❌ Не хватает ⭐");
-
+    if (!player) {
         return;
     }
 
-    balance -= price;
-    income += 1;
 
-    updateScreen();
+    document
+        .getElementById("username")
+        .textContent =
+        player.first_name ||
+        "Игрок";
 
-    showToast("✅ Куплено: " + name);
+
+    document
+        .getElementById("tgusername")
+        .textContent =
+
+        player.username
+
+            ? "@" +
+              player.username
+
+            : "Telegram";
+
+
+    document
+        .getElementById("avatar")
+        .textContent =
+
+        (
+            player.first_name ||
+            "R"
+        )
+        .charAt(0)
+        .toUpperCase();
 
 }
 
 
-/* БОНУС */
+/* =========================
+   НАВИГАЦИЯ
+========================= */
 
-function collect() {
+const navButtons =
+    document.querySelectorAll(
+        ".nav button"
+    );
 
-    balance += 446;
 
-    updateScreen();
+const pages =
+    document.querySelectorAll(
+        ".page"
+    );
 
-    showToast("🔥 +446 ⭐");
+
+navButtons.forEach(
+    function(button) {
+
+
+        button.addEventListener(
+            "click",
+            function() {
+
+
+                const pageName =
+                    button.getAttribute(
+                        "data-page"
+                    );
+
+
+                pages.forEach(
+                    function(page) {
+
+                        page.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+                navButtons.forEach(
+                    function(btn) {
+
+                        btn.classList.remove(
+                            "active"
+                        );
+
+                    }
+                );
+
+
+                const selectedPage =
+                    document.getElementById(
+                        pageName
+                    );
+
+
+                if (selectedPage) {
+
+                    selectedPage
+                        .classList
+                        .add("active");
+
+                }
+
+
+                button.classList.add(
+                    "active"
+                );
+
+
+                window.scrollTo(
+                    0,
+                    0
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================
+   ПОКУПКА
+========================= */
+
+async function buy(price, name) {
+
+
+    if (!tg || !tg.initData) {
+
+        showToast(
+            "❌ Открой игру через Telegram"
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+
+        showToast(
+            "⏳ Покупка..."
+        );
+
+
+        const response =
+            await fetch(
+                "/api/buy",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        initData:
+                            tg.initData,
+
+                        price:
+                            price
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.ok) {
+
+            showToast(
+                "❌ " +
+                (
+                    data.error ||
+                    "Ошибка покупки"
+                )
+            );
+
+            return;
+
+        }
+
+
+        player =
+            data.player;
+
+
+        balance =
+            Number(
+                player.balance
+            );
+
+
+        income =
+            Number(
+                player.income
+            );
+
+
+        updateScreen();
+
+
+        showToast(
+            "✅ Куплено: " +
+            name
+        );
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        showToast(
+            "❌ Ошибка покупки"
+        );
+
+    }
 
 }
 
 
-/* ПРИГЛАСИТЬ */
+/* =========================
+   БОНУС
+========================= */
+
+async function collect() {
+
+
+    if (!tg || !tg.initData) {
+
+        showToast(
+            "❌ Открой игру через Telegram"
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+
+        const button =
+            document.getElementById(
+                "bonusButton"
+            );
+
+
+        button.disabled = true;
+
+
+        button.textContent =
+            "⏳ Получаем...";
+
+
+        const response =
+            await fetch(
+                "/api/collect",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        initData:
+                            tg.initData
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.ok) {
+
+            showToast(
+                "❌ " +
+                (
+                    data.error ||
+                    "Ошибка бонуса"
+                )
+            );
+
+            button.disabled = false;
+
+            button.textContent =
+                "Забрать +446 ⭐";
+
+            return;
+
+        }
+
+
+        player =
+            data.player;
+
+
+        balance =
+            Number(
+                player.balance
+            );
+
+
+        income =
+            Number(
+                player.income
+            );
+
+
+        updateScreen();
+
+
+        showToast(
+            "🔥 +446 ⭐"
+        );
+
+
+        button.textContent =
+            "✅ Получено";
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        showToast(
+            "❌ Ошибка бонуса"
+        );
+
+
+        const button =
+            document.getElementById(
+                "bonusButton"
+            );
+
+
+        button.disabled = false;
+
+
+        button.textContent =
+            "Забрать +446 ⭐";
+
+    }
+
+}
+
+
+/* =========================
+   ПРИГЛАСИТЬ
+========================= */
 
 function inviteFriend() {
 
-    if (!tg) return;
 
-    const botUsername = "RaneGameBot";
+    if (!tg) {
+
+        return;
+
+    }
+
+
+    const botUsername =
+        "RaneGameBot";
+
+
+    const telegramId =
+        player
+            ? player.telegram_id
+            : "";
+
 
     const link =
         "https://t.me/" +
         botUsername +
         "?start=ref_" +
-        (player ? player.telegram_id : "");
+        telegramId;
+
+
+    const shareUrl =
+        "https://t.me/share/url" +
+        "?url=" +
+        encodeURIComponent(link) +
+        "&text=" +
+        encodeURIComponent(
+            "Заходи в RaneGame! 🔥"
+        );
+
 
     if (tg.openTelegramLink) {
 
         tg.openTelegramLink(
-            "https://t.me/share/url?url=" +
-            encodeURIComponent(link) +
-            "&text=" +
-            encodeURIComponent("Заходи в RaneGame!")
+            shareUrl
         );
 
     } else {
 
-        navigator.clipboard.writeText(link);
+        navigator.clipboard
+            .writeText(link)
+            .then(
+                function() {
 
-        showToast("🔗 Ссылка скопирована");
+                    showToast(
+                        "🔗 Ссылка скопирована"
+                    );
+
+                }
+            );
 
     }
 
 }
 
 
-/* УВЕДОМЛЕНИЕ */
+/* =========================
+   УВЕДОМЛЕНИЕ
+========================= */
 
 function showToast(text) {
 
+
     const toast =
-        document.getElementById("toast");
+        document.getElementById(
+            "toast"
+        );
 
-    toast.textContent = text;
-    toast.style.display = "block";
 
-    setTimeout(function() {
+    toast.textContent =
+        text;
 
-        toast.style.display = "none";
 
-    }, 2000);
+    toast.style.display =
+        "block";
+
+
+    clearTimeout(
+        window.toastTimer
+    );
+
+
+    window.toastTimer =
+        setTimeout(
+            function() {
+
+                toast.style.display =
+                    "none";
+
+            },
+            2000
+        );
 
 }
 
 
-/* ЗАПУСК */
+/* =========================
+   БЕЗОПАСНЫЙ ТЕКСТ ОШИБКИ
+========================= */
+
+function escapeHtml(text) {
+
+    return String(text)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================
+   ЗАПУСК
+========================= */
 
 loadPlayer();
 
