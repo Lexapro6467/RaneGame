@@ -266,98 +266,101 @@ app.post(
 
         try {
 
-            const user =
-                req.body?.user;
+            const user = req.body?.user;
 
+            /* =========================================
+               ПРОВЕРКА АДМИНА
+            ========================================= */
 
             if (
                 !user ||
-                String(user.id) !==
-                DEV_TELEGRAM_ID
+                String(user.id) !== DEV_TELEGRAM_ID
             ) {
 
                 return res
                     .status(403)
                     .json({
-
                         ok: false,
-
-                        error:
-                            "Доступ запрещён"
-
+                        error: "Доступ запрещён"
                     });
 
             }
 
-
             const telegramId =
-                DEV_TELEGRAM_ID;
+                Number(DEV_TELEGRAM_ID);
 
+
+            /* =========================================
+               УДАЛЯЕМ ВСЕ ПОКУПКИ
+            ========================================= */
 
             const {
                 error: purchasesError
-            } =
-                await supabase
-                    .from("gift_purchases")
-                    .delete()
-                    .eq(
-                        "telegram_id",
-                        telegramId
-                    );
-
+            } = await supabase
+                .from("gift_purchases")
+                .delete()
+                .eq(
+                    "telegram_id",
+                    telegramId
+                );
 
             if (purchasesError) {
                 throw purchasesError;
             }
 
 
+            /* =========================================
+               УДАЛЯЕМ ВСЕ ПОДАРКИ ИЗ ИНВЕНТАРЯ
+            ========================================= */
+
             const {
                 error: giftsError
-            } =
-                await supabase
-                    .from("player_gifts")
-                    .delete()
-                    .eq(
-                        "telegram_id",
-                        telegramId
-                    );
-
+            } = await supabase
+                .from("player_gifts")
+                .delete()
+                .eq(
+                    "telegram_id",
+                    telegramId
+                );
 
             if (giftsError) {
                 throw giftsError;
             }
 
 
+            /* =========================================
+               СБРАСЫВАЕМ АККАУНТ
+            ========================================= */
+
             const {
                 data: player,
                 error: playerError
-            } =
-                await supabase
-                    .from("players")
-                    .update({
+            } = await supabase
+                .from("players")
+                .update({
 
-                        balance:
-                            0,
+                    /* ⭐ Баланс */
+                    balance: 0,
 
-                        income:
-                            0,
+                    /* 💰 Доход */
+                    income: 0,
 
-                        economy_multiplier:
-                            1.00,
+                    /* 📈 Множитель */
+                    economy_multiplier: 1.00,
 
-                        economy_expires_at:
-                            null,
+                    /* ⏱️ Время действия множителя */
+                    economy_expires_at: null,
 
-                        bonus_claimed_at:
-                            null
+                    /* 🎁 Недельный бонус */
+                    bonus_claimed_at: null
 
-                    })
-                    .eq(
-                        "telegram_id",
-                        telegramId
-                    )
-                    .select("*")
-                    .single();
+                })
+                .eq(
+                    "telegram_id",
+                    telegramId
+                )
+                .select("*")
+                .single();
 
 
             if (playerError) {
@@ -365,15 +368,23 @@ app.post(
             }
 
 
+            /* =========================================
+               ГОТОВО
+            ========================================= */
+
             return res.json({
 
                 ok: true,
 
                 success: true,
 
+                message:
+                    "Аккаунт полностью сброшен",
+
                 player
 
             });
+
 
         } catch (error) {
 
@@ -389,7 +400,8 @@ app.post(
                     ok: false,
 
                     error:
-                        error.message
+                        error.message ||
+                        "Ошибка сброса аккаунта"
 
                 });
 
