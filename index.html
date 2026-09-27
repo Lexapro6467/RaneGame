@@ -110,14 +110,11 @@ button:disabled {
         #7d1111,
         #3b0808
     );
-
     border-radius: 24px;
     padding: 28px 20px;
     text-align: center;
     margin-bottom: 15px;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,.3);
 }
 
 .balance {
@@ -154,7 +151,6 @@ button:disabled {
         #260909,
         #140505
     );
-
     border: 1px solid #4d1616;
     border-radius: 22px;
     padding: 20px;
@@ -859,19 +855,36 @@ let rouletteSignature = null;
 let rouletteSpinning = false;
 
 
+/* ПОЛУЧИТЬ TELEGRAM USER */
+
+function getTelegramUser() {
+
+    if (
+        !tg ||
+        !tg.initDataUnsafe ||
+        !tg.initDataUnsafe.user
+    ) {
+
+        throw new Error(
+            "Открой RaneGame через Telegram"
+        );
+
+    }
+
+    return tg.initDataUnsafe.user;
+
+}
+
+
 /* ЗАГРУЗКА ИГРОКА */
 
 async function loadPlayer() {
 
     try {
 
-        if (!tg || !tg.initData) {
+        const tgUser =
+            getTelegramUser();
 
-            throw new Error(
-                "Открой игру через Telegram"
-            );
-
-        }
 
         const response =
             await fetch(
@@ -886,8 +899,7 @@ async function loadPlayer() {
 
                     body: JSON.stringify({
 
-                        initData:
-                            tg.initData
+                        user: tgUser
 
                     })
 
@@ -909,13 +921,18 @@ async function loadPlayer() {
         }
 
 
-        player = data.player;
+        player =
+            data.player;
 
         balance =
-            Number(player.balance);
+            Number(
+                player.balance
+            );
 
         income =
-            Number(player.income);
+            Number(
+                player.income
+            );
 
         economyMultiplier =
             Number(
@@ -933,12 +950,14 @@ async function loadPlayer() {
 
         document
             .getElementById("loading")
-            .style.display = "none";
+            .style.display =
+            "none";
 
 
         document
             .getElementById("game")
-            .style.display = "block";
+            .style.display =
+            "block";
 
 
         startMultiplierTimer();
@@ -1476,6 +1495,10 @@ async function spinRoulette() {
 
     try {
 
+        const tgUser =
+            getTelegramUser();
+
+
         const response =
             await fetch(
                 API + "/api/roulette/spin",
@@ -1489,8 +1512,7 @@ async function spinRoulette() {
 
                     body: JSON.stringify({
 
-                        initData:
-                            tg.initData
+                        user: tgUser
 
                     })
 
@@ -1763,6 +1785,10 @@ async function claimRoulette() {
 
     try {
 
+        const tgUser =
+            getTelegramUser();
+
+
         const response =
             await fetch(
                 API + "/api/roulette/claim",
@@ -1776,8 +1802,7 @@ async function claimRoulette() {
 
                     body: JSON.stringify({
 
-                        initData:
-                            tg.initData,
+                        user: tgUser,
 
                         multiplier:
                             rouletteResult,
@@ -1826,12 +1851,14 @@ async function claimRoulette() {
 
         economyMultiplier =
             Number(
-                player.economy_multiplier
+                player.economy_multiplier ||
+                1
             );
 
 
         economyExpiresAt =
-            player.economy_expires_at;
+            player.economy_expires_at ||
+            null;
 
 
         updateScreen();
@@ -1856,9 +1883,7 @@ async function claimRoulette() {
 
 
         showToast(
-            "🔥 Активирован x" +
-            economyMultiplier.toFixed(1) +
-            " на 4 часа"
+            "🔥 Множитель активирован"
         );
 
 
@@ -1890,18 +1915,11 @@ async function claimRoulette() {
 
 async function buy(price, name) {
 
-    if (!tg || !tg.initData) {
-
-        showToast(
-            "❌ Открой игру через Telegram"
-        );
-
-        return;
-
-    }
-
-
     try {
+
+        const tgUser =
+            getTelegramUser();
+
 
         showToast(
             "⏳ Покупка..."
@@ -1921,11 +1939,10 @@ async function buy(price, name) {
 
                     body: JSON.stringify({
 
-                        initData:
-                            tg.initData,
+                        user: tgUser,
 
                         price:
-                            price
+                            Number(price)
 
                     })
 
@@ -1983,7 +2000,8 @@ async function buy(price, name) {
 
 
         showToast(
-            "❌ Ошибка покупки"
+            "❌ " +
+            error.message
         );
 
     }
@@ -1995,18 +2013,11 @@ async function buy(price, name) {
 
 async function collect() {
 
-    if (!tg || !tg.initData) {
-
-        showToast(
-            "❌ Открой игру через Telegram"
-        );
-
-        return;
-
-    }
-
-
     try {
+
+        const tgUser =
+            getTelegramUser();
+
 
         const button =
             document.getElementById(
@@ -2035,8 +2046,7 @@ async function collect() {
 
                     body: JSON.stringify({
 
-                        initData:
-                            tg.initData
+                        user: tgUser
 
                     })
 
@@ -2064,7 +2074,7 @@ async function collect() {
 
 
             button.textContent =
-                "только через 7 дней";
+                "Забрать +1000 ⭐";
 
 
             return;
@@ -2106,7 +2116,8 @@ async function collect() {
 
 
         showToast(
-            "❌ Ошибка бонуса"
+            "❌ " +
+            error.message
         );
 
 
@@ -2121,7 +2132,7 @@ async function collect() {
 
 
         button.textContent =
-            "только через 7 дней";
+            "Забрать +1000 ⭐";
 
     }
 
@@ -2132,45 +2143,80 @@ async function collect() {
 
 function inviteFriend() {
 
-    if (!tg) {
-        return;
+    try {
+
+        const tgUser =
+            getTelegramUser();
+
+
+        const telegramId =
+            tgUser.id;
+
+
+        const link =
+            "https://t.me/" +
+            "RaneGameBot" +
+            "?start=ref_" +
+            telegramId;
+
+
+        const shareUrl =
+            "https://t.me/share/url" +
+            "?url=" +
+            encodeURIComponent(link) +
+            "&text=" +
+            encodeURIComponent(
+                "Залетай в RaneGame, по моей ссылке +100 звёзд на старте"
+            );
+
+
+        if (tg && tg.openTelegramLink) {
+
+            tg.openTelegramLink(
+                shareUrl
+            );
+
+        } else {
+
+            navigator.clipboard
+                .writeText(link)
+                .then(
+                    function() {
+
+                        showToast(
+                            "🔗 Ссылка скопирована"
+                        );
+
+                    }
+                );
+
+        }
+
+    } catch (error) {
+
+        showToast(
+            "❌ Открой игру через Telegram"
+        );
+
     }
 
-
-    const botUsername =
-        "RaneGameBot";
+}
 
 
-    const telegramId =
-        player
-            ? player.telegram_id
-            : "";
+/* КОПИРОВАТЬ ССЫЛКУ */
+
+function copyInviteLink() {
+
+    try {
+
+        const tgUser =
+            getTelegramUser();
 
 
-    const link =
-        "https://t.me/" +
-        botUsername +
-        "?start=ref_" +
-        telegramId;
+        const link =
+            "https://t.me/RaneGameBot?start=ref_" +
+            tgUser.id;
 
-
-    const shareUrl =
-        "https://t.me/share/url" +
-        "?url=" +
-        encodeURIComponent(link) +
-        "&text=" +
-        encodeURIComponent(
-            "Залетай в RaneGame, по моей ссылке +100 звёзд на старте"
-        );
-
-
-    if (tg.openTelegramLink) {
-
-        tg.openTelegramLink(
-            shareUrl
-        );
-
-    } else {
 
         navigator.clipboard
             .writeText(link)
@@ -2182,48 +2228,24 @@ function inviteFriend() {
                     );
 
                 }
+            )
+            .catch(
+                function() {
+
+                    showToast(
+                        "❌ Не удалось скопировать"
+                    );
+
+                }
             );
 
-    }
+    } catch (error) {
 
-}
-
-
-/* КОПИРОВАТЬ ССЫЛКУ */
-
-function copyInviteLink() {
-
-    const telegramId =
-        player
-            ? player.telegram_id
-            : "";
-
-
-    const link =
-        "https://t.me/RaneGameBot?start=ref_" +
-        telegramId;
-
-
-    navigator.clipboard
-        .writeText(link)
-        .then(
-            function() {
-
-                showToast(
-                    "🔗 Ссылка скопирована"
-                );
-
-            }
-        )
-        .catch(
-            function() {
-
-                showToast(
-                    "❌ Не удалось скопировать"
-                );
-
-            }
+        showToast(
+            "❌ Открой игру через Telegram"
         );
+
+    }
 
 }
 
