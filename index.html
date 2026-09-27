@@ -544,9 +544,9 @@ button:disabled {
 
 <div class="balance-card">
 
-    <div class="balance" id="balance">
-        ⭐ 0
-    </div>
+    <div class="balance">
+    ⭐ <span id="balance">0</span>
+</div>
 
     <div>
         <span class="income">
@@ -616,18 +616,26 @@ button:disabled {
 
     <h3>
         Твоя ссылка
-          
-          &8https://t.me/RaneGameBot?start=ref_8791077915
     </h3>
-      
-    </p>
+
+    <div style="
+        font-size: 12px;
+        color: #888;
+        word-break: break-all;
+        margin: 10px 0;
+    ">
+        https://t.me/RaneGameBot?start=ref_<span id="refId"></span>
+    </div>
 
     <button onclick="inviteFriend()">
-                Позави друга
+        Позови друга
+    </button>
+
+    <button onclick="copyInviteLink()">
+        Копировать
     </button>
 
 </div>
-
 
 <!-- БОНУС -->
 
