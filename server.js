@@ -573,26 +573,50 @@ async function ensureGiftShop() {
     const state =
         await getShopState();
 
-
     const updatedAt =
         new Date(
             state.updated_at
         ).getTime();
 
-
     const now =
         Date.now();
 
+    // Проверяем, есть ли вообще подарки в магазине
+    const {
+        data: currentShop,
+        error: shopError
+    } =
+        await supabase
+            .from("shop_gifts")
+            .select("id")
+            .eq("shop_id", 1);
 
+    if (shopError) {
+        throw shopError;
+    }
+
+    const shopIsEmpty =
+        !currentShop ||
+        currentShop.length === 0;
+
+    const timeToRefresh =
+        !updatedAt ||
+        now - updatedAt >= SHOP_REFRESH_MS;
+
+    // Если магазин пустой ИЛИ прошло 3 часа —
+    // создаём новый ассортимент
     if (
-        now - updatedAt >=
-        SHOP_REFRESH_MS
+        shopIsEmpty ||
+        timeToRefresh
     ) {
+
+        console.log(
+            "🎁 Обновляем магазин подарков..."
+        );
 
         return await refreshGiftShop();
 
     }
-
 
     return null;
 
