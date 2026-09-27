@@ -581,7 +581,6 @@ async function ensureGiftShop() {
     const now =
         Date.now();
 
-    // Проверяем, есть ли вообще подарки в магазине
     const {
         data: currentShop,
         error: shopError
@@ -603,8 +602,6 @@ async function ensureGiftShop() {
         !updatedAt ||
         now - updatedAt >= SHOP_REFRESH_MS;
 
-    // Если магазин пустой ИЛИ прошло 3 часа —
-    // создаём новый ассортимент
     if (
         shopIsEmpty ||
         timeToRefresh
@@ -877,6 +874,7 @@ app.get(
 
 /* =========================================================
    ПОКУПКА ПОДАРКА
+   ИСПРАВЛЕНО: quantity 1-5
 ========================================================= */
 
 app.post(
@@ -917,6 +915,49 @@ app.post(
                         error:
                             "Не передан gift_id"
                     });
+
+            }
+
+
+            /*
+               Получаем количество,
+               которое выбрал игрок.
+            */
+
+            let quantity =
+                Number(
+                    req.body?.quantity
+                );
+
+
+            /*
+               Если quantity не передан —
+               покупаем 1 штуку.
+            */
+
+            if (
+                !Number.isFinite(quantity) ||
+                quantity < 1
+            ) {
+                quantity = 1;
+            }
+
+
+            /*
+               Только целое количество.
+            */
+
+            quantity =
+                Math.floor(quantity);
+
+
+            /*
+               Максимум за одну покупку — 5.
+            */
+
+            if (quantity > 5) {
+
+                quantity = 5;
 
             }
 
@@ -998,7 +1039,8 @@ app.post(
 
 
             /*
-               Проверяем количество.
+               Проверяем количество
+               уже имеющихся подарков.
             */
 
             const {
@@ -1032,8 +1074,17 @@ app.post(
                     : 0;
 
 
+            /*
+               Сколько ещё можно купить.
+            */
+
+            const remaining =
+                5 -
+                currentQuantity;
+
+
             if (
-                currentQuantity >= 5
+                remaining <= 0
             ) {
 
                 return res
@@ -1048,12 +1099,37 @@ app.post(
 
 
             /*
+               Нельзя купить больше,
+               чем осталось до лимита 5.
+            */
+
+            if (
+                quantity >
+                remaining
+            ) {
+
+                quantity =
+                    remaining;
+
+            }
+
+
+            /*
+               Итоговая цена.
+            */
+
+            const totalPrice =
+                price *
+                quantity;
+
+
+            /*
                Проверяем баланс.
             */
 
             if (
                 Number(player.balance) <
-                price
+                totalPrice
             ) {
 
                 return res
@@ -1068,21 +1144,30 @@ app.post(
 
 
             /*
-               Списываем баланс.
+               Списываем цену
+               сразу за всё количество.
             */
 
             const newBalance =
                 Number(
                     player.balance
                 ) -
-                price;
+                totalPrice;
 
+
+            /*
+               Доход увеличивается
+               за каждую штуку.
+            */
 
             const newIncome =
                 Number(
                     player.income
                 ) +
-                giftIncome;
+                (
+                    giftIncome *
+                    quantity
+                );
 
 
             /*
@@ -1118,18 +1203,26 @@ app.post(
 
 
             /*
-               Добавляем отдельную покупку.
-               Именно она отвечает
-               за индивидуальный таймер 5 часов.
+               Создаём отдельную покупку
+               ДЛЯ КАЖДОЙ ШТУКИ.
+
+               Например quantity = 5:
+               создастся 5 записей.
+
+               У каждой записи будет
+               свой purchased_at,
+               поэтому каждый подарок
+               можно будет продать
+               отдельно через 5 часов.
             */
 
-            const {
-                data: purchase,
-                error: purchaseError
-            } =
-                await supabase
-                    .from("gift_purchases")
-                    .insert({
+            const purchaseRows =
+                Array.from(
+                    {
+                        length:
+                            quantity
+                    },
+                    () => ({
 
                         telegram_id:
                             Number(user.id),
@@ -1141,8 +1234,19 @@ app.post(
                             new Date().toISOString()
 
                     })
-                    .select("*")
-                    .single();
+                );
+
+
+            const {
+                data: purchases,
+                error: purchaseError
+            } =
+                await supabase
+                    .from("gift_purchases")
+                    .insert(
+                        purchaseRows
+                    )
+                    .select("*");
 
 
             if (purchaseError) {
@@ -1154,6 +1258,11 @@ app.post(
                Обновляем общий инвентарь.
             */
 
+            const newQuantity =
+                currentQuantity +
+                quantity;
+
+
             if (existingGift) {
 
                 const {
@@ -1164,8 +1273,7 @@ app.post(
                         .update({
 
                             quantity:
-                                currentQuantity +
-                                1,
+                                newQuantity,
 
                             purchased_at:
                                 new Date().toISOString()
@@ -1201,7 +1309,7 @@ app.post(
                                 giftId,
 
                             quantity:
-                                1,
+                                quantity,
 
                             purchased_at:
                                 new Date().toISOString()
@@ -1216,6 +1324,10 @@ app.post(
             }
 
 
+            /*
+               Возвращаем результат.
+            */
+
             return res.json({
 
                 ok: true,
@@ -1223,9 +1335,15 @@ app.post(
                 player:
                     updatedPlayer,
 
-                purchase,
+                purchases:
+                    purchases || [],
 
-                gift
+                gift,
+
+                quantity,
+
+                total_price:
+                    totalPrice
 
             });
 
@@ -2104,11 +2222,6 @@ app.post(
             }
 
 
-            /*
-               Токен рулетки живёт
-               максимум 2 минуты.
-            */
-
             if (
                 Date.now() -
                 issuedAt >
@@ -2348,11 +2461,6 @@ async function processReferral(
     }
 
 
-    /*
-       Проверяем, не был ли человек
-       уже приглашён.
-    */
-
     const {
         data: existingReferral,
         error: existingError
@@ -2379,19 +2487,11 @@ async function processReferral(
     }
 
 
-    /*
-       Создаём игрока.
-    */
-
     const invitedPlayer =
         await getOrCreatePlayer(
             invitedUser
         );
 
-
-    /*
-       Новый игрок получает +100.
-    */
 
     await updatePlayer(
         invitedId,
@@ -2406,10 +2506,6 @@ async function processReferral(
         }
     );
 
-
-    /*
-       Считаем приглашённых.
-    */
 
     const {
         count,
@@ -2442,10 +2538,6 @@ async function processReferral(
         1;
 
 
-    /*
-       Записываем приглашение.
-    */
-
     const {
         error: referralInsertError
     } =
@@ -2469,10 +2561,6 @@ async function processReferral(
         throw referralInsertError;
     }
 
-
-    /*
-       Награда пригласившему.
-    */
 
     const reward =
         referralRewards[
@@ -2561,20 +2649,11 @@ async function handleTelegramUpdate(
         "";
 
 
-    /*
-       Создаём пользователя,
-       если его ещё нет.
-    */
-
     const player =
         await getOrCreatePlayer(
             from
         );
 
-
-    /*
-       Referral.
-    */
 
     if (
         startParam.startsWith(
@@ -2616,10 +2695,6 @@ async function handleTelegramUpdate(
 
     }
 
-
-    /*
-       Кнопка Mini App.
-    */
 
     await telegramRequest(
         "sendMessage",
