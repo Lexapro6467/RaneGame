@@ -15,307 +15,183 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const BOT_TOKEN = process.env.BOT_TOKEN;
 
 
-/* =========================================================
-   TELEGRAM AUTH
-========================================================= */
+/* =====================================================
+   TELEGRAM WEB APP AUTH
+===================================================== */
 
 function validateTelegramInitData(initData) {
 
-    console.log("=================================");
-    console.log("TELEGRAM AUTH");
-    console.log("=================================");
-
     if (!initData) {
-
-        console.log("❌ initData отсутствует");
-
         return {
             ok: false,
             error: "initData отсутствует"
         };
-
     }
-
 
     if (!BOT_TOKEN) {
-
-        console.log("❌ BOT_TOKEN отсутствует");
-
         return {
             ok: false,
-            error: "BOT_TOKEN не найден в Render"
+            error: "BOT_TOKEN отсутствует в Render"
         };
-
     }
 
+    const params = new URLSearchParams(initData);
 
-    console.log(
-        "initData получен. Длина:",
-        initData.length
-    );
-
-
-    const params =
-        new URLSearchParams(initData);
-
-
-    const receivedHash =
-        params.get("hash");
-
-    const authDate =
-        params.get("auth_date");
-
-    const userData =
-        params.get("user");
-
+    const receivedHash = params.get("hash");
+    const authDate = params.get("auth_date");
 
     if (!receivedHash) {
-
-        console.log("❌ hash отсутствует");
-
         return {
             ok: false,
             error: "hash отсутствует"
         };
-
     }
 
-
     if (!authDate) {
-
-        console.log("❌ auth_date отсутствует");
-
         return {
             ok: false,
             error: "auth_date отсутствует"
         };
-
     }
 
-
-    if (!userData) {
-
-        console.log("❌ user отсутствует");
-
-        return {
-            ok: false,
-            error: "user отсутствует"
-        };
-
-    }
+    const dataCheckString = [...params.entries()]
+        .filter(([key]) => key !== "hash")
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, value]) => `${key}=${value}`)
+        .join("\n");
 
 
     /*
-       Проверяем время.
-       Разрешаем данные не старше 24 часов.
+       Telegram:
+       secret_key = HMAC_SHA256(bot_token, "WebAppData")
     */
 
-    const now =
-        Math.floor(Date.now() / 1000);
+    const secretKey = crypto
+        .createHmac(
+            "sha256",
+            "WebAppData"
+        )
+        .update(BOT_TOKEN)
+        .digest();
 
-    const authTime =
-        Number(authDate);
 
-    const age =
-        now - authTime;
+    const calculatedHash = crypto
+        .createHmac(
+            "sha256",
+            secretKey
+        )
+        .update(dataCheckString)
+        .digest("hex");
 
 
-    console.log(
-        "Возраст initData:",
-        age,
-        "сек."
-    );
+    /*
+       Безопасное сравнение
+    */
+
+    const receivedBuffer =
+        Buffer.from(receivedHash, "hex");
+
+    const calculatedBuffer =
+        Buffer.from(calculatedHash, "hex");
 
 
     if (
-        !Number.isFinite(authTime) ||
-        age < -300 ||
-        age > 86400
+        receivedBuffer.length !==
+        calculatedBuffer.length
     ) {
-
-        console.log(
-            "❌ initData устарел"
-        );
-
-        return {
-            ok: false,
-            error: "initData устарел"
-        };
-
-    }
-
-
-    /*
-       Формируем строку проверки Telegram.
-    */
-
-    const dataCheckString =
-        [...params.entries()]
-            .filter(
-                ([key]) =>
-                    key !== "hash"
-            )
-            .sort(
-                ([a], [b]) =>
-                    a.localeCompare(b)
-            )
-            .map(
-                ([key, value]) =>
-                    `${key}=${value}`
-            )
-            .join("\n");
-
-
-    /*
-       Создаём секретный ключ.
-    */
-
-    const secretKey =
-        crypto
-            .createHmac(
-                "sha256",
-                "WebAppData"
-            )
-            .update(BOT_TOKEN)
-            .digest();
-
-
-    /*
-       Создаём правильный hash.
-    */
-
-    const calculatedHash =
-        crypto
-            .createHmac(
-                "sha256",
-                secretKey
-            )
-            .update(dataCheckString)
-            .digest("hex");
-
-
-    /*
-       Сравниваем hash.
-    */
-
-    if (
-        calculatedHash !==
-        receivedHash
-    ) {
-
-        console.log(
-            "❌ HASH НЕ СОВПАЛ"
-        );
-
-        console.log(
-            "Проверь BOT_TOKEN в Render."
-        );
-
         return {
             ok: false,
             error:
                 "HASH не совпал — проверь BOT_TOKEN в Render"
         };
+    }
 
+
+    if (
+        !crypto.timingSafeEqual(
+            receivedBuffer,
+            calculatedBuffer
+        )
+    ) {
+        return {
+            ok: false,
+            error:
+                "HASH не совпал — проверь BOT_TOKEN в Render"
+        };
     }
 
 
     /*
-       Получаем Telegram пользователя.
+       Получаем пользователя
     */
+
+    const userData =
+        params.get("user");
+
+    if (!userData) {
+        return {
+            ok: false,
+            error: "Данные пользователя отсутствуют"
+        };
+    }
+
 
     let user;
 
     try {
-
-        user =
-            JSON.parse(userData);
-
-    } catch (error) {
-
-        console.log(
-            "❌ Не удалось прочитать user"
-        );
-
+        user = JSON.parse(userData);
+    } catch {
         return {
             ok: false,
             error:
-                "Ошибка данных пользователя Telegram"
+                "Не удалось прочитать данные Telegram"
         };
-
     }
 
 
     if (!user.id) {
-
-        console.log(
-            "❌ Telegram ID отсутствует"
-        );
-
         return {
             ok: false,
             error:
                 "Telegram ID отсутствует"
         };
-
     }
-
-
-    console.log(
-        "✅ Telegram ID:",
-        user.id
-    );
-
-    console.log(
-        "✅ Авторизация успешна"
-    );
 
 
     return {
         ok: true,
-        user: user
+        user
     };
-
 }
 
 
-/* =========================================================
-   SUPABASE — ПОЛУЧИТЬ ИГРОКА
-========================================================= */
+/* =====================================================
+   SUPABASE
+===================================================== */
 
 async function getPlayer(telegramId) {
 
-    const response =
-        await fetch(
-            `${SUPABASE_URL}/rest/v1/players?telegram_id=eq.${telegramId}&select=*`,
-            {
-                method: "GET",
-
-                headers: {
-                    apikey:
-                        SUPABASE_KEY,
-
-                    Authorization:
-                        `Bearer ${SUPABASE_KEY}`
-                }
+    const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/players?telegram_id=eq.${telegramId}&select=*`,
+        {
+            headers: {
+                apikey: SUPABASE_KEY,
+                Authorization:
+                    `Bearer ${SUPABASE_KEY}`
             }
-        );
+        }
+    );
 
 
     if (!response.ok) {
 
-        const text =
-            await response.text();
-
         console.error(
-            "Supabase GET error:",
-            text
+            await response.text()
         );
 
         throw new Error(
             "Ошибка получения игрока"
         );
-
     }
 
 
@@ -323,80 +199,61 @@ async function getPlayer(telegramId) {
         await response.json();
 
 
-    if (
-        !Array.isArray(players) ||
-        players.length === 0
-    ) {
-
+    if (!players.length) {
         return null;
-
     }
 
 
     return players[0];
-
 }
 
 
-/* =========================================================
-   SUPABASE — СОЗДАТЬ ИГРОКА
-========================================================= */
+/* =====================================================
+   СОЗДАНИЕ ИГРОКА
+===================================================== */
 
 async function createPlayer(user) {
 
-    const response =
-        await fetch(
-            `${SUPABASE_URL}/rest/v1/players`,
-            {
-                method: "POST",
+    const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/players`,
+        {
+            method: "POST",
 
-                headers: {
-                    apikey:
-                        SUPABASE_KEY,
+            headers: {
+                apikey: SUPABASE_KEY,
 
-                    Authorization:
-                        `Bearer ${SUPABASE_KEY}`,
+                Authorization:
+                    `Bearer ${SUPABASE_KEY}`,
 
-                    "Content-Type":
-                        "application/json",
+                "Content-Type":
+                    "application/json",
 
-                    Prefer:
-                        "return=representation"
-                },
+                Prefer:
+                    "return=representation"
+            },
 
-                body:
-                    JSON.stringify({
+            body: JSON.stringify({
+                telegram_id: user.id,
 
-                        telegram_id:
-                            user.id,
+                username:
+                    user.username || null,
 
-                        username:
-                            user.username ||
-                            null,
-
-                        first_name:
-                            user.first_name ||
-                            "Игрок"
-
-                    })
-            }
-        );
+                first_name:
+                    user.first_name || "Игрок"
+            })
+        }
+    );
 
 
     if (!response.ok) {
 
-        const text =
-            await response.text();
-
         console.error(
-            "Supabase CREATE error:",
-            text
+            await response.text()
         );
 
         throw new Error(
             "Ошибка создания игрока"
         );
-
     }
 
 
@@ -405,59 +262,51 @@ async function createPlayer(user) {
 
 
     return players[0];
-
 }
 
 
-/* =========================================================
-   SUPABASE — ОБНОВИТЬ ИГРОКА
-========================================================= */
+/* =====================================================
+   ОБНОВЛЕНИЕ ИГРОКА
+===================================================== */
 
 async function updatePlayer(
     telegramId,
     data
 ) {
 
-    const response =
-        await fetch(
-            `${SUPABASE_URL}/rest/v1/players?telegram_id=eq.${telegramId}`,
-            {
-                method: "PATCH",
+    const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/players?telegram_id=eq.${telegramId}`,
+        {
+            method: "PATCH",
 
-                headers: {
-                    apikey:
-                        SUPABASE_KEY,
+            headers: {
+                apikey: SUPABASE_KEY,
 
-                    Authorization:
-                        `Bearer ${SUPABASE_KEY}`,
+                Authorization:
+                    `Bearer ${SUPABASE_KEY}`,
 
-                    "Content-Type":
-                        "application/json",
+                "Content-Type":
+                    "application/json",
 
-                    Prefer:
-                        "return=representation"
-                },
+                Prefer:
+                    "return=representation"
+            },
 
-                body:
-                    JSON.stringify(data)
-            }
-        );
+            body:
+                JSON.stringify(data)
+        }
+    );
 
 
     if (!response.ok) {
 
-        const text =
-            await response.text();
-
         console.error(
-            "Supabase UPDATE error:",
-            text
+            await response.text()
         );
 
         throw new Error(
-            "Ошибка сохранения игрока"
+            "Ошибка обновления игрока"
         );
-
     }
 
 
@@ -466,53 +315,43 @@ async function updatePlayer(
 
 
     return players[0];
-
 }
 
 
-/* =========================================================
+/* =====================================================
    ГЛАВНАЯ
-========================================================= */
+===================================================== */
 
-app.get(
-    "/",
-    (req, res) => {
+app.get("/", (req, res) => {
 
-        res.sendFile(
-            path.join(
-                __dirname,
-                "index.html"
-            )
-        );
+    res.sendFile(
+        path.join(
+            __dirname,
+            "index.html"
+        )
+    );
 
-    }
-);
+});
 
 
-/* =========================================================
+/* =====================================================
    STATUS
-========================================================= */
+===================================================== */
 
-app.get(
-    "/api/status",
-    (req, res) => {
+app.get("/api/status", (req, res) => {
 
-        res.json({
+    res.json({
+        ok: true,
+        message:
+            "RaneGame server работает!"
+    });
 
-            ok: true,
-
-            message:
-                "RaneGame server работает!"
-
-        });
-
-    }
-);
+});
 
 
-/* =========================================================
-   ПОЛУЧИТЬ ИГРОКА
-========================================================= */
+/* =====================================================
+   PLAYER
+===================================================== */
 
 app.post(
     "/api/player",
@@ -528,16 +367,10 @@ app.post(
 
             if (!auth.ok) {
 
-                return res
-                    .status(401)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            auth.error
-
-                    });
+                return res.status(401).json({
+                    ok: false,
+                    error: auth.error
+                });
 
             }
 
@@ -552,11 +385,6 @@ app.post(
                 );
 
 
-            /*
-               Если игрока нет —
-               создаём.
-            */
-
             if (!player) {
 
                 player =
@@ -568,11 +396,8 @@ app.post(
 
 
             res.json({
-
                 ok: true,
-
-                player: player
-
+                player
             });
 
 
@@ -584,16 +409,11 @@ app.post(
             );
 
 
-            res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        "Ошибка сервера"
-
-                });
+            res.status(500).json({
+                ok: false,
+                error:
+                    "Ошибка сервера"
+            });
 
         }
 
@@ -601,9 +421,9 @@ app.post(
 );
 
 
-/* =========================================================
-   ПОЛУЧИТЬ БОНУС
-========================================================= */
+/* =====================================================
+   BONUS
+===================================================== */
 
 app.post(
     "/api/collect",
@@ -619,16 +439,10 @@ app.post(
 
             if (!auth.ok) {
 
-                return res
-                    .status(401)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            auth.error
-
-                    });
+                return res.status(401).json({
+                    ok: false,
+                    error: auth.error
+                });
 
             }
 
@@ -645,28 +459,17 @@ app.post(
 
             if (!player) {
 
-                return res
-                    .status(404)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Игрок не найден"
-
-                    });
+                return res.status(404).json({
+                    ok: false,
+                    error:
+                        "Игрок не найден"
+                });
 
             }
 
 
-            const currentBalance =
-                Number(
-                    player.balance
-                );
-
-
-            const newBalance =
-                currentBalance + 446;
+            const balance =
+                Number(player.balance);
 
 
             const updated =
@@ -674,18 +477,14 @@ app.post(
                     user.id,
                     {
                         balance:
-                            newBalance
+                            balance + 446
                     }
                 );
 
 
             res.json({
-
                 ok: true,
-
-                player:
-                    updated
-
+                player: updated
             });
 
 
@@ -697,16 +496,11 @@ app.post(
             );
 
 
-            res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        "Ошибка сохранения бонуса"
-
-                });
+            res.status(500).json({
+                ok: false,
+                error:
+                    "Ошибка бонуса"
+            });
 
         }
 
@@ -714,9 +508,9 @@ app.post(
 );
 
 
-/* =========================================================
-   ПОКУПКА
-========================================================= */
+/* =====================================================
+   BUY
+===================================================== */
 
 app.post(
     "/api/buy",
@@ -732,16 +526,10 @@ app.post(
 
             if (!auth.ok) {
 
-                return res
-                    .status(401)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            auth.error
-
-                    });
+                return res.status(401).json({
+                    ok: false,
+                    error: auth.error
+                });
 
             }
 
@@ -751,31 +539,19 @@ app.post(
 
 
             const price =
-                Number(
-                    req.body.price
-                );
+                Number(req.body.price);
 
-
-            /*
-               Разрешаем только
-               целые положительные цены.
-            */
 
             if (
                 !Number.isInteger(price) ||
                 price <= 0
             ) {
 
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Неверная цена"
-
-                    });
+                return res.status(400).json({
+                    ok: false,
+                    error:
+                        "Неверная цена"
+                });
 
             }
 
@@ -788,91 +564,50 @@ app.post(
 
             if (!player) {
 
-                return res
-                    .status(404)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Игрок не найден"
-
-                    });
+                return res.status(404).json({
+                    ok: false,
+                    error:
+                        "Игрок не найден"
+                });
 
             }
 
 
-            const currentBalance =
-                Number(
-                    player.balance
-                );
+            const balance =
+                Number(player.balance);
 
 
-            /*
-               Проверяем баланс.
-            */
+            if (balance < price) {
 
-            if (
-                currentBalance <
-                price
-            ) {
-
-                return res
-                    .status(400)
-                    .json({
-
-                        ok: false,
-
-                        error:
-                            "Недостаточно ⭐"
-
-                    });
+                return res.status(400).json({
+                    ok: false,
+                    error:
+                        "Недостаточно ⭐"
+                });
 
             }
 
 
-            /*
-               Снимаем деньги.
-            */
-
-            const newBalance =
-                currentBalance -
-                price;
-
-
-            /*
-               Пока каждая покупка
-               даёт +1 к доходу.
-            */
-
-            const newIncome =
-                Number(
-                    player.income
-                ) + 1;
+            const income =
+                Number(player.income);
 
 
             const updated =
                 await updatePlayer(
                     user.id,
                     {
-
                         balance:
-                            newBalance,
+                            balance - price,
 
                         income:
-                            newIncome
-
+                            income + 1
                     }
                 );
 
 
             res.json({
-
                 ok: true,
-
-                player:
-                    updated
-
+                player: updated
             });
 
 
@@ -884,16 +619,11 @@ app.post(
             );
 
 
-            res
-                .status(500)
-                .json({
-
-                    ok: false,
-
-                    error:
-                        "Ошибка покупки"
-
-                });
+            res.status(500).json({
+                ok: false,
+                error:
+                    "Ошибка покупки"
+            });
 
         }
 
@@ -901,28 +631,25 @@ app.post(
 );
 
 
-/* =========================================================
+/* =====================================================
    FALLBACK
-========================================================= */
+===================================================== */
 
-app.get(
-    "*",
-    (req, res) => {
+app.get("*", (req, res) => {
 
-        res.sendFile(
-            path.join(
-                __dirname,
-                "index.html"
-            )
-        );
+    res.sendFile(
+        path.join(
+            __dirname,
+            "index.html"
+        )
+    );
 
-    }
-);
+});
 
 
-/* =========================================================
+/* =====================================================
    START
-========================================================= */
+===================================================== */
 
 app.listen(
     PORT,
