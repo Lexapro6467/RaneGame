@@ -1904,6 +1904,13 @@ async function startTelegramPolling() {
 // ======================================================
 
 app.get(/.*/, (req, res) => {
+    if (req.path.startsWith("/api/")) {
+        return res.status(404).json({
+            ok: false,
+            error: "API endpoint not found"
+        });
+    }
+
     res.sendFile(
         path.join(
             __dirname,
@@ -1911,7 +1918,6 @@ app.get(/.*/, (req, res) => {
         )
     );
 });
-
 // ======================================================
 // START
 // ======================================================
