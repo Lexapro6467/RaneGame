@@ -1362,86 +1362,181 @@ button:disabled {
     padding: 30px 10px;
 }
 
-
 /* =================================
-   АДМИН ПАНЕЛЬ
+   АДМИН
 ================================= */
 
-.admin-button {
-    display: none;
+const DEV_TELEGRAM_ID =
+    "5370959021438146805";
 
-    margin-top: 8px;
 
-    padding: 9px 14px;
+function isAdmin() {
 
-    background:
-        linear-gradient(
-            135deg,
-            #8f1717,
-            #571010
+    try {
+
+        const user =
+            getTelegramUser();
+
+        return String(user.id) ===
+            DEV_TELEGRAM_ID;
+
+    } catch (error) {
+
+        return false;
+
+    }
+
+}
+
+
+function showAdminButton() {
+
+    const button =
+        document.getElementById(
+            "adminButton"
         );
 
-    border: 1px solid #a52a2a;
+    if (!button) {
+        return;
+    }
 
-    border-radius: 10px;
+    try {
 
-    color: #fff;
+        const user =
+            getTelegramUser();
 
-    font-size: 13px;
+        if (
+            String(user.id) ===
+            DEV_TELEGRAM_ID
+        ) {
 
-    width: 100%;
+            button.style.display =
+                "block";
+
+        } else {
+
+            button.style.display =
+                "none";
+
+        }
+
+    } catch (error) {
+
+        button.style.display =
+            "none";
+
+    }
+
 }
 
-.admin-card {
-    background:
-        linear-gradient(
-            145deg,
-            #2a0b0b,
-            #130505
+
+function openAdminPanel() {
+
+    if (!isAdmin()) {
+
+        showToast(
+            "❌ Доступ запрещён"
         );
 
-    border: 1px solid #651818;
+        return;
 
-    border-radius: 20px;
+    }
 
-    padding: 18px;
+    pages.forEach(
+        function(page) {
 
-    margin-bottom: 15px;
+            page.classList.remove(
+                "active"
+            );
 
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.3);
-}
+        }
+    );
 
-.admin-card h2 {
-    margin-top: 0;
-}
-
-.admin-card p {
-    color: #aaa;
-    line-height: 1.5;
-}
-
-.admin-button-action {
-    width: 100%;
-
-    margin-top: 10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #8f1717,
-            #5d0d0d
+    const adminPage =
+        document.getElementById(
+            "admin"
         );
+
+    if (adminPage) {
+
+        adminPage.classList.add(
+            "active"
+        );
+
+    }
+
+    navButtons.forEach(
+        function(button) {
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+    window.scrollTo(
+        0,
+        0
+    );
+
 }
 
-.admin-back {
-    width: 100%;
 
-    margin-bottom: 14px;
+function closeAdminPanel() {
 
-    background: #321010;
+    pages.forEach(
+        function(page) {
+
+            page.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+    const home =
+        document.getElementById(
+            "home"
+        );
+
+    if (home) {
+
+        home.classList.add(
+            "active"
+        );
+
+    }
+
+    navButtons.forEach(
+        function(button) {
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+    const menuButton =
+        document.querySelector(
+            '.nav button[data-page="home"]'
+        );
+
+    if (menuButton) {
+
+        menuButton.classList.add(
+            "active"
+        );
+
+    }
+
+    window.scrollTo(
+        0,
+        0
+    );
+
 }
-
 
 /* =================================
    НАВИГАЦИЯ
@@ -3124,23 +3219,22 @@ async function resetMyAccount() {
 
     }
 
-
     const confirmed =
         confirm(
             "⚠️ СБРОС АККАУНТА\n\n" +
-            "Удалятся все подарки и покупки.\n" +
-            "Баланс станет 0 ⭐.\n" +
-            "Доход станет 0 ⭐/час.\n\n" +
+            "Будут удалены:\n" +
+            "🎁 Все подарки\n" +
+            "🛒 Все покупки\n" +
+            "⭐ Баланс → 0\n" +
+            "💰 Доход → 0 ⭐/час\n" +
+            "⚡ Множитель → x1.0\n" +
+            "🎁 Бонус → сброшен\n\n" +
             "Продолжить?"
         );
 
-
     if (!confirmed) {
-
         return;
-
     }
-
 
     try {
 
@@ -3148,12 +3242,10 @@ async function resetMyAccount() {
             "⏳ Сбрасываем аккаунт..."
         );
 
-
         const data =
             await apiRequest(
                 "/api/dev/reset-account"
             );
-
 
         if (data.player) {
 
@@ -3179,27 +3271,28 @@ async function resetMyAccount() {
                 player.economy_expires_at ||
                 null;
 
-            inventory = [];
-
-            inventoryLoaded = true;
-
-            updateScreen();
-
-            renderInventory();
-
-            renderGiftShop();
-
         }
 
+        inventory = [];
+
+        inventoryLoaded = true;
+
+        updateScreen();
+
+        renderInventory();
+
+        renderGiftShop();
 
         showToast(
-            "✅ Аккаунт сброшен"
+            "✅ Аккаунт полностью сброшен"
         );
-
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "RESET ERROR:",
+            error
+        );
 
         showToast(
             "❌ " +
