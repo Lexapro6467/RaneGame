@@ -1,4 +1,4 @@
-const express = require("express");
+const DEV_TELEGRAM_ID = "5370959021438146805";
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
