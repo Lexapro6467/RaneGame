@@ -1,4 +1,4 @@
-const DEV_TELEGRAM_ID = "5370959021438146805";
+const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
@@ -21,11 +21,6 @@ const SUPABASE_SERVICE_ROLE_KEY =
 
 const BOT_TOKEN =
     process.env.BOT_TOKEN;
-
-
-/* =========================================================
-   ADMIN
-========================================================= */
 
 const DEV_TELEGRAM_ID =
     "5370959021438146805";
@@ -244,10 +239,6 @@ app.post(
             const user =
                 req.body?.user;
 
-            /*
-               Проверяем Telegram ID
-               прямо на сервере.
-            */
 
             if (
                 !user ||
@@ -273,9 +264,7 @@ app.post(
                 DEV_TELEGRAM_ID;
 
 
-            /*
-               Удаляем отдельные покупки.
-            */
+            /* Удаляем покупки */
 
             const {
                 error: purchasesError
@@ -294,9 +283,7 @@ app.post(
             }
 
 
-            /*
-               Удаляем инвентарь.
-            */
+            /* Удаляем инвентарь */
 
             const {
                 error: giftsError
@@ -315,9 +302,7 @@ app.post(
             }
 
 
-            /*
-               Сбрасываем самого игрока.
-            */
+            /* Сбрасываем игрока */
 
             const {
                 data: player,
