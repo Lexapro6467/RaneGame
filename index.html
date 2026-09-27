@@ -259,11 +259,6 @@
             gap: 10px;
         }
 
-        /*
-         * ВАЖНО:
-         * Карточка подарка сама НЕ переливается.
-         * Анимируется только подарок внутри.
-         */
         .gift-card {
             position: relative;
             min-width: 0;
@@ -597,8 +592,6 @@
             color: #fff;
         }
 
-        /* BUY MODAL */
-
         .buy-modal {
             position: fixed;
             inset: 0;
@@ -724,8 +717,6 @@
             font-weight: 700;
         }
 
-        /* ROULETTE */
-
         .roulette-modal {
             position: fixed;
             inset: 0;
@@ -790,8 +781,6 @@
             font-weight: 800;
         }
 
-        /* TOAST */
-
         .toast {
             position: fixed;
             left: 50%;
@@ -845,7 +834,6 @@
 
 <div class="app">
 
-    <!-- МЕНЮ -->
     <section id="page-home" class="page active">
 
         <div class="profile">
@@ -936,7 +924,6 @@
             </button>
         </div>
 
-        <!-- ПОДАРКИ ТЕПЕРЬ В МЕНЮ -->
         <div class="section-title">🎁 Подарки</div>
 
         <div class="tabs">
@@ -969,7 +956,6 @@
 
     </section>
 
-    <!-- АУКЦИОН -->
     <section id="page-auction" class="page">
 
         <div class="section-title">🔨 Аукцион</div>
@@ -986,7 +972,6 @@
 
     </section>
 
-    <!-- ТОП -->
     <section id="page-top" class="page">
 
         <div class="section-title">🏆 Топ</div>
@@ -1005,7 +990,6 @@
 
 </div>
 
-<!-- НИЖНЕЕ МЕНЮ -->
 <nav class="bottom-nav">
 
     <button
@@ -1037,7 +1021,6 @@
 
 </nav>
 
-<!-- ОКНО ПОКУПКИ -->
 <div id="buyModal" class="buy-modal">
 
     <div class="buy-modal-box">
@@ -1107,7 +1090,6 @@
 
 </div>
 
-<!-- РУЛЕТКА -->
 <div id="rouletteModal" class="roulette-modal">
 
     <div class="roulette-box">
@@ -1169,18 +1151,10 @@
 
     let giftObserver = null;
 
-    /* =========================
-       BUY MODAL
-    ========================= */
-
     let buyModalGift = null;
     let buyModalMax = 1;
     let buyModalQuantity = 1;
     let buyModalBusy = false;
-
-    /* =========================
-       HELPERS
-    ========================= */
 
     function getTelegramUser() {
         if (
@@ -1264,10 +1238,6 @@
         }
     }
 
-    /* =========================
-       PLAYER
-    ========================= */
-
     async function loadPlayer() {
         const telegramId = getTelegramId();
 
@@ -1335,10 +1305,6 @@
             referralLink;
     }
 
-    /* =========================
-       NAVIGATION
-    ========================= */
-
     function navigate(pageName) {
         document
             .querySelectorAll(".page")
@@ -1371,10 +1337,6 @@
         }
     }
 
-    /* =========================
-       INCOME
-    ========================= */
-
     async function collectIncome() {
         try {
             const data = await apiRequest(
@@ -1401,10 +1363,6 @@
             showToast("❌ " + error.message);
         }
     }
-
-    /* =========================
-       BONUS
-    ========================= */
 
     function updateBonusInfo() {
         const element =
@@ -1454,10 +1412,6 @@
         }
     }
 
-    /* =========================
-       REFERRAL
-    ========================= */
-
     function copyReferral() {
         const text =
             document.getElementById(
@@ -1484,10 +1438,6 @@
 
         showToast(text);
     }
-
-    /* =========================
-       GIFT ANIMATIONS
-    ========================= */
 
     function getGiftAnimationClass(gift) {
         const emoji = String(
@@ -1539,10 +1489,6 @@
 
         return "gift-animation-bounce";
     }
-
-    /* =========================
-       GIFT SHOP
-    ========================= */
 
     async function loadGiftShop() {
         try {
@@ -1679,10 +1625,6 @@
 
         setupGiftAnimationObserver();
     }
-
-    /* =========================
-       INVENTORY
-    ========================= */
 
     async function loadInventory() {
         try {
@@ -1940,10 +1882,6 @@
         }
     }
 
-    /* =========================
-       GIFT TABS
-    ========================= */
-
     function switchGiftTab(tab) {
         giftTab = tab;
 
@@ -2004,10 +1942,6 @@
             }
         }
     }
-
-    /* =========================
-       BUY MODAL
-    ========================= */
 
     function openBuyModal(giftId) {
 
@@ -2187,11 +2121,6 @@
 
         try {
 
-            /*
-             * Покупаем каждую штуку отдельным
-             * запросом, поэтому существующий
-             * backend менять не нужно.
-             */
             for (
                 let i = 0;
                 i < quantity;
@@ -2232,18 +2161,9 @@
                 }
             }
 
-            /*
-             * После покупки сразу обновляем
-             * инвентарь и магазин.
-             *
-             * Никакой кнопки «Обновить»
-             * пользователю не требуется.
-             */
             inventoryLoaded = false;
 
             await loadInventory();
-
-            renderGiftShop();
 
             closeBuyModal();
 
@@ -2268,10 +2188,6 @@
             updateBuyModal();
         }
     }
-
-    /* =========================
-       ANIMATION OPTIMIZATION
-    ========================= */
 
     function setupGiftAnimationObserver() {
 
@@ -2343,10 +2259,6 @@
                 }
             );
     }
-
-    /* =========================
-       ROULETTE
-    ========================= */
 
     function openRoulette() {
 
@@ -2442,10 +2354,6 @@
         }
     }
 
-    /* =========================
-       UTILS
-    ========================= */
-
     function escapeHtml(value) {
 
         return String(value)
@@ -2484,10 +2392,6 @@
         );
     }
 
-    /* =========================
-       START
-    ========================= */
-
     async function init() {
 
         try {
@@ -2496,14 +2400,6 @@
 
             await loadGiftShop();
 
-            /*
-             * Загружаем инвентарь сразу,
-             * чтобы магазин сразу знал,
-             * сколько подарков уже куплено.
-             *
-             * Поэтому лимит 5/5 отображается
-             * сразу, без кнопки обновления.
-             */
             await loadInventory();
 
         } catch (error) {
