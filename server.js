@@ -1255,7 +1255,7 @@ app.post(
                     user.id,
                     {
                         balance:
-                            balance + 446
+                            balance + 1000
                     }
                 );
 
