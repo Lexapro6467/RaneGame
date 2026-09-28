@@ -1,5995 +1,2156 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width,
-               initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>RaneGame</title>
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    margin: 0;
-    padding: 0 0 90px;
-
-    background:
-        radial-gradient(
-            circle at top,
-            #210909 0%,
-            #100606 42%,
-            #080303 100%
-        );
-
-    color: #fff;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-button {
-    border: 0;
-    outline: none;
-    border-radius: 14px;
-    padding: 13px 18px;
-    background: #8f1717;
-    color: #fff;
-    font-weight: bold;
-    font-size: 15px;
-    cursor: pointer;
-
-    transition:
-        transform .15s ease,
-        filter .15s ease,
-        opacity .15s ease;
-}
-
-button:active {
-    transform: scale(.96);
-}
-
-button:hover {
-    filter: brightness(1.08);
-}
-
-button:disabled {
-    opacity: .5;
-    cursor: default;
-}
-
-.loading {
-    min-height: 100vh;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-    color: #aaa;
-    padding: 20px;
-}
-
-.error {
-    background: #350b0b;
-    border: 1px solid #761717;
-    padding: 18px;
-    border-radius: 16px;
-    max-width: 400px;
-    line-height: 1.5;
-}
-
-
-/* =================================
-   ВЕРХНИЙ ПРОФИЛЬ
-================================= */
-
-.top {
-    padding: 20px 18px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 12px;
-}
-
-.avatar {
-    width: 52px;
-    height: 52px;
-
-    flex-shrink: 0;
-
-    border-radius: 50%;
-
-    background:
-        linear-gradient(
-            145deg,
-            #a51d1d,
-            #510909
-        );
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 22px;
-    font-weight: bold;
-
-    box-shadow:
-        0 6px 20px rgba(0,0,0,.35);
-}
-
-.name {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.username {
-    color: #999;
-    font-size: 14px;
-    margin-top: 4px;
-}
-
-
-/* =================================
-   СТРАНИЦЫ
-================================= */
-
-.page {
-    display: none;
-
-    padding: 0 16px;
-
-    animation:
-        pageAppear
-        .2s
-        ease;
-}
-
-.page.active {
-    display: block;
-}
-
-@keyframes pageAppear {
-
-    from {
-        opacity: 0;
-        transform: translateY(4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-}
-
-
-/* =================================
-   БАЛАНС
-================================= */
-
-.balance-card {
-    background:
-        radial-gradient(
-            circle at 50% 0%,
-            rgba(255,70,70,.20),
-            transparent 55%
-        ),
-        linear-gradient(
-            135deg,
-            #7d1111,
-            #3b0808
-        );
-
-    border-radius: 24px;
-
-    padding: 28px 20px;
-
-    text-align: center;
-
-    margin-bottom: 15px;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.3);
-}
-
-.balance {
-    font-size: 44px;
-    font-weight: bold;
-
-    margin: 10px 0;
-}
-
-.income {
-    color: #72ff72;
-}
-
-
-/* =================================
-   КАРТОЧКИ
-================================= */
-
-.card {
-    background:
-        linear-gradient(
-            145deg,
-            rgba(35,13,13,.98),
-            rgba(21,7,7,.98)
-        );
-
-    border: 1px solid #351515;
-
-    border-radius: 18px;
-
-    padding: 18px;
-
-    margin-bottom: 14px;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,.18);
-}
-
-.card h2,
-.card h3 {
-    margin-top: 0;
-}
-
-.card p {
-    color: #aaa;
-    line-height: 1.5;
-}
-
-
-/* =================================
-   ЭКОНОМИКА
-================================= */
-
-.economy-card {
-    background:
-        linear-gradient(
-            145deg,
-            #260909,
-            #140505
-        );
-
-    border: 1px solid #4d1616;
-
-    border-radius: 22px;
-
-    padding: 20px;
-
-    margin-bottom: 15px;
-
-    overflow: hidden;
-}
-
-.economy-header {
-    display: flex;
-
-    justify-content: space-between;
-    align-items: center;
-
-    gap: 10px;
-
-    margin-bottom: 14px;
-}
-
-.economy-title {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.multiplier-active {
-    background: #163516;
-    color: #72ff72;
-
-    padding: 7px 10px;
-
-    border-radius: 10px;
-
-    font-weight: bold;
-    font-size: 13px;
-}
-
-.multiplier-none {
-    background: #321010;
-    color: #ff7777;
-
-    padding: 7px 10px;
-
-    border-radius: 10px;
-
-    font-weight: bold;
-    font-size: 13px;
-}
-
-.current-multiplier {
-    text-align: center;
-
-    font-size: 48px;
-    font-weight: bold;
-
-    margin: 12px 0 4px;
-}
-
-.multiplier-time {
-    text-align: center;
-
-    color: #aaa;
-
-    font-size: 14px;
-
-    min-height: 20px;
-
-    margin-bottom: 15px;
-}
-
-.roulette-spin-button {
-    width: 100%;
-
-    font-size: 17px;
-
-    padding: 15px;
-}
-
-.claim-button {
-    width: 100%;
-
-    background:
-        linear-gradient(
-            135deg,
-            #a91c1c,
-            #681010
-        );
-
-    font-size: 17px;
-
-    padding: 15px;
-
-    display: none;
-}
-
-.claim-button.show {
-    display: block;
-}
-
-
-/* =================================
-   РУЛЕТКА
-================================= */
-
-.roulette-window {
-    position: relative;
-
-    height: 92px;
-
-    margin: 18px 0;
-
-    overflow: hidden;
-
-    border-radius: 18px;
-
-    background: #0d0404;
-
-    border: 1px solid #421313;
-}
-
-.roulette-window::before {
-    content: "";
-
-    position: absolute;
-
-    left: 50%;
-    top: 0;
-    bottom: 0;
-
-    width: 3px;
-
-    transform: translateX(-50%);
-
-    background: #ff4545;
-
-    box-shadow:
-        0 0 14px rgba(255,50,50,.8);
-
-    z-index: 5;
-}
-
-.roulette-track {
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-
-    gap: 10px;
-
-    transform: translateX(0);
-
-    will-change: transform;
-}
-
-.roulette-item {
-    flex: 0 0 76px;
-
-    height: 60px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 14px;
-
-    background: #281010;
-
-    border: 1px solid #4a1717;
-
-    color: #aaa;
-
-    font-size: 17px;
-    font-weight: bold;
-}
-
-.roulette-item.selected {
-    background: #791414;
-
-    color: #fff;
-
-    border-color: #ff4444;
-}
-
-
-/* =================================
-   ВКЛАДКИ ПОДАРКОВ
-================================= */
-
-.shop-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
-}
-
-.shop-tab {
-    flex: 1;
-
-    background: #241010;
-
-    border: 1px solid #3b1515;
-
-    color: #888;
-
-    padding: 11px 8px;
-}
-
-.shop-tab.active {
-    background: #761414;
-
-    border-color: #a52626;
-
-    color: white;
-}
-
-.shop-info {
-    background: #241010;
-
-    border: 1px solid #3b1515;
-
-    border-radius: 16px;
-
-    padding: 13px;
-
-    margin-bottom: 14px;
-
-    color: #aaa;
-
-    font-size: 13px;
-
-    line-height: 1.5;
-}
-
-.shop-info b {
-    color: white;
-}
-
-.refresh-shop {
-    width: 100%;
-
-    background: #321010;
-
-    margin-bottom: 12px;
-}
-
-
-/* =================================
-   СЕТКА ПОДАРКОВ
-================================= */
-
-.shop-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
-
-    gap: 12px;
-}
-
-
-/* =================================
-   КАРТОЧКА ПОДАРКА
-================================= */
-
-.gift-card {
-    position: relative;
-
-    overflow: hidden;
-
-    min-height: 285px;
-
-    padding: 14px 12px 12px;
-
-    background:
-        radial-gradient(
-            circle at 50% 20%,
-            rgba(255,60,60,.10),
-            transparent 45%
-        ),
-        linear-gradient(
-            145deg,
-            #2a1114,
-            #17090b 70%,
-            #100607
-        );
-
-    border: 1px solid
-        rgba(255,92,92,.20);
-
-    border-radius: 22px;
-
-    text-align: center;
-
-    box-shadow:
-        0 8px 22px
-        rgba(0,0,0,.30);
-
-    contain:
-        layout
-        paint;
-
-    transform:
-        translateZ(0);
-}
-
-.gift-card:active {
-    transform:
-        translateZ(0)
-        scale(.97);
-}
-
-.gift-visual {
-    position: relative;
-
-    width: 125px;
-    height: 125px;
-
-    margin: 3px auto 10px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 38px;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,70,70,.16),
-            transparent 72%
-        );
-
-    overflow: visible;
-
-    isolation: isolate;
-
-    contain:
-        layout
-        paint;
-
-    transform:
-        translateZ(0);
-}
-
-.gift-visual::before {
-    content: "";
-
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    width: 88px;
-    height: 88px;
-
-    transform:
-        translate3d(
-            -50%,
-            -50%,
-            0
-        )
-        scale(.8);
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,70,70,.34),
-            transparent 70%
-        );
-
-    opacity: .45;
-
-    animation:
-        giftAuraOptimized
-        2.6s
-        ease-in-out
-        infinite;
-
-    will-change:
-        transform,
-        opacity;
-
-    z-index: -1;
-}
-
-.gift-visual::after {
-    content: "";
-
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    width: 72px;
-    height: 72px;
-
-    border-radius: 50%;
-
-    border:
-        1px solid
-        rgba(255,90,90,.12);
-
-    transform:
-        translate3d(
-            -50%,
-            -50%,
-            0
-        )
-        scale(.65);
-
-    opacity: .5;
-
-    animation:
-        giftRingOptimized
-        3.4s
-        ease-out
-        infinite;
-
-    will-change:
-        transform,
-        opacity;
-
-    pointer-events: none;
-}
-
-.gift-emoji {
-    position: relative;
-
-    z-index: 5;
-
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 72px;
-
-    line-height: 1;
-
-    user-select: none;
-
-    transform-origin: center;
-
-    will-change:
-        transform;
-
-    contain:
-        layout
-        paint;
-
-    transform:
-        translateZ(0);
-}
-
-
-/* =================================
-   ИСКРЫ
-================================= */
-
-.gift-spark {
-    position: absolute;
-
-    z-index: 8;
-
-    pointer-events: none;
-
-    color: white;
-
-    font-weight: bold;
-
-    text-shadow:
-        0 0 5px
-        rgba(255,255,255,.8);
-
-    animation:
-        sparkOptimized
-        2.2s
-        ease-in-out
-        infinite;
-
-    will-change:
-        transform,
-        opacity;
-}
-
-.gift-spark-1 {
-    top: 9px;
-    left: 12px;
-    font-size: 17px;
-}
-
-.gift-spark-2 {
-    top: 18px;
-    right: 10px;
-    font-size: 10px;
-    animation-delay: .5s;
-}
-
-.gift-spark-3 {
-    left: 9px;
-    bottom: 17px;
-    font-size: 9px;
-    animation-delay: 1s;
-}
-
-.gift-spark-4 {
-    right: 14px;
-    bottom: 11px;
-    font-size: 14px;
-    animation-delay: 1.5s;
-}
-
-
-/* =================================
-   АНИМАЦИИ ПОДАРКОВ
-================================= */
-
-.gift-animation-bounce .gift-emoji {
-    animation:
-        normalGiftOptimized
-        2.4s
-        ease-in-out
-        infinite;
-}
-
-.gift-animation-heart .gift-emoji {
-    animation:
-        heartGiftOptimized
-        1.5s
-        ease-in-out
-        infinite;
-}
-
-.gift-animation-shine .gift-emoji {
-    animation:
-        diamondGiftOptimized
-        2.2s
-        ease-in-out
-        infinite;
-}
-
-.gift-animation-rocket .gift-emoji {
-    animation:
-        rocketGiftOptimized
-        1.7s
-        ease-in-out
-        infinite;
-}
-
-.gift-animation-magic .gift-emoji {
-    animation:
-        magicGiftOptimized
-        1.9s
-        ease-in-out
-        infinite;
-}
-
-
-/* =================================
-   KEYFRAMES
-================================= */
-
-@keyframes giftAuraOptimized {
-
-    0%, 100% {
-        transform:
-            translate3d(-50%,-50%,0)
-            scale(.78);
-
-        opacity: .25;
-    }
-
-    50% {
-        transform:
-            translate3d(-50%,-50%,0)
-            scale(1.12);
-
-        opacity: .65;
-    }
-}
-
-@keyframes giftRingOptimized {
-
-    0% {
-        transform:
-            translate3d(-50%,-50%,0)
-            scale(.6);
-
-        opacity: .45;
-    }
-
-    75% {
-        transform:
-            translate3d(-50%,-50%,0)
-            scale(1.35);
-
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 0;
-    }
-}
-
-@keyframes sparkOptimized {
-
-    0%, 100% {
-        opacity: .15;
-
-        transform:
-            translate3d(0,5px,0)
-            scale(.7)
-            rotate(0deg);
-    }
-
-    50% {
-        opacity: .9;
-
-        transform:
-            translate3d(0,-7px,0)
-            scale(1.08)
-            rotate(35deg);
-    }
-}
-
-@keyframes normalGiftOptimized {
-
-    0%, 100% {
-        transform:
-            translate3d(0,0,0)
-            rotate(-2deg)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(0,-7px,0)
-            rotate(2deg)
-            scale(1.06);
-    }
-}
-
-@keyframes heartGiftOptimized {
-
-    0%, 100% {
-        transform:
-            translate3d(0,0,0)
-            scale(1)
-            rotate(-4deg);
-    }
-
-    25% {
-        transform:
-            translate3d(0,-3px,0)
-            scale(1.1)
-            rotate(4deg);
-    }
-
-    50% {
-        transform:
-            translate3d(0,-5px,0)
-            scale(.97)
-            rotate(-3deg);
-    }
-
-    75% {
-        transform:
-            translate3d(0,-3px,0)
-            scale(1.08)
-            rotate(3deg);
-    }
-}
-
-@keyframes diamondGiftOptimized {
-
-    0%, 100% {
-        transform:
-            translate3d(0,2px,0)
-            rotate(-5deg)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(0,-9px,0)
-            rotate(5deg)
-            scale(1.09);
-    }
-}
-
-@keyframes rocketGiftOptimized {
-
-    0%, 100% {
-        transform:
-            translate3d(0,6px,0)
-            rotate(-5deg)
-            scale(1);
-    }
-
-    45% {
-        transform:
-            translate3d(0,-14px,0)
-            rotate(5deg)
-            scale(1.08);
-    }
-
-    70% {
-        transform:
-            translate3d(0,-7px,0)
-            rotate(1deg)
-            scale(1.04);
-    }
-}
-
-@keyframes magicGiftOptimized {
-
-    0%, 100% {
-        transform:
-            translate3d(0,2px,0)
-            rotate(-4deg)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(0,-9px,0)
-            rotate(5deg)
-            scale(1.1);
-    }
-}
-
-.gift-paused *,
-.gift-paused::before,
-.gift-paused::after {
-    animation-play-state:
-        paused !important;
-}
-
-.gift-name {
-    position: relative;
-    z-index: 2;
-
-    font-size: 15px;
-    font-weight: 700;
-
-    min-height: 38px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: #fff;
-
-    padding: 0 3px;
-}
-
-.gift-income {
-    position: relative;
-    z-index: 2;
-
-    display: inline-block;
-
-    color: #78ff9b;
-
-    font-size: 12px;
-    font-weight: 600;
-
-    margin: 5px 0 7px;
-
-    padding: 4px 8px;
-
-    border-radius: 8px;
-
-    background:
-        rgba(70,255,120,.07);
-}
-
-.gift-price {
-    position: relative;
-    z-index: 2;
-
-    color: #ffd84d;
-
-    font-size: 16px;
-    font-weight: 800;
-
-    margin-bottom: 9px;
-}
-
-.gift-buy {
-    position: relative;
-    z-index: 2;
-
-    width: 100%;
-
-    padding: 10px 7px;
-
-    border-radius: 12px;
-
-    font-size: 13px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #a91f2b,
-            #74111a
-        );
-}
-
-.gift-buy:disabled {
-    background: #321519;
-
-    color: #777;
-
-    border-color: #3b1b1f;
-}
-
-.gift-count {
-    position: absolute;
-
-    top: 9px;
-    right: 9px;
-
-    z-index: 10;
-
-    min-width: 30px;
-
-    padding: 5px 7px;
-
-    border-radius: 10px;
-
-    background:
-        rgba(120,17,30,.9);
-
-    border:
-        1px solid
-        rgba(255,100,100,.18);
-
-    color: #fff;
-
-    font-size: 11px;
-    font-weight: 700;
-}
-
-
-/* =================================
-   ИНВЕНТАРЬ
-================================= */
-
-.inventory-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.inventory-card {
-    background:
-        linear-gradient(
-            145deg,
-            #241010,
-            #160808
-        );
-
-    border: 1px solid #3b1515;
-
-    border-radius: 18px;
-
-    padding: 14px;
-
-    contain:
-        layout
-        paint;
-
-    transform:
-        translateZ(0);
-}
-
-.inventory-top {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.inventory-emoji {
-    width: 58px;
-    height: 58px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 40px;
-
-    border-radius: 16px;
-
-    background:
-        radial-gradient(
-            circle,
-            rgba(255,70,70,.12),
-            transparent 70%
-        );
-
-    will-change:
-        transform;
-
-    contain:
-        layout
-        paint;
-
-    transform:
-        translateZ(0);
-}
-
-.inventory-emoji.gift-animation-bounce {
-    animation:
-        normalGiftOptimized
-        2.4s
-        ease-in-out
-        infinite;
-}
-
-.inventory-emoji.gift-animation-heart {
-    animation:
-        heartGiftOptimized
-        1.5s
-        ease-in-out
-        infinite;
-}
-
-.inventory-emoji.gift-animation-shine {
-    animation:
-        diamondGiftOptimized
-        2.2s
-        ease-in-out
-        infinite;
-}
-
-.inventory-emoji.gift-animation-rocket {
-    animation:
-        rocketGiftOptimized
-        1.7s
-        ease-in-out
-        infinite;
-}
-
-.inventory-emoji.gift-animation-magic {
-    animation:
-        magicGiftOptimized
-        1.9s
-        ease-in-out
-        infinite;
-}
-
-.inventory-paused .inventory-emoji {
-    animation-play-state:
-        paused !important;
-}
-
-.inventory-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.inventory-name {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.inventory-count {
-    color: #aaa;
-    font-size: 13px;
-    margin-top: 5px;
-}
-
-.inventory-income {
-    color: #72ff72;
-    font-size: 13px;
-    margin-top: 4px;
-}
-
-.inventory-purchases {
-    margin-top: 12px;
-
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.purchase-row {
-    background: #180808;
-
-    border-radius: 12px;
-
-    padding: 9px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 8px;
-
-    font-size: 12px;
-}
-
-.purchase-time {
-    color: #999;
-}
-
-.sell-button {
-    background: #5d1111;
-
-    padding: 8px 10px;
-
-    font-size: 12px;
-
-    white-space: nowrap;
-}
-
-.sell-button.ready {
-    background: #8f1717;
-}
-
-
-/* =================================
-   АУКЦИОН
-================================= */
-
-.auction-placeholder {
-    text-align: center;
-    padding: 30px 10px;
-}
-
-
-/* =================================
-   АДМИН
-================================= */
-
-.admin-button {
-   .admin-category {
-    margin-top: 14px;
-    padding: 14px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #260909,
-            #120505
-        );
-
-    border: 1px solid #651818;
-
-    border-radius: 18px;
-
-    box-shadow:
-        0 8px 25px
-        rgba(0,0,0,.25);
-}
-
-.admin-category-title {
-    font-size: 17px;
-    font-weight: bold;
-
-    margin-bottom: 4px;
-}
-
-.admin-category-description {
-    color: #999;
-
-    font-size: 12px;
-
-    margin-bottom: 10px;
-}
-
-.admin-category .admin-button {
-    margin-top: 0;
-}
-
-.admin-card {
-    background:
-        linear-gradient(
-            145deg,
-            #2a0b0b,
-            #130505
-        );
-
-    border: 1px solid #651818;
-
-    border-radius: 20px;
-
-    padding: 18px;
-
-    margin-bottom: 15px;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.3);
-}
-
-.admin-card h2 {
-    margin-top: 0;
-}
-
-.admin-card p {
-    color: #aaa;
-    line-height: 1.5;
-}
-
-.admin-button-action {
-    width: 100%;
-
-    margin-top: 10px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #8f1717,
-            #5d0d0d
-        );
-}
-
-.admin-back {
-    width: 100%;
-
-    margin-bottom: 14px;
-
-    background: #321010;
-}
-
-
-/* =================================
-   МОДАЛКА АДМИНА
-================================= */
-
-.admin-login-modal {
-    position: fixed;
-
-    inset: 0;
-
-    background:
-        rgba(5,1,1,.88);
-
-    z-index: 3000;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 20px;
-}
-
-.admin-login-modal.show {
-    display: flex;
-}
-
-.admin-login-box {
-    width: 100%;
-
-    max-width: 360px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #2a0b0b,
-            #130505
-        );
-
-    border: 1px solid #651818;
-
-    border-radius: 22px;
-
-    padding: 22px;
-
-    box-shadow:
-        0 20px 60px
-        rgba(0,0,0,.7);
-}
-
-.admin-login-box h2 {
-    margin-top: 0;
-
-    text-align: center;
-}
-
-.admin-login-box p {
-    color: #999;
-
-    text-align: center;
-
-    font-size: 14px;
-}
-
-.admin-password {
-    width: 100%;
-
-    padding: 14px;
-
-    margin: 12px 0;
-
-    background: #120606;
-
-    border: 1px solid #4d1616;
-
-    border-radius: 12px;
-
-    color: white;
-
-    font-size: 16px;
-
-    outline: none;
-}
-
-.admin-password:focus {
-    border-color: #a52a2a;
-}
-
-.admin-login-actions {
-    display: flex;
-
-    gap: 8px;
-}
-
-.admin-login-actions button {
-    flex: 1;
-}
-
-.admin-cancel {
-    background: #321010;
-}
-
-
-/* =================================
-   НАВИГАЦИЯ
-================================= */
-
-.nav {
-    position: fixed;
-
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    height: 78px;
-
-    background:
-        rgba(24,7,7,.97);
-
-    border-top:
-        1px solid #351515;
-
-    display: flex;
-
-    justify-content: space-around;
-
-    align-items: center;
-
-    z-index: 100;
-
-    backdrop-filter:
-        blur(12px);
-}
-
-.nav button {
-    background: transparent;
-
-    color: #777;
-
-    padding: 8px 12px;
-
-    font-size: 12px;
-
-    min-width: 70px;
-}
-
-.nav button.active {
-    color: white;
-}
-
-
-/* =================================
-   РУЛЕТКА МОДАЛКА
-================================= */
-
-.roulette-lock {
-    position: fixed;
-
-    inset: 0;
-
-    background:
-        rgba(8,1,1,.96);
-
-    z-index: 1000;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 20px;
-}
-
-.roulette-lock.show {
-    display: flex;
-}
-
-.roulette-modal {
-    width: 100%;
-
-    max-width: 430px;
-
-    background: #170707;
-
-    border: 1px solid #561515;
-
-    border-radius: 24px;
-
-    padding: 22px;
-
-    box-shadow:
-        0 20px 60px
-        rgba(0,0,0,.7);
-}
-
-.roulette-modal h2 {
-    text-align: center;
-    margin-top: 0;
-}
-
-.roulette-modal-text {
-    text-align: center;
-
-    color: #999;
-
-    font-size: 14px;
-
-    margin-bottom: 15px;
-}
-
-.roulette-result {
-    text-align: center;
-
-    color: #ff8585;
-
-    font-size: 14px;
-
-    min-height: 20px;
-
-    margin-bottom: 10px;
-}
-
-
-/* =================================
-   МОДАЛКА ПОКУПКИ
-================================= */
-
-.buy-modal {
-    position: fixed;
-    inset: 0;
-
-    background: rgba(5,1,1,.82);
-
-    z-index: 1500;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 20px;
-}
-
-.buy-modal.show {
-    display: flex;
-}
-
-.buy-modal-box {
-    width: 100%;
-    max-width: 360px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #2a0b0b,
-            #130505
-        );
-
-    border: 1px solid #551717;
-
-    border-radius: 22px;
-
-    padding: 22px;
-
-    text-align: center;
-
-    box-shadow:
-        0 20px 60px
-        rgba(0,0,0,.7);
-}
-
-.buy-modal-gift {
-    font-size: 60px;
-    margin-bottom: 8px;
-}
-
-.buy-modal-title {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-.buy-modal-price {
-    color: #ffd84d;
-    font-size: 15px;
-    margin-bottom: 20px;
-}
-
-.buy-quantity {
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 18px;
-
-    margin: 18px 0;
-}
-
-.quantity-button {
-    width: 46px;
-    height: 46px;
-
-    padding: 0;
-
-    font-size: 24px;
-
-    background: #541111;
-
-    border: 1px solid #751919;
-}
-
-.quantity-value {
-    min-width: 45px;
-
-    font-size: 25px;
-    font-weight: bold;
-}
-
-.buy-total {
-    color: #aaa;
-
-    font-size: 14px;
-
-    margin-bottom: 16px;
-}
-
-.buy-total strong {
-    color: #ffd84d;
-
-    font-size: 18px;
-}
-
-.buy-modal-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.buy-modal-actions button {
-    flex: 1;
-}
-
-.buy-cancel {
-    background: #3a1717;
-}
-
-
-/* =================================
-   TOAST
-================================= */
-
-.toast {
-    position: fixed;
-
-    bottom: 95px;
-
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    background: #271010;
-
-    border: 1px solid #5c1a1a;
-
-    padding: 12px 18px;
-
-    border-radius: 12px;
-
-    display: none;
-
-    z-index: 4000;
-
-    white-space: nowrap;
-
-    max-width:
-        calc(100vw - 30px);
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-}
-
-
-/* =================================
-   МОБИЛЬНЫЕ
-================================= */
-
-@media (max-width: 360px) {
-
-    .shop-grid {
-        gap: 8px;
-    }
-
-    .gift-card {
-        padding-left: 8px;
-        padding-right: 8px;
-    }
-
-    .gift-visual {
-        width: 105px;
-        height: 105px;
-    }
-
-    .gift-emoji {
-        font-size: 60px;
-    }
-
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+margin:0;padding:0 0 90px;
+background:radial-gradient(circle at top,#210909 0%,#100606 42%,#080303 100%);
+color:#fff;font-family:Arial,Helvetica,sans-serif;min-height:100vh;overflow-x:hidden
+}
+button{
+border:0;outline:none;border-radius:14px;padding:13px 18px;background:#8f1717;
+color:#fff;font-weight:bold;font-size:15px;cursor:pointer;
+transition:transform .15s ease,filter .15s ease,opacity .15s ease
+}
+button:active{transform:scale(.96)}
+button:hover{filter:brightness(1.08)}
+button:disabled{opacity:.5;cursor:default}
+
+.loading{
+min-height:100vh;display:flex;align-items:center;justify-content:center;
+text-align:center;color:#aaa;padding:20px
+}
+.error{
+background:#350b0b;border:1px solid #761717;padding:18px;border-radius:16px;
+max-width:400px;line-height:1.5
+}
+
+/* ПРОФИЛЬ */
+.top{padding:20px 18px;display:flex;align-items:center;gap:12px}
+.name{font-size:20px;font-weight:bold}
+.username{color:#999;font-size:14px;margin-top:4px}
+
+/* СТРАНИЦЫ */
+.page{display:none;padding:0 16px;animation:pageAppear .2s ease}
+.page.active{display:block}
+@keyframes pageAppear{
+from{opacity:0;transform:translateY(4px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+/* БАЛАНС */
+.balance-card{
+background:radial-gradient(circle at 50% 0%,rgba(255,70,70,.20),transparent 55%),
+linear-gradient(135deg,#7d1111,#3b0808);
+border-radius:24px;padding:28px 20px;text-align:center;margin-bottom:15px;
+box-shadow:0 10px 30px rgba(0,0,0,.3)
+}
+.balance{font-size:44px;font-weight:bold;margin:10px 0}
+.income{color:#72ff72}
+
+/* КАРТОЧКИ */
+.card{
+background:linear-gradient(145deg,rgba(35,13,13,.98),rgba(21,7,7,.98));
+border:1px solid #351515;border-radius:18px;padding:18px;margin-bottom:14px;
+box-shadow:0 8px 25px rgba(0,0,0,.18)
+}
+.card h2,.card h3{margin-top:0}
+.card p{color:#aaa;line-height:1.5}
+
+/* ЭКОНОМИКА */
+.economy-card{
+background:linear-gradient(145deg,#260909,#140505);border:1px solid #4d1616;
+border-radius:22px;padding:20px;margin-bottom:15px;overflow:hidden
+}
+.economy-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.economy-title{font-size:20px;font-weight:bold}
+.multiplier-active,.multiplier-none{
+padding:7px 10px;border-radius:10px;font-weight:bold;font-size:13px
+}
+.multiplier-active{background:#163516;color:#72ff72}
+.multiplier-none{background:#321010;color:#ff7777}
+.current-multiplier{text-align:center;font-size:48px;font-weight:bold;margin:12px 0 4px}
+.multiplier-time{text-align:center;color:#aaa;font-size:14px;min-height:20px;margin-bottom:15px}
+.roulette-spin-button{width:100%;font-size:17px;padding:15px}
+.claim-button{
+width:100%;background:linear-gradient(135deg,#a91c1c,#681010);
+font-size:17px;padding:15px;display:none
+}
+.claim-button.show{display:block}
+
+/* РУЛЕТКА */
+.roulette-window{
+position:relative;height:92px;margin:18px 0;overflow:hidden;border-radius:18px;
+background:#0d0404;border:1px solid #421313
+}
+.roulette-window:before{
+content:"";position:absolute;left:50%;top:0;bottom:0;width:3px;
+transform:translateX(-50%);background:#ff4545;
+box-shadow:0 0 14px rgba(255,50,50,.8);z-index:5
+}
+.roulette-track{height:100%;display:flex;align-items:center;gap:10px;transform:translateX(0);will-change:transform}
+.roulette-item{
+flex:0 0 76px;height:60px;display:flex;align-items:center;justify-content:center;
+border-radius:14px;background:#281010;border:1px solid #4a1717;color:#aaa;
+font-size:17px;font-weight:bold
+}
+.roulette-item.selected{background:#791414;color:#fff;border-color:#ff4444}
+
+/* ПОДАРКИ */
+.shop-tabs{display:flex;gap:8px;margin-bottom:14px}
+.shop-tab{
+flex:1;background:#241010;border:1px solid #3b1515;color:#888;padding:11px 8px
+}
+.shop-tab.active{background:#761414;border-color:#a52626;color:#fff}
+.shop-info{
+background:#241010;border:1px solid #3b1515;border-radius:16px;padding:13px;
+margin-bottom:14px;color:#aaa;font-size:13px;line-height:1.5
+}
+.shop-info b{color:white}
+.refresh-shop{width:100%;background:#321010;margin-bottom:12px}
+.shop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+
+.gift-card{
+position:relative;overflow:hidden;min-height:285px;padding:14px 12px 12px;
+background:radial-gradient(circle at 50% 20%,rgba(255,60,60,.10),transparent 45%),
+linear-gradient(145deg,#2a1114,#17090b 70%,#100607);
+border:1px solid rgba(255,92,92,.20);border-radius:22px;text-align:center;
+box-shadow:0 8px 22px rgba(0,0,0,.30);contain:layout paint;transform:translateZ(0)
+}
+.gift-card:active{transform:translateZ(0) scale(.97)}
+.gift-visual{
+position:relative;width:125px;height:125px;margin:3px auto 10px;display:flex;
+align-items:center;justify-content:center;border-radius:38px;
+background:radial-gradient(circle,rgba(255,70,70,.16),transparent 72%);
+overflow:visible;isolation:isolate;contain:layout paint;transform:translateZ(0)
+}
+.gift-visual:before{
+content:"";position:absolute;left:50%;top:50%;width:88px;height:88px;
+transform:translate3d(-50%,-50%,0) scale(.8);border-radius:50%;
+background:radial-gradient(circle,rgba(255,70,70,.34),transparent 70%);
+opacity:.45;animation:giftAuraOptimized 2.6s ease-in-out infinite;
+will-change:transform,opacity;z-index:-1
+}
+.gift-visual:after{
+content:"";position:absolute;left:50%;top:50%;width:72px;height:72px;border-radius:50%;
+border:1px solid rgba(255,90,90,.12);
+transform:translate3d(-50%,-50%,0) scale(.65);opacity:.5;
+animation:giftRingOptimized 3.4s ease-out infinite;
+will-change:transform,opacity;pointer-events:none
+}
+.gift-emoji{
+position:relative;z-index:5;width:100%;height:100%;display:flex;align-items:center;
+justify-content:center;font-size:72px;line-height:1;user-select:none;
+transform-origin:center;will-change:transform;contain:layout paint;transform:translateZ(0)
+}
+.gift-spark{
+position:absolute;z-index:8;pointer-events:none;color:#fff;font-weight:bold;
+text-shadow:0 0 5px rgba(255,255,255,.8);
+animation:sparkOptimized 2.2s ease-in-out infinite;will-change:transform,opacity
+}
+.gift-spark-1{top:9px;left:12px;font-size:17px}
+.gift-spark-2{top:18px;right:10px;font-size:10px;animation-delay:.5s}
+.gift-spark-3{left:9px;bottom:17px;font-size:9px;animation-delay:1s}
+.gift-spark-4{right:14px;bottom:11px;font-size:14px;animation-delay:1.5s}
+
+.gift-animation-bounce .gift-emoji{animation:normalGiftOptimized 2.4s ease-in-out infinite}
+.gift-animation-heart .gift-emoji{animation:heartGiftOptimized 1.5s ease-in-out infinite}
+.gift-animation-shine .gift-emoji{animation:diamondGiftOptimized 2.2s ease-in-out infinite}
+.gift-animation-rocket .gift-emoji{animation:rocketGiftOptimized 1.7s ease-in-out infinite}
+.gift-animation-magic .gift-emoji{animation:magicGiftOptimized 1.9s ease-in-out infinite}
+
+@keyframes giftAuraOptimized{
+0%,100%{transform:translate3d(-50%,-50%,0) scale(.78);opacity:.25}
+50%{transform:translate3d(-50%,-50%,0) scale(1.12);opacity:.65}
+}
+@keyframes giftRingOptimized{
+0%{transform:translate3d(-50%,-50%,0) scale(.6);opacity:.45}
+75%{transform:translate3d(-50%,-50%,0) scale(1.35);opacity:0}
+100%{opacity:0}
+}
+@keyframes sparkOptimized{
+0%,100%{opacity:.15;transform:translate3d(0,5px,0) scale(.7) rotate(0deg)}
+50%{opacity:.9;transform:translate3d(0,-7px,0) scale(1.08) rotate(35deg)}
+}
+@keyframes normalGiftOptimized{
+0%,100%{transform:translate3d(0,0,0) rotate(-2deg) scale(1)}
+50%{transform:translate3d(0,-7px,0) rotate(2deg) scale(1.06)}
+}
+@keyframes heartGiftOptimized{
+0%,100%{transform:translate3d(0,0,0) scale(1) rotate(-4deg)}
+25%{transform:translate3d(0,-3px,0) scale(1.1) rotate(4deg)}
+50%{transform:translate3d(0,-5px,0) scale(.97) rotate(-3deg)}
+75%{transform:translate3d(0,-3px,0) scale(1.08) rotate(3deg)}
+}
+@keyframes diamondGiftOptimized{
+0%,100%{transform:translate3d(0,2px,0) rotate(-5deg) scale(1)}
+50%{transform:translate3d(0,-9px,0) rotate(5deg) scale(1.09)}
+}
+@keyframes rocketGiftOptimized{
+0%,100%{transform:translate3d(0,6px,0) rotate(-5deg) scale(1)}
+45%{transform:translate3d(0,-14px,0) rotate(5deg) scale(1.08)}
+70%{transform:translate3d(0,-7px,0) rotate(1deg) scale(1.04)}
+}
+@keyframes magicGiftOptimized{
+0%,100%{transform:translate3d(0,2px,0) rotate(-4deg) scale(1)}
+50%{transform:translate3d(0,-9px,0) rotate(5deg) scale(1.1)}
+}
+.gift-paused *,.gift-paused:before,.gift-paused:after{animation-play-state:paused!important}
+.gift-name{
+position:relative;z-index:2;font-size:15px;font-weight:700;min-height:38px;
+display:flex;align-items:center;justify-content:center;color:#fff;padding:0 3px
+}
+.gift-income{
+position:relative;z-index:2;display:inline-block;color:#78ff9b;font-size:12px;
+font-weight:600;margin:5px 0 7px;padding:4px 8px;border-radius:8px;
+background:rgba(70,255,120,.07)
+}
+.gift-price{position:relative;z-index:2;color:#ffd84d;font-size:16px;font-weight:800;margin-bottom:9px}
+.gift-buy{
+position:relative;z-index:2;width:100%;padding:10px 7px;border-radius:12px;
+font-size:13px;background:linear-gradient(135deg,#a91f2b,#74111a)
+}
+.gift-buy:disabled{background:#321519;color:#777;border-color:#3b1b1f}
+.gift-count{
+position:absolute;top:9px;right:9px;z-index:10;min-width:30px;padding:5px 7px;
+border-radius:10px;background:rgba(120,17,30,.9);
+border:1px solid rgba(255,100,100,.18);color:#fff;font-size:11px;font-weight:700
+}
+
+/* ИНВЕНТАРЬ */
+.inventory-list{display:flex;flex-direction:column;gap:10px}
+.inventory-card{
+background:linear-gradient(145deg,#241010,#160808);border:1px solid #3b1515;
+border-radius:18px;padding:14px;contain:layout paint;transform:translateZ(0)
+}
+.inventory-top{display:flex;align-items:center;gap:12px}
+.inventory-emoji{
+width:58px;height:58px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+font-size:40px;border-radius:16px;background:radial-gradient(circle,rgba(255,70,70,.12),transparent 70%);
+will-change:transform;contain:layout paint;transform:translateZ(0)
+}
+.inventory-emoji.gift-animation-bounce{animation:normalGiftOptimized 2.4s ease-in-out infinite}
+.inventory-emoji.gift-animation-heart{animation:heartGiftOptimized 1.5s ease-in-out infinite}
+.inventory-emoji.gift-animation-shine{animation:diamondGiftOptimized 2.2s ease-in-out infinite}
+.inventory-emoji.gift-animation-rocket{animation:rocketGiftOptimized 1.7s ease-in-out infinite}
+.inventory-emoji.gift-animation-magic{animation:magicGiftOptimized 1.9s ease-in-out infinite}
+.inventory-paused .inventory-emoji{animation-play-state:paused!important}
+.inventory-info{flex:1;min-width:0}
+.inventory-name{font-weight:bold;font-size:16px}
+.inventory-count{color:#aaa;font-size:13px;margin-top:5px}
+.inventory-income{color:#72ff72;font-size:13px;margin-top:4px}
+.inventory-purchases{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.purchase-row{
+background:#180808;border-radius:12px;padding:9px;display:flex;align-items:center;
+justify-content:space-between;gap:8px;font-size:12px
+}
+.purchase-time{color:#999}
+.sell-button{background:#5d1111;padding:8px 10px;font-size:12px;white-space:nowrap}
+.sell-button.ready{background:#8f1717}
+
+/* АУКЦИОН */
+.auction-placeholder{text-align:center;padding:30px 10px}
+
+/* АДМИН */
+.admin-category{
+margin-top:14px;padding:14px;background:linear-gradient(145deg,#260909,#120505);
+border:1px solid #651818;border-radius:18px;box-shadow:0 8px 25px rgba(0,0,0,.25)
+}
+.admin-category-title{font-size:17px;font-weight:bold;margin-bottom:4px}
+.admin-category-description{color:#999;font-size:12px;margin-bottom:10px}
+.admin-button{
+display:block;width:100%;margin-top:0;padding:10px 14px;
+background:linear-gradient(135deg,#8f1717,#571010);
+border:1px solid #a52a2a;border-radius:10px;color:#fff;font-size:13px
+}
+.admin-card{
+background:linear-gradient(145deg,#2a0b0b,#130505);border:1px solid #651818;
+border-radius:20px;padding:18px;margin-bottom:15px;box-shadow:0 10px 30px rgba(0,0,0,.3)
+}
+.admin-card h2{margin-top:0}
+.admin-card p{color:#aaa;line-height:1.5}
+.admin-button-action{
+width:100%;margin-top:10px;background:linear-gradient(135deg,#8f1717,#5d0d0d)
+}
+.admin-back{width:100%;margin-bottom:14px;background:#321010}
+
+/* АДМИН МОДАЛКА */
+.admin-login-modal{
+position:fixed;inset:0;background:rgba(5,1,1,.88);z-index:3000;display:none;
+align-items:center;justify-content:center;padding:20px
+}
+.admin-login-modal.show{display:flex}
+.admin-login-box{
+width:100%;max-width:360px;background:linear-gradient(145deg,#2a0b0b,#130505);
+border:1px solid #651818;border-radius:22px;padding:22px;
+box-shadow:0 20px 60px rgba(0,0,0,.7)
+}
+.admin-login-box h2{margin-top:0;text-align:center}
+.admin-login-box p{color:#999;text-align:center;font-size:14px}
+.admin-password{
+width:100%;padding:14px;margin:12px 0;background:#120606;border:1px solid #4d1616;
+border-radius:12px;color:#fff;font-size:16px;outline:none
+}
+.admin-password:focus{border-color:#a52a2a}
+.admin-login-actions{display:flex;gap:8px}
+.admin-login-actions button{flex:1}
+.admin-cancel{background:#321010}
+
+/* НАВИГАЦИЯ */
+.nav{
+position:fixed;bottom:0;left:0;right:0;height:78px;background:rgba(24,7,7,.97);
+border-top:1px solid #351515;display:flex;justify-content:space-around;
+align-items:center;z-index:100;backdrop-filter:blur(12px)
+}
+.nav button{background:transparent;color:#777;padding:8px 12px;font-size:12px;min-width:70px}
+.nav button.active{color:#fff}
+
+/* РУЛЕТКА МОДАЛКА */
+.roulette-lock{
+position:fixed;inset:0;background:rgba(8,1,1,.96);z-index:1000;display:none;
+align-items:center;justify-content:center;padding:20px
+}
+.roulette-lock.show{display:flex}
+.roulette-modal{
+width:100%;max-width:430px;background:#170707;border:1px solid #561515;
+border-radius:24px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.7)
+}
+.roulette-modal h2{text-align:center;margin-top:0}
+.roulette-modal-text{text-align:center;color:#999;font-size:14px;margin-bottom:15px}
+.roulette-result{text-align:center;color:#ff8585;font-size:14px;min-height:20px;margin-bottom:10px}
+
+/* ПОКУПКА */
+.buy-modal{
+position:fixed;inset:0;background:rgba(5,1,1,.82);z-index:1500;display:none;
+align-items:center;justify-content:center;padding:20px
+}
+.buy-modal.show{display:flex}
+.buy-modal-box{
+width:100%;max-width:360px;background:linear-gradient(145deg,#2a0b0b,#130505);
+border:1px solid #551717;border-radius:22px;padding:22px;text-align:center;
+box-shadow:0 20px 60px rgba(0,0,0,.7)
+}
+.buy-modal-gift{font-size:60px;margin-bottom:8px}
+.buy-modal-title{font-size:20px;font-weight:bold;margin-bottom:6px}
+.buy-modal-price{color:#ffd84d;font-size:15px;margin-bottom:20px}
+.buy-quantity{display:flex;align-items:center;justify-content:center;gap:18px;margin:18px 0}
+.quantity-button{width:46px;height:46px;padding:0;font-size:24px;background:#541111;border:1px solid #751919}
+.quantity-value{min-width:45px;font-size:25px;font-weight:bold}
+.buy-total{color:#aaa;font-size:14px;margin-bottom:16px}
+.buy-total strong{color:#ffd84d;font-size:18px}
+.buy-modal-actions{display:flex;gap:8px}
+.buy-modal-actions button{flex:1}
+.buy-cancel{background:#3a1717}
+
+/* TOAST */
+.toast{
+position:fixed;bottom:95px;left:50%;transform:translateX(-50%);background:#271010;
+border:1px solid #5c1a1a;padding:12px 18px;border-radius:12px;display:none;
+z-index:4000;white-space:nowrap;max-width:calc(100vw - 30px);overflow:hidden;text-overflow:ellipsis
+}
+
+@media(max-width:360px){
+.shop-grid{gap:8px}
+.gift-card{padding-left:8px;padding-right:8px}
+.gift-visual{width:105px;height:105px}
+.gift-emoji{font-size:60px}
+}
+@media(prefers-reduced-motion:reduce){
+*,*::before,*::after{
+animation-duration:.01ms!important;animation-iteration-count:1!important;
+scroll-behavior:auto!important;transition-duration:.01ms!important
 }
-
-
-/* =================================
-   ОТКЛЮЧЕНА АНИМАЦИЯ
-================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: .01ms !important;
-
-        animation-iteration-count:
-            1 !important;
-
-        scroll-behavior: auto !important;
-
-        transition-duration:
-            .01ms !important;
-    }
-
 }
-
 </style>
-
 </head>
 
 <body>
 
+<div id="loading" class="loading">Загрузка RaneGame...</div>
 
-<div
-    id="loading"
-    class="loading">
-
-    Загрузка RaneGame...
-
-</div>
-
-
-<div
-    id="game"
-    style="display:none;">
-
+<div id="game" style="display:none;">
 
 <div class="top">
+<div>
+<div class="name" id="username">Игрок</div>
+<div class="username" id="tgusername">@Telegram</div>
 
-    <div>
-
-        <div
-            class="name"
-            id="username">
-
-            Игрок
-
-        </div>
-
-        <div
-            class="username"
-            id="tgusername">
-
-            @Telegram
-
-        </div>
-
-      <div
-    id="adminCategory"
-    class="admin-category"
-    style="display:none;">
-
-    <div class="admin-category-title">
-        ⚙️ Админ Панель
-    </div>
-
-    <div class="admin-category-description">
-        Управление твоим аккаунтом
-    </div>
-
-    <button
-        id="adminButton"
-        class="admin-button"
-        type="button"
-        onclick="openAdminLogin()">
-
-        🔐 Открыть админ панель
-
-    </button>
-
-</div>
-    </div>
-
+<div id="adminCategory" class="admin-category" style="display:none;">
+<div class="admin-category-title">⚙️ Админ Панель</div>
+<div class="admin-category-description">Управление твоим аккаунтом</div>
+<button id="adminButton" class="admin-button" type="button" onclick="openAdminLogin()">🔐 Открыть админ панель</button>
 </div>
 
+</div>
+</div>
 
-<section
-    id="home"
-    class="page active">
-
+<section id="home" class="page active">
 
 <div class="balance-card">
-
-    <div class="balance">
-
-        ⭐
-        <span id="balance">
-            0
-        </span>
-
-    </div>
-
-    <div>
-
-        <span class="income">
-
-            +
-            <span id="income">
-                0
-            </span>
-
-            в час
-
-        </span>
-
-    </div>
-
+<div class="balance">⭐ <span id="balance">0</span></div>
+<div><span class="income">+ <span id="income">0</span> в час</span></div>
 </div>
-
 
 <div class="economy-card">
-
-    <div class="economy-header">
-
-        <div class="economy-title">
-            Крутим
-        </div>
-
-        <div
-            id="economyStatus"
-            class="multiplier-none">
-
-            Не активна
-
-        </div>
-
-    </div>
-
-    <div
-        class="current-multiplier"
-        id="currentMultiplier">
-
-        x1.0
-
-    </div>
-
-    <div
-        class="multiplier-time"
-        id="multiplierTime">
-
-        Крути рулетку
-
-    </div>
-
-    <button
-        id="openRouletteButton"
-        class="roulette-spin-button"
-        onclick="openRoulette()">
-
-        🎰 Крутить
-
-    </button>
-
+<div class="economy-header">
+<div class="economy-title">Крутим</div>
+<div id="economyStatus" class="multiplier-none">Не активна</div>
 </div>
 
+<div class="current-multiplier" id="currentMultiplier">x1.0</div>
+<div class="multiplier-time" id="multiplierTime">Крути рулетку</div>
+
+<button id="openRouletteButton" class="roulette-spin-button" onclick="openRoulette()">🎰 Крутить</button>
+</div>
 
 <div class="card">
+<h3>🔗 Твоя ссылка</h3>
 
-    <h3>
-        🔗 Твоя ссылка
-    </h3>
-
-    <div
-        style="
-            font-size:12px;
-            color:#888;
-            word-break:break-all;
-            margin:10px 0;
-        ">
-
-        https://t.me/RaneGameBot?start=ref_<span
-            id="refId">
-        </span>
-
-    </div>
-
-    <button
-        onclick="inviteFriend()">
-
-        Позови друга
-
-    </button>
-
-    <button
-        onclick="copyInviteLink()"
-        style="
-            background:#555;
-            margin-top:8px;
-        ">
-
-        Копировать
-
-    </button>
-
+<div style="font-size:12px;color:#888;word-break:break-all;margin:10px 0;">
+https://t.me/RaneGameBot?start=ref_<span id="refId"></span>
 </div>
 
+<button onclick="inviteFriend()">Позови друга</button>
+<button onclick="copyInviteLink()" style="background:#555;margin-top:8px;">Копировать</button>
+</div>
 
 <div class="card">
-
-    <h3>
-        🔥 Еженедельный бонус
-    </h3>
-
-    <p>
-        Забери еженедельную награду.
-    </p>
-
-    <button
-        id="bonusButton"
-        onclick="collect()">
-
-        Забрать +1000 ⭐
-
-    </button>
-
+<h3>🔥 Еженедельный бонус</h3>
+<p>Забери еженедельную награду.</p>
+<button id="bonusButton" onclick="collect()">Забрать +1000 ⭐</button>
 </div>
-
 
 <div class="card">
+<h2>🎁 Подарки</h2>
 
-    <h2>
-        🎁 Подарки
-    </h2>
-
-    <div class="shop-tabs">
-
-        <button
-            id="shopTab"
-            class="shop-tab active"
-            onclick="showShopTab('shop')">
-
-            🛒 Магазин
-
-        </button>
-
-        <button
-            id="inventoryTab"
-            class="shop-tab"
-            onclick="showShopTab('inventory')">
-
-            🎒 Инвентарь
-
-        </button>
-
-    </div>
-
-
-    <div id="giftShop">
-
-        <div class="shop-info">
-
-            🔄 Ассортимент обновляется
-            <b>раз в 3 часа</b>.<br>
-
-            🎁 Каждый подарок даёт
-            <b>+1 ⭐/час</b>.<br>
-
-            📦 Одного вида можно купить
-            максимум <b>5 раз</b>.
-
-        </div>
-
-        <button
-            class="refresh-shop"
-            onclick="loadGiftShop(true)">
-
-            🔄 Обновить магазин
-
-        </button>
-
-        <div
-            id="shopGrid"
-            class="shop-grid">
-
-            <div
-                class="empty-inventory"
-                style="grid-column:1/-1;">
-
-                Загрузка подарков...
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div
-        id="giftInventory"
-        style="display:none;">
-
-        <div class="shop-info">
-
-            💰 Подарок можно продать за его
-            <b>полную цену</b>.<br>
-
-            ⏳ После покупки должно пройти
-            <b>5 часов</b>.<br>
-
-            ⭐ Доход от подарка:
-            <b>+1 ⭐/час</b>.
-
-        </div>
-
-        <div
-            id="inventoryList"
-            class="inventory-list">
-
-            <div class="empty-inventory">
-
-                Загрузка инвентаря...
-
-            </div>
-
-        </div>
-
-    </div>
-
+<div class="shop-tabs">
+<button id="shopTab" class="shop-tab active" onclick="showShopTab('shop')">🛒 Магазин</button>
+<button id="inventoryTab" class="shop-tab" onclick="showShopTab('inventory')">🎒 Инвентарь</button>
 </div>
 
+<div id="giftShop">
+<div class="shop-info">
+🔄 Ассортимент обновляется <b>раз в 3 часа</b>.<br>
+🎁 Каждый подарок даёт <b>+1 ⭐/час</b>.<br>
+📦 Одного вида можно купить максимум <b>5 раз</b>.
+</div>
+
+<button class="refresh-shop" onclick="loadGiftShop(true)">🔄 Обновить магазин</button>
+
+<div id="shopGrid" class="shop-grid">
+<div class="empty-inventory" style="grid-column:1/-1;">Загрузка подарков...</div>
+</div>
+</div>
+
+<div id="giftInventory" style="display:none;">
+<div class="shop-info">
+💰 Подарок можно продать за его <b>полную цену</b>.<br>
+⏳ После покупки должно пройти <b>5 часов</b>.<br>
+⭐ Доход от подарка: <b>+1 ⭐/час</b>.
+</div>
+
+<div id="inventoryList" class="inventory-list">
+<div class="empty-inventory">Загрузка инвентаря...</div>
+</div>
+</div>
+
+</div>
 </section>
 
+<section id="admin" class="page">
+<button type="button" class="admin-back" onclick="closeAdminPanel()">← Назад в меню</button>
 
-<section
-    id="admin"
-    class="page">
+<div class="admin-card">
+<h2>⚙️ Админ Панель</h2>
+<p>Панель администратора.</p>
 
-    <button
-        type="button"
-        class="admin-back"
-        onclick="closeAdminPanel()">
-
-        ← Назад в меню
-
-    </button>
-
-    <div class="admin-card">
-
-        <h2>
-            ⚙️ Админ Панель
-        </h2>
-
-        <p>
-            Панель администратора.
-        </p>
-
-        <button
-            type="button"
-            class="admin-button-action"
-            onclick="resetMyAccount()">
-
-            🧹 Сбросить мой аккаунт
-
-        </button>
-
-    </div>
-
+<button type="button" class="admin-button-action" onclick="resetMyAccount()">
+🧹 Сбросить мой аккаунт
+</button>
+</div>
 </section>
 
+<section id="auction" class="page">
+<div class="card">
+<h2>🔨 Аукцион</h2>
 
-<section
-    id="auction"
-    class="page">
+<div class="auction-placeholder">
+<div style="font-size:55px;margin-bottom:15px;">🔨</div>
+<p>Здесь скоро появится аукцион.</p>
 
-    <div class="card">
-
-        <h2>
-            🔨 Аукцион
-        </h2>
-
-        <div class="auction-placeholder">
-
-            <div
-                style="
-                    font-size:55px;
-                    margin-bottom:15px;
-                ">
-
-                🔨
-
-            </div>
-
-            <p>
-                Здесь скоро появится аукцион.
-            </p>
-
-            <button
-                onclick="
-                    showToast(
-                        '🔨 Аукцион скоро будет доступен'
-                    )
-                ">
-
-                Открыть
-
-            </button>
-
-        </div>
-
-    </div>
-
+<button onclick="showToast('🔨 Аукцион скоро будет доступен')">
+Открыть
+</button>
+</div>
+</div>
 </section>
 
+<section id="top" class="page">
+<div class="card">
+<h2>🏆 Топ игроков</h2>
+<p>Таблица лидеров появится здесь.</p>
 
-<section
-    id="top"
-    class="page">
-
-    <div class="card">
-
-        <h2>
-            🏆 Топ игроков
-        </h2>
-
-        <p>
-            Таблица лидеров появится здесь.
-        </p>
-
-        <button
-            onclick="
-                showToast(
-                    '🏆 Топ скоро появится'
-                )
-            ">
-
-            Обновить
-
-        </button>
-
-    </div>
-
+<button onclick="showToast('🏆 Топ скоро появится')">
+Обновить
+</button>
+</div>
 </section>
-
 
 <div class="nav">
-
-    <button
-        class="active"
-        data-page="home">
-
-        🏠
-        <br>
-        Меню
-
-    </button>
-
-    <button
-        data-page="auction">
-
-        🔨
-        <br>
-        Аукцион
-
-    </button>
-
-    <button
-        data-page="top">
-
-        🏆
-        <br>
-        Топ
-
-    </button>
-
+<button class="active" data-page="home">🏠<br>Меню</button>
+<button data-page="auction">🔨<br>Аукцион</button>
+<button data-page="top">🏆<br>Топ</button>
 </div>
 
 </div>
 
+<!-- АДМИН LOGIN -->
+<div id="adminLoginModal" class="admin-login-modal">
+<div class="admin-login-box">
 
-<div
-    id="adminLoginModal"
-    class="admin-login-modal">
+<h2>⚙️ Админ</h2>
+<p>Введите пароль администратора</p>
 
-    <div class="admin-login-box">
+<input id="adminPassword" class="admin-password" type="password" placeholder="Пароль" autocomplete="off">
 
-        <h2>
-            ⚙️ Админ
-        </h2>
-
-        <p>
-            Введите пароль администратора
-        </p>
-
-        <input
-            id="adminPassword"
-            class="admin-password"
-            type="password"
-            placeholder="Пароль"
-            autocomplete="off">
-
-        <div class="admin-login-actions">
-
-            <button
-                type="button"
-                class="admin-cancel"
-                onclick="closeAdminLogin()">
-
-                Отмена
-
-            </button>
-
-            <button
-                type="button"
-                onclick="loginAdmin()">
-
-                🔓 Войти
-
-            </button>
-
-        </div>
-
-    </div>
-
+<div class="admin-login-actions">
+<button type="button" class="admin-cancel" onclick="closeAdminLogin()">Отмена</button>
+<button type="button" onclick="loginAdmin()">🔓 Войти</button>
 </div>
 
-
-<div
-    id="rouletteLock"
-    class="roulette-lock">
-
-    <div class="roulette-modal">
-
-        <h2>
-            🎰 Экономика
-        </h2>
-
-        <div class="roulette-modal-text">
-
-            Крути рулетку и получи множитель
-            на 4 часа.
-
-        </div>
-
-        <div class="roulette-window">
-
-            <div
-                id="rouletteTrack"
-                class="roulette-track">
-            </div>
-
-        </div>
-
-        <div
-            id="rouletteResult"
-            class="roulette-result">
-
-            Выбери свой множитель
-
-        </div>
-
-        <button
-            id="rouletteSpinButton"
-            class="roulette-spin-button"
-            onclick="spinRoulette()">
-
-            🎰 Крутить
-
-        </button>
-
-        <button
-            id="rouletteClaimButton"
-            class="claim-button"
-            onclick="claimRoulette()">
-
-            Забрать
-
-        </button>
-
-    </div>
-
+</div>
 </div>
 
+<!-- РУЛЕТКА -->
+<div id="rouletteLock" class="roulette-lock">
+<div class="roulette-modal">
 
-<div
-    id="buyModal"
-    class="buy-modal">
+<h2>🎰 Экономика</h2>
 
-    <div class="buy-modal-box">
-
-        <div
-            id="buyModalGift"
-            class="buy-modal-gift">
-
-            🎁
-
-        </div>
-
-        <div
-            id="buyModalTitle"
-            class="buy-modal-title">
-
-            Подарок
-
-        </div>
-
-        <div
-            id="buyModalPrice"
-            class="buy-modal-price">
-
-            0 ⭐ за 1 шт.
-
-        </div>
-
-        <div class="buy-quantity">
-
-            <button
-                type="button"
-                class="quantity-button"
-                onclick="changeBuyQuantity(-1)">
-
-                −
-
-            </button>
-
-            <div
-                id="buyQuantity"
-                class="quantity-value">
-
-                1
-
-            </div>
-
-            <button
-                type="button"
-                class="quantity-button"
-                onclick="changeBuyQuantity(1)">
-
-                +
-
-            </button>
-
-        </div>
-
-        <div class="buy-total">
-
-            Итого:
-            <strong id="buyTotal">
-                0 ⭐
-            </strong>
-
-        </div>
-
-        <div class="buy-modal-actions">
-
-            <button
-                type="button"
-                class="buy-cancel"
-                onclick="closeBuyModal()">
-
-                Отмена
-
-            </button>
-
-            <button
-                type="button"
-                onclick="confirmBuyGift()">
-
-                Купить
-
-            </button>
-
-        </div>
-
-    </div>
-
+<div class="roulette-modal-text">
+Крути рулетку и получи множитель на 4 часа.
 </div>
 
-
-<div
-    id="toast"
-    class="toast">
+<div class="roulette-window">
+<div id="rouletteTrack" class="roulette-track"></div>
 </div>
 
+<div id="rouletteResult" class="roulette-result">
+Выбери свой множитель
+</div>
+
+<button id="rouletteSpinButton" class="roulette-spin-button" onclick="spinRoulette()">
+🎰 Крутить
+</button>
+
+<button id="rouletteClaimButton" class="claim-button" onclick="claimRoulette()">
+Забрать
+</button>
+
+</div>
+</div>
+
+<!-- ПОКУПКА -->
+<div id="buyModal" class="buy-modal">
+<div class="buy-modal-box">
+
+<div id="buyModalGift" class="buy-modal-gift">🎁</div>
+<div id="buyModalTitle" class="buy-modal-title">Подарок</div>
+<div id="buyModalPrice" class="buy-modal-price">0 ⭐ за 1 шт.</div>
+
+<div class="buy-quantity">
+<button type="button" class="quantity-button" onclick="changeBuyQuantity(-1)">−</button>
+<div id="buyQuantity" class="quantity-value">1</div>
+<button type="button" class="quantity-button" onclick="changeBuyQuantity(1)">+</button>
+</div>
+
+<div class="buy-total">
+Итого: <strong id="buyTotal">0 ⭐</strong>
+</div>
+
+<div class="buy-modal-actions">
+<button type="button" class="buy-cancel" onclick="closeBuyModal()">Отмена</button>
+<button type="button" onclick="confirmBuyGift()">Купить</button>
+</div>
+
+</div>
+</div>
+
+<div id="toast" class="toast"></div>
 
 <script>
-
-/* =================================
+/* ================================
    API
-================================= */
+================================ */
 
-const API =
-    "https://ranegame.onrender.com";
+const API="https://ranegame.onrender.com";
 
-
-/* =================================
+/* ================================
    TELEGRAM
-================================= */
+================================ */
 
-const tg =
-    window.Telegram &&
-    window.Telegram.WebApp;
+const tg=window.Telegram&&window.Telegram.WebApp;
 
-if (tg) {
-
-    tg.ready();
-    tg.expand();
-
+if(tg){
+tg.ready();
+tg.expand();
 }
 
-
-/* =================================
+/* ================================
    СОСТОЯНИЕ
-================================= */
+================================ */
 
-let player = null;
+let player=null;
+let balance=0;
+let income=0;
+let economyMultiplier=1;
+let economyExpiresAt=null;
 
-let balance = 0;
+let rouletteResult=null;
+let rouletteIssuedAt=null;
+let rouletteSignature=null;
+let rouletteSpinning=false;
 
-let income = 0;
+let giftShop=[];
+let inventory=[];
+let giftObserver=null;
 
-let economyMultiplier = 1.0;
+let shopLoaded=false;
+let inventoryLoaded=false;
 
-let economyExpiresAt = null;
+let selectedBuyGift=null;
+let selectedBuyQuantity=1;
 
-let rouletteResult = null;
+let adminLoggedIn=false;
 
-let rouletteIssuedAt = null;
-
-let rouletteSignature = null;
-
-let rouletteSpinning = false;
-
-let giftShop = [];
-
-let inventory = [];
-
-let giftObserver = null;
-
-let shopLoaded = false;
-
-let inventoryLoaded = false;
-
-
-/* =================================
+/* ================================
    TELEGRAM USER
-================================= */
+================================ */
 
-function getTelegramUser() {
-
-    if (
-        !tg ||
-        !tg.initDataUnsafe ||
-        !tg.initDataUnsafe.user
-    ) {
-
-        throw new Error(
-            "Открой RaneGame через Telegram"
-        );
-
-    }
-
-    return tg.initDataUnsafe.user;
-
+function getTelegramUser(){
+if(!tg||!tg.initDataUnsafe||!tg.initDataUnsafe.user){
+throw new Error("Открой RaneGame через Telegram");
+}
+return tg.initDataUnsafe.user;
 }
 
-
-/* =================================
+/* ================================
    API REQUEST
-================================= */
+================================ */
 
-async function apiRequest(
-    endpoint,
-    body = {}
-) {
+async function apiRequest(endpoint,body={}){
+const tgUser=getTelegramUser();
 
-    const tgUser =
-        getTelegramUser();
+const safeUser={
+...tgUser,
+id:String(tgUser.id)
+};
 
-    /*
-     * ВАЖНО:
-     * ID берём напрямую из Telegram.
-     * player.telegram_id больше не может
-     * подменить настоящий Telegram ID.
-     */
+const response=await fetch(API+endpoint,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+...body,
+user:safeUser
+})
+});
 
-    const safeUser = {
-        ...tgUser,
-        id: String(tgUser.id)
-    };
+let data;
 
-    const response =
-        await fetch(
-            API + endpoint,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body: JSON.stringify({
-                    ...body,
-                    user: safeUser
-                })
-            }
-        );
-
-
-    let data;
-
-    try {
-
-        data =
-            await response.json();
-
-    } catch {
-
-        throw new Error(
-            "Сервер вернул неправильный ответ"
-        );
-
-    }
-
-
-    if (!data.ok) {
-
-        throw new Error(
-            data.error ||
-            "Ошибка сервера"
-        );
-
-    }
-
-
-    return data;
-
+try{
+data=await response.json();
+}catch{
+throw new Error("Сервер вернул неправильный ответ");
 }
 
+if(!data.ok){
+throw new Error(data.error||"Ошибка сервера");
+}
 
-/* =================================
+return data;
+}
+
+/* ================================
    ЗАГРУЗКА ИГРОКА
-================================= */
+================================ */
 
-async function loadPlayer() {
+async function loadPlayer(){
+try{
 
-    try {
+const data=await apiRequest("/api/player");
 
-        const data =
-            await apiRequest(
-                "/api/player"
-            );
+player=data.player;
 
-        player =
-            data.player;
+balance=Number(player.balance||0);
+income=Number(player.income||0);
+economyMultiplier=Number(player.economy_multiplier||1);
+economyExpiresAt=player.economy_expires_at||null;
 
-        balance =
-            Number(
-                player.balance || 0
-            );
+updateScreen();
+showAdminButton();
 
-        income =
-            Number(
-                player.income || 0
-            );
+/*
+ * ВАЖНО:
+ * Теперь экран открывается сразу после
+ * загрузки игрока.
+ */
+document.getElementById("loading").style.display="none";
+document.getElementById("game").style.display="block";
 
-        economyMultiplier =
-            Number(
-                player.economy_multiplier || 1
-            );
+/*
+ * Магазин и инвентарь загружаются
+ * параллельно, поэтому игра не зависает.
+ */
+loadGiftShop();
+loadInventory();
 
-        economyExpiresAt =
-            player.economy_expires_at ||
-            null;
+}catch(error){
 
-        updateScreen();
+console.error(error);
 
-        function showAdminButton() {
-
-    const category =
-        document.getElementById(
-            "adminCategory"
-        );
-
-    if (!category) {
-        return;
-    }
-
-    if (isAdmin()) {
-
-        category.style.display =
-            "block";
-
-    } else {
-
-        category.style.display =
-            "none";
-
-    }
+document.getElementById("loading").innerHTML=`
+<div class="error">
+❌ Ошибка
+<br><br>
+${escapeHtml(error.message)}
+<br><br>
+Открой RaneGame через Telegram.
+</div>`;
 
 }
-
-    } catch (error) {
-
-        console.error(error);
-
-        document
-            .getElementById("loading")
-            .innerHTML = `
-
-                <div class="error">
-
-                    ❌ Ошибка
-
-                    <br><br>
-
-                    ${escapeHtml(
-                        error.message
-                    )}
-
-                    <br><br>
-
-                    Открой RaneGame
-                    через Telegram.
-
-                </div>
-
-            `;
-
-    }
-
 }
 
-
-/* =================================
+/* ================================
    ЭКРАН
-================================= */
+================================ */
 
-function updateScreen() {
+function updateScreen(){
 
-    const balanceElement =
-        document.getElementById(
-            "balance"
-        );
+const balanceElement=document.getElementById("balance");
 
-    if (balanceElement) {
-
-        balanceElement.textContent =
-            Math.floor(balance)
-                .toLocaleString("ru-RU");
-
-    }
-
-
-    const incomeElement =
-        document.getElementById(
-            "income"
-        );
-
-    if (incomeElement) {
-
-        incomeElement.textContent =
-            income;
-
-    }
-
-
-    if (!player) {
-
-        return;
-
-    }
-
-
-    const usernameElement =
-        document.getElementById(
-            "username"
-        );
-
-    if (usernameElement) {
-
-        usernameElement.textContent =
-            player.first_name ||
-            "Игрок";
-
-    }
-
-
-    const tgUsernameElement =
-        document.getElementById(
-            "tgusername"
-        );
-
-    if (tgUsernameElement) {
-
-        tgUsernameElement.textContent =
-            player.username
-                ? "@" +
-                  player.username
-                : "Telegram";
-
-    }
-
-
-    const refId =
-        document.getElementById(
-            "refId"
-        );
-
-    if (refId) {
-
-        refId.textContent =
-            player.telegram_id ||
-            "";
-
-    }
-
-
-    updateEconomyScreen();
-
+if(balanceElement){
+balanceElement.textContent=Math.floor(balance).toLocaleString("ru-RU");
 }
 
+const incomeElement=document.getElementById("income");
 
-/* =================================
+if(incomeElement){
+incomeElement.textContent=income;
+}
+
+if(!player)return;
+
+const usernameElement=document.getElementById("username");
+
+if(usernameElement){
+usernameElement.textContent=player.first_name||"Игрок";
+}
+
+const tgUsernameElement=document.getElementById("tgusername");
+
+if(tgUsernameElement){
+tgUsernameElement.textContent=player.username?"@"+player.username:"Telegram";
+}
+
+const refId=document.getElementById("refId");
+
+if(refId){
+refId.textContent=player.telegram_id||"";
+}
+
+updateEconomyScreen();
+}
+
+/* ================================
    ЭКОНОМИКА
-================================= */
+================================ */
 
-function updateEconomyScreen() {
+function updateEconomyScreen(){
 
-    const multiplierElement =
-        document.getElementById(
-            "currentMultiplier"
-        );
+const multiplierElement=document.getElementById("currentMultiplier");
+const statusElement=document.getElementById("economyStatus");
+const timeElement=document.getElementById("multiplierTime");
 
-    const statusElement =
-        document.getElementById(
-            "economyStatus"
-        );
+if(
+economyExpiresAt&&
+new Date(economyExpiresAt).getTime()>Date.now()
+){
 
-    const timeElement =
-        document.getElementById(
-            "multiplierTime"
-        );
+multiplierElement.textContent="x"+Number(economyMultiplier).toFixed(1);
+statusElement.textContent="Активна";
+statusElement.className="multiplier-active";
 
+timeElement.textContent=
+"Осталось: "+
+formatTime(
+new Date(economyExpiresAt).getTime()-Date.now()
+);
 
-    if (
-        economyExpiresAt &&
-        new Date(
-            economyExpiresAt
-        ).getTime() >
-        Date.now()
-    ) {
-
-        multiplierElement.textContent =
-            "x" +
-            Number(
-                economyMultiplier
-            ).toFixed(1);
-
-        statusElement.textContent =
-            "Активна";
-
-        statusElement.className =
-            "multiplier-active";
-
-        timeElement.textContent =
-            "Осталось: " +
-            formatTime(
-                new Date(
-                    economyExpiresAt
-                ).getTime() -
-                Date.now()
-            );
-
-        return;
-
-    }
-
-
-    economyMultiplier = 1.0;
-
-    economyExpiresAt = null;
-
-    multiplierElement.textContent =
-        "x1.0";
-
-    statusElement.textContent =
-        "Не активна";
-
-    statusElement.className =
-        "multiplier-none";
-
-    timeElement.textContent =
-        "Крути рулетку";
-
+return;
 }
 
+economyMultiplier=1;
+economyExpiresAt=null;
 
-/* =================================
+multiplierElement.textContent="x1.0";
+statusElement.textContent="Не активна";
+statusElement.className="multiplier-none";
+timeElement.textContent="Крути рулетку";
+}
+
+/* ================================
    ТАЙМЕР
-================================= */
+================================ */
 
-function startMultiplierTimer() {
+function startMultiplierTimer(){
+clearInterval(window.multiplierTimer);
 
-    clearInterval(
-        window.multiplierTimer
-    );
-
-    window.multiplierTimer =
-        setInterval(
-            function() {
-
-                updateEconomyScreen();
-
-            },
-            1000
-        );
-
+window.multiplierTimer=setInterval(()=>{
+updateEconomyScreen();
+},1000);
 }
 
+/* ================================
+   ВРЕМЯ
+================================ */
 
-/* =================================
-   ФОРМАТ ВРЕМЕНИ
-================================= */
+function formatTime(ms){
 
-function formatTime(ms) {
+if(ms<=0)return"00:00:00";
 
-    if (ms <= 0) {
+const totalSeconds=Math.floor(ms/1000);
+const hours=Math.floor(totalSeconds/3600);
+const minutes=Math.floor((totalSeconds%3600)/60);
+const seconds=totalSeconds%60;
 
-        return "00:00:00";
-
-    }
-
-    const totalSeconds =
-        Math.floor(
-            ms / 1000
-        );
-
-    const hours =
-        Math.floor(
-            totalSeconds / 3600
-        );
-
-    const minutes =
-        Math.floor(
-            (
-                totalSeconds % 3600
-            ) / 60
-        );
-
-    const seconds =
-        totalSeconds % 60;
-
-    return (
-        String(hours)
-            .padStart(2, "0") +
-        ":" +
-        String(minutes)
-            .padStart(2, "0") +
-        ":" +
-        String(seconds)
-            .padStart(2, "0")
-    );
-
+return(
+String(hours).padStart(2,"0")+":"+
+String(minutes).padStart(2,"0")+":"+
+String(seconds).padStart(2,"0")
+);
 }
 
-
-/* =================================
+/* ================================
    АДМИН
-================================= */
+================================ */
+
+const DEV_TELEGRAM_ID="8791077915";
+const ADMIN_PASSWORD="LexaJordon1122";
+
+function isAdmin(){
+
+try{
+
+const tgUser=getTelegramUser();
+
+return String(tgUser.id)===DEV_TELEGRAM_ID;
+
+}catch{
+
+return false;
+
+}
+}
 
 /*
- * ТВОЙ TELEGRAM ID
+ * ИСПРАВЛЕНО:
+ * Показываем всю категорию,
+ * а не только кнопку.
  */
+function showAdminButton(){
 
-const DEV_TELEGRAM_ID =
-    "8791077915";
+const category=document.getElementById("adminCategory");
 
+if(!category)return;
 
-/*
- * Пароль админки
- */
-
-const ADMIN_PASSWORD =
-    "LexaJordon1122";
-
-
-let adminLoggedIn = false;
-
-
-/*
- * Проверка администратора.
- *
- * ID берём напрямую из Telegram,
- * а не из player.
- */
-
-function isAdmin() {
-
-    try {
-
-        const tgUser =
-            getTelegramUser();
-
-        return String(
-            tgUser.id
-        ) === DEV_TELEGRAM_ID;
-
-    } catch {
-
-        return false;
-
-    }
+if(isAdmin()){
+category.style.display="block";
+}else{
+category.style.display="none";
+}
 
 }
 
+/* ================================
+   ОКНО АДМИНА
+================================ */
 
-/*
- * Показать кнопку администратора.
- */
+function openAdminLogin(){
 
-function showAdminButton() {
-
-    const button =
-        document.getElementById(
-            "adminButton"
-        );
-
-    if (!button) {
-        return;
-    }
-
-    if (isAdmin()) {
-
-        button.style.display =
-            "block";
-
-    } else {
-
-        button.style.display =
-            "none";
-
-    }
-
+if(!isAdmin()){
+showToast("❌ Доступ запрещён");
+return;
 }
 
+const modal=document.getElementById("adminLoginModal");
 
-/*
- * Открыть окно пароля.
- */
+if(!modal)return;
 
-function openAdminLogin() {
+modal.classList.add("show");
 
-    if (!isAdmin()) {
+const input=document.getElementById("adminPassword");
 
-        showToast(
-            "❌ Доступ запрещён"
-        );
+if(input){
 
-        return;
+input.value="";
 
-    }
-
-
-    const modal =
-        document.getElementById(
-            "adminLoginModal"
-        );
-
-    if (!modal) {
-        return;
-    }
-
-
-    modal.classList.add(
-        "show"
-    );
-
-
-    const input =
-        document.getElementById(
-            "adminPassword"
-        );
-
-    if (input) {
-
-        input.value = "";
-
-        setTimeout(
-            function() {
-
-                input.focus();
-
-            },
-            100
-        );
-
-    }
+setTimeout(()=>{
+input.focus();
+},100);
 
 }
-
-
-/*
- * Закрыть окно пароля.
- */
-
-function closeAdminLogin() {
-
-    const modal =
-        document.getElementById(
-            "adminLoginModal"
-        );
-
-    if (modal) {
-
-        modal.classList.remove(
-            "show"
-        );
-
-    }
-
 }
 
+function closeAdminLogin(){
 
-/*
- * Вход администратора.
- */
+const modal=document.getElementById("adminLoginModal");
 
-function loginAdmin() {
-
-    if (!isAdmin()) {
-
-        showToast(
-            "❌ Доступ запрещён"
-        );
-
-        closeAdminLogin();
-
-        return;
-
-    }
-
-
-    const input =
-        document.getElementById(
-            "adminPassword"
-        );
-
-
-    const password =
-        input
-            ? input.value
-            : "";
-
-
-    if (
-        password !==
-        ADMIN_PASSWORD
-    ) {
-
-        showToast(
-            "❌ Неверный пароль"
-        );
-
-        if (input) {
-
-            input.value = "";
-
-            input.focus();
-
-        }
-
-        return;
-
-    }
-
-
-    adminLoggedIn =
-        true;
-
-
-    closeAdminLogin();
-
-    openAdminPanel();
-
-    showToast(
-        "✅ Админ-панель открыта"
-    );
-
+if(modal){
+modal.classList.remove("show");
+}
 }
 
+/* ================================
+   ВХОД АДМИНА
+================================ */
 
-/*
- * Открыть админ-панель.
- */
+function loginAdmin(){
 
-function openAdminPanel() {
-
-    if (!isAdmin()) {
-
-        showToast(
-            "❌ Доступ запрещён"
-        );
-
-        return;
-
-    }
-
-
-    if (!adminLoggedIn) {
-
-        openAdminLogin();
-
-        return;
-
-    }
-
-
-    pages.forEach(
-        function(page) {
-
-            page.classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-
-    const adminPage =
-        document.getElementById(
-            "admin"
-        );
-
-
-    if (adminPage) {
-
-        adminPage.classList.add(
-            "active"
-        );
-
-    }
-
-
-    navButtons.forEach(
-        function(button) {
-
-            button.classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-
-    window.scrollTo(
-        0,
-        0
-    );
-
+if(!isAdmin()){
+showToast("❌ Доступ запрещён");
+closeAdminLogin();
+return;
 }
 
+const input=document.getElementById("adminPassword");
+const password=input?input.value:"";
 
-/*
- * Назад из админки.
- */
+if(password!==ADMIN_PASSWORD){
 
-function closeAdminPanel() {
+showToast("❌ Неверный пароль");
 
-    adminLoggedIn =
-        false;
-
-
-    pages.forEach(
-        function(page) {
-
-            page.classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-
-    const home =
-        document.getElementById(
-            "home"
-        );
-
-
-    if (home) {
-
-        home.classList.add(
-            "active"
-        );
-
-    }
-
-
-    navButtons.forEach(
-        function(button) {
-
-            button.classList.remove(
-                "active"
-            );
-
-        }
-    );
-
-
-    const menuButton =
-        document.querySelector(
-            '.nav button[data-page="home"]'
-        );
-
-
-    if (menuButton) {
-
-        menuButton.classList.add(
-            "active"
-        );
-
-    }
-
-
-    window.scrollTo(
-        0,
-        0
-    );
-
+if(input){
+input.value="";
+input.focus();
 }
 
+return;
+}
 
-/*
- * Enter / Escape
- */
+adminLoggedIn=true;
 
-document.addEventListener(
-    "keydown",
-    function(event) {
+closeAdminLogin();
+openAdminPanel();
 
-        if (
-            event.key === "Enter"
-        ) {
+showToast("✅ Админ-панель открыта");
+}
 
-            const modal =
-                document.getElementById(
-                    "adminLoginModal"
-                );
+/* ================================
+   ОТКРЫТЬ АДМИНКУ
+================================ */
 
+function openAdminPanel(){
 
-            if (
-                modal &&
-                modal.classList.contains(
-                    "show"
-                )
-            ) {
+if(!isAdmin()){
+showToast("❌ Доступ запрещён");
+return;
+}
 
-                loginAdmin();
+if(!adminLoggedIn){
+openAdminLogin();
+return;
+}
 
-            }
+pages.forEach(page=>{
+page.classList.remove("active");
+});
 
-        }
+const adminPage=document.getElementById("admin");
 
+if(adminPage){
+adminPage.classList.add("active");
+}
 
-        if (
-            event.key === "Escape"
-        ) {
+navButtons.forEach(button=>{
+button.classList.remove("active");
+});
 
-            const modal =
-                document.getElementById(
-                    "adminLoginModal"
-                );
+window.scrollTo(0,0);
+}
 
+/* ================================
+   ЗАКРЫТЬ АДМИНКУ
+================================ */
 
-            if (
-                modal &&
-                modal.classList.contains(
-                    "show"
-                )
-            ) {
+function closeAdminPanel(){
 
-                closeAdminLogin();
+adminLoggedIn=false;
 
-            }
+pages.forEach(page=>{
+page.classList.remove("active");
+});
 
-        }
+const home=document.getElementById("home");
 
-    }
-);
+if(home){
+home.classList.add("active");
+}
 
+navButtons.forEach(button=>{
+button.classList.remove("active");
+});
 
-/* =================================
+const menuButton=document.querySelector('.nav button[data-page="home"]');
+
+if(menuButton){
+menuButton.classList.add("active");
+}
+
+window.scrollTo(0,0);
+}
+
+/* ================================
+   ENTER / ESCAPE
+================================ */
+
+document.addEventListener("keydown",event=>{
+
+if(event.key==="Enter"){
+
+const modal=document.getElementById("adminLoginModal");
+
+if(modal&&modal.classList.contains("show")){
+loginAdmin();
+}
+}
+
+if(event.key==="Escape"){
+
+const modal=document.getElementById("adminLoginModal");
+
+if(modal&&modal.classList.contains("show")){
+closeAdminLogin();
+}
+}
+
+});
+
+/* ================================
    СБРОС АККАУНТА
-================================= */
+================================ */
 
-async function resetMyAccount() {
+async function resetMyAccount(){
 
-    if (!isAdmin()) {
-
-        showToast(
-            "❌ Доступ запрещён"
-        );
-
-        return;
-
-    }
-
-
-    if (!adminLoggedIn) {
-
-        openAdminLogin();
-
-        return;
-
-    }
-
-
-    const confirmed =
-        confirm(
-            "⚠️ СБРОС АККАУНТА\n\n" +
-            "Будут удалены:\n" +
-            "🎁 Все подарки\n" +
-            "🛒 Все покупки\n" +
-            "⭐ Баланс → 0\n" +
-            "💰 Доход → 0 ⭐/час\n" +
-            "⚡ Множитель → x1.0\n" +
-            "🎁 Бонус → сброшен\n\n" +
-            "Продолжить?"
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    try {
-
-        showToast(
-            "⏳ Сбрасываем аккаунт..."
-        );
-
-
-        const data =
-            await apiRequest(
-                "/api/dev/reset-account"
-            );
-
-
-        if (data.player) {
-
-            player =
-                data.player;
-
-            balance =
-                Number(
-                    player.balance || 0
-                );
-
-            income =
-                Number(
-                    player.income || 0
-                );
-
-            economyMultiplier =
-                Number(
-                    player.economy_multiplier || 1
-                );
-
-            economyExpiresAt =
-                player.economy_expires_at ||
-                null;
-
-        }
-
-
-        inventory = [];
-
-        inventoryLoaded = true;
-
-
-        updateScreen();
-
-        renderInventory();
-
-        renderGiftShop();
-
-
-        showToast(
-            "✅ Аккаунт полностью сброшен"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "RESET ERROR:",
-            error
-        );
-
-        showToast(
-            "❌ " +
-            error.message
-        );
-
-    }
-
+if(!isAdmin()){
+showToast("❌ Доступ запрещён");
+return;
 }
 
+if(!adminLoggedIn){
+openAdminLogin();
+return;
+}
 
-/* =================================
-   НАВИГАЦИЯ
-================================= */
-
-const navButtons =
-    document.querySelectorAll(
-        ".nav button"
-    );
-
-
-const pages =
-    document.querySelectorAll(
-        ".page"
-    );
-
-
-navButtons.forEach(
-    function(button) {
-
-        button.addEventListener(
-            "click",
-            function() {
-
-                const roulette =
-                    document.getElementById(
-                        "rouletteLock"
-                    );
-
-
-                if (
-                    roulette &&
-                    roulette.classList.contains(
-                        "show"
-                    )
-                ) {
-
-                    return;
-
-                }
-
-
-                const pageName =
-                    button.getAttribute(
-                        "data-page"
-                    );
-
-
-                pages.forEach(
-                    function(page) {
-
-                        page.classList.remove(
-                            "active"
-                        );
-
-                    }
-                );
-
-
-                navButtons.forEach(
-                    function(btn) {
-
-                        btn.classList.remove(
-                            "active"
-                        );
-
-                    }
-                );
-
-
-                const selectedPage =
-                    document.getElementById(
-                        pageName
-                    );
-
-
-                if (selectedPage) {
-
-                    selectedPage
-                        .classList
-                        .add(
-                            "active"
-                        );
-
-                }
-
-
-                button.classList.add(
-                    "active"
-                );
-
-
-                window.scrollTo(
-                    0,
-                    0
-                );
-
-            }
-        );
-
-    }
+const confirmed=confirm(
+"⚠️ СБРОС АККАУНТА\n\n"+
+"Будут удалены:\n"+
+"🎁 Все подарки\n"+
+"🛒 Все покупки\n"+
+"⭐ Баланс → 0\n"+
+"💰 Доход → 0 ⭐/час\n"+
+"⚡ Множитель → x1.0\n"+
+"🎁 Бонус → сброшен\n\n"+
+"Продолжить?"
 );
 
+if(!confirmed)return;
 
-/* =================================
-   ВКЛАДКИ ПОДАРКОВ
-================================= */
+try{
 
-function showShopTab(tab) {
+showToast("⏳ Сбрасываем аккаунт...");
 
-    const shop =
-        document.getElementById(
-            "giftShop"
-        );
+const data=await apiRequest("/api/dev/reset-account");
 
-    const inventoryElement =
-        document.getElementById(
-            "giftInventory"
-        );
+if(data.player){
 
-    const shopTab =
-        document.getElementById(
-            "shopTab"
-        );
-
-    const inventoryTab =
-        document.getElementById(
-            "inventoryTab"
-        );
-
-
-    if (tab === "shop") {
-
-        shop.style.display =
-            "block";
-
-        inventoryElement.style.display =
-            "none";
-
-        shopTab.classList.add(
-            "active"
-        );
-
-        inventoryTab.classList.remove(
-            "active"
-        );
-
-
-        if (!shopLoaded) {
-
-            loadGiftShop();
-
-        }
-
-    } else {
-
-        shop.style.display =
-            "none";
-
-        inventoryElement.style.display =
-            "block";
-
-        shopTab.classList.remove(
-            "active"
-        );
-
-        inventoryTab.classList.add(
-            "active"
-        );
-
-
-        if (!inventoryLoaded) {
-
-            loadInventory();
-
-        }
-
-    }
-
+player=data.player;
+balance=Number(player.balance||0);
+income=Number(player.income||0);
+economyMultiplier=Number(player.economy_multiplier||1);
+economyExpiresAt=player.economy_expires_at||null;
 }
 
+inventory=[];
+inventoryLoaded=true;
 
-/* =================================
+updateScreen();
+renderInventory();
+renderGiftShop();
+
+showToast("✅ Аккаунт полностью сброшен");
+
+}catch(error){
+
+console.error("RESET ERROR:",error);
+
+showToast("❌ "+error.message);
+}
+}
+
+/* ================================
+   НАВИГАЦИЯ
+================================ */
+
+const navButtons=document.querySelectorAll(".nav button");
+const pages=document.querySelectorAll(".page");
+
+navButtons.forEach(button=>{
+
+button.addEventListener("click",()=>{
+
+const roulette=document.getElementById("rouletteLock");
+
+if(
+roulette&&
+roulette.classList.contains("show")
+){
+return;
+}
+
+const pageName=button.getAttribute("data-page");
+
+pages.forEach(page=>{
+page.classList.remove("active");
+});
+
+navButtons.forEach(btn=>{
+btn.classList.remove("active");
+});
+
+const selectedPage=document.getElementById(pageName);
+
+if(selectedPage){
+selectedPage.classList.add("active");
+}
+
+button.classList.add("active");
+
+window.scrollTo(0,0);
+});
+});
+
+/* ================================
+   ВКЛАДКИ
+================================ */
+
+function showShopTab(tab){
+
+const shop=document.getElementById("giftShop");
+const inventoryElement=document.getElementById("giftInventory");
+const shopTab=document.getElementById("shopTab");
+const inventoryTab=document.getElementById("inventoryTab");
+
+if(tab==="shop"){
+
+shop.style.display="block";
+inventoryElement.style.display="none";
+
+shopTab.classList.add("active");
+inventoryTab.classList.remove("active");
+
+if(!shopLoaded){
+loadGiftShop();
+}
+
+}else{
+
+shop.style.display="none";
+inventoryElement.style.display="block";
+
+shopTab.classList.remove("active");
+inventoryTab.classList.add("active");
+
+if(!inventoryLoaded){
+loadInventory();
+}
+
+}
+}
+
+/* ================================
    МАГАЗИН
-================================= */
+================================ */
 
-async function loadGiftShop(
-    forceReload = false
-) {
+async function loadGiftShop(forceReload=false){
 
-    if (
-        shopLoaded &&
-        !forceReload
-    ) {
+if(shopLoaded&&!forceReload)return;
 
-        return;
+const grid=document.getElementById("shopGrid");
 
-    }
+try{
 
+if(!giftShop.length){
 
-    const grid =
-        document.getElementById(
-            "shopGrid"
-        );
-
-
-    try {
-
-        if (!giftShop.length) {
-
-            grid.innerHTML = `
-
-                <div
-                    class="empty-inventory"
-                    style="grid-column:1/-1;">
-
-                    🔄 Загружаем магазин...
-
-                </div>
-
-            `;
-
-        }
-
-
-        const response =
-            await fetch(
-                API +
-                "/api/gifts"
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!data.ok) {
-
-            throw new Error(
-                data.error ||
-                "Не удалось загрузить магазин"
-            );
-
-        }
-
-
-        giftShop =
-            Array.isArray(
-                data.gifts
-            )
-                ? data.gifts
-                : [];
-
-
-        shopLoaded = true;
-
-
-        renderGiftShop();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-
-        grid.innerHTML = `
-
-            <div
-                class="empty-inventory"
-                style="grid-column:1/-1;">
-
-                ❌ Не удалось загрузить магазин
-
-                <br><br>
-
-                ${escapeHtml(
-                    error.message
-                )}
-
-            </div>
-
-        `;
-
-    }
-
+grid.innerHTML=`
+<div class="empty-inventory" style="grid-column:1/-1;">
+🔄 Загружаем магазин...
+</div>`;
 }
 
+const response=await fetch(API+"/api/gifts");
+const data=await response.json();
 
-/* =================================
-   ТИП АНИМАЦИИ
-================================= */
-
-function getGiftAnimationClass(
-    gift
-) {
-
-    const emoji =
-        String(
-            gift.emoji ||
-            ""
-        );
-
-
-    if (
-        [
-            "💝",
-            "💗",
-            "💖",
-            "💓",
-            "💞",
-            "💕"
-        ].includes(
-            emoji
-        )
-    ) {
-
-        return "gift-animation-heart";
-
-    }
-
-
-    if (
-        [
-            "💎",
-            "👑",
-            "⭐",
-            "🌟",
-            "✨",
-            "🏆",
-            "🏅",
-            "💰"
-        ].includes(
-            emoji
-        )
-    ) {
-
-        return "gift-animation-shine";
-
-    }
-
-
-    if (
-        emoji === "🚀" ||
-        emoji === "☄️"
-    ) {
-
-        return "gift-animation-rocket";
-
-    }
-
-
-    if (
-        [
-            "🔮",
-            "🔥",
-            "⚡",
-            "🌈",
-            "🎆",
-            "🌌",
-            "🪄"
-        ].includes(
-            emoji
-        )
-    ) {
-
-        return "gift-animation-magic";
-
-    }
-
-
-    return "gift-animation-bounce";
-
+if(!data.ok){
+throw new Error(data.error||"Не удалось загрузить магазин");
 }
 
+giftShop=Array.isArray(data.gifts)?data.gifts:[];
+shopLoaded=true;
 
-/* =================================
+renderGiftShop();
+
+}catch(error){
+
+console.error(error);
+
+grid.innerHTML=`
+<div class="empty-inventory" style="grid-column:1/-1;">
+❌ Не удалось загрузить магазин
+<br><br>
+${escapeHtml(error.message)}
+</div>`;
+}
+}
+
+/* ================================
+   АНИМАЦИЯ ПОДАРКА
+================================ */
+
+function getGiftAnimationClass(gift){
+
+const emoji=String(gift.emoji||"");
+
+if(["💝","💗","💖","💓","💞","💕"].includes(emoji)){
+return"gift-animation-heart";
+}
+
+if(["💎","👑","⭐","🌟","✨","🏆","🏅","💰"].includes(emoji)){
+return"gift-animation-shine";
+}
+
+if(emoji==="🚀"||emoji==="☄️"){
+return"gift-animation-rocket";
+}
+
+if(["🔮","🔥","⚡","🌈","🎆","🌌","🪄"].includes(emoji)){
+return"gift-animation-magic";
+}
+
+return"gift-animation-bounce";
+}
+
+/* ================================
    РЕНДЕР МАГАЗИНА
-================================= */
+================================ */
 
-function renderGiftShop() {
+function renderGiftShop(){
 
-    const grid =
-        document.getElementById(
-            "shopGrid"
-        );
+const grid=document.getElementById("shopGrid");
 
+if(!grid)return;
 
-    if (!grid) return;
+if(!giftShop.length){
 
+grid.innerHTML=`
+<div class="empty-inventory" style="grid-column:1/-1;">
+🎁 Сейчас подарков нет
+</div>`;
 
-    if (!giftShop.length) {
-
-        grid.innerHTML = `
-
-            <div
-                class="empty-inventory"
-                style="grid-column:1/-1;">
-
-                🎁 Сейчас подарков нет
-
-            </div>
-
-        `;
-
-        setupGiftAnimationObserver();
-
-        return;
-
-    }
-
-
-    grid.innerHTML =
-        giftShop
-            .map(
-                function(gift) {
-
-                    const owned =
-                        inventory.find(
-                            function(item) {
-
-                                return Number(
-                                    item.gift_id
-                                ) ===
-                                Number(
-                                    gift.id
-                                );
-
-                            }
-                        );
-
-
-                    const quantity =
-                        owned
-                            ? Number(
-                                owned.quantity || 0
-                            )
-                            : 0;
-
-
-                    const maxReached =
-                        quantity >= 5;
-
-
-                    const animationClass =
-                        getGiftAnimationClass(
-                            gift
-                        );
-
-
-                    return `
-
-                        <div
-                            class="gift-card">
-
-                            ${
-                                quantity > 0
-                                    ? `
-                                        <div
-                                            class="gift-count">
-
-                                            ${quantity}/5
-
-                                        </div>
-                                      `
-                                    : ""
-                            }
-
-                            <div
-                                class="gift-visual ${animationClass}">
-
-                                <span
-                                    class="gift-spark gift-spark-1">
-
-                                    ✦
-
-                                </span>
-
-                                <span
-                                    class="gift-spark gift-spark-2">
-
-                                    ✧
-
-                                </span>
-
-                                <span
-                                    class="gift-spark gift-spark-3">
-
-                                    ·
-
-                                </span>
-
-                                <span
-                                    class="gift-spark gift-spark-4">
-
-                                    ✦
-
-                                </span>
-
-                                <div
-                                    class="gift-emoji">
-
-                                    ${escapeHtml(
-                                        gift.emoji
-                                    )}
-
-                                </div>
-
-                            </div>
-
-                            <div
-                                class="gift-name">
-
-                                ${escapeHtml(
-                                    gift.name
-                                )}
-
-                            </div>
-
-                            <div
-                                class="gift-income">
-
-                                +${
-                                    Number(
-                                        gift.income ||
-                                        1
-                                    )
-                                } ⭐/час
-
-                            </div>
-
-                            <div
-                                class="gift-price">
-
-                                ${Number(
-                                    gift.price
-                                )} ⭐
-
-                            </div>
-
-                            <button
-                                class="gift-buy"
-
-                                ${
-                                    maxReached
-                                        ? "disabled"
-                                        : ""
-                                }
-
-                                onclick="
-                                    buyGift(
-                                        ${Number(
-                                            gift.id
-                                        )}
-                                    )
-                                ">
-
-                                ${
-                                    maxReached
-                                        ? "Максимум"
-                                        : "Купить"
-                                }
-
-                            </button>
-
-                        </div>
-
-                    `;
-
-                }
-            )
-            .join("");
-
-
-    setupGiftAnimationObserver();
-
+setupGiftAnimationObserver();
+return;
 }
 
+grid.innerHTML=giftShop.map(gift=>{
 
-/* =================================
+const owned=inventory.find(item=>
+Number(item.gift_id)===Number(gift.id)
+);
+
+const quantity=owned?Number(owned.quantity||0):0;
+const maxReached=quantity>=5;
+const animationClass=getGiftAnimationClass(gift);
+
+return`
+<div class="gift-card">
+
+${quantity>0?`
+<div class="gift-count">${quantity}/5</div>
+`:""}
+
+<div class="gift-visual ${animationClass}">
+
+<span class="gift-spark gift-spark-1">✦</span>
+<span class="gift-spark gift-spark-2">✧</span>
+<span class="gift-spark gift-spark-3">·</span>
+<span class="gift-spark gift-spark-4">✦</span>
+
+<div class="gift-emoji">
+${escapeHtml(gift.emoji)}
+</div>
+
+</div>
+
+<div class="gift-name">
+${escapeHtml(gift.name)}
+</div>
+
+<div class="gift-income">
++${Number(gift.income||1)} ⭐/час
+</div>
+
+<div class="gift-price">
+${Number(gift.price)} ⭐
+</div>
+
+<button
+class="gift-buy"
+${maxReached?"disabled":""}
+onclick="buyGift(${Number(gift.id)})">
+
+${maxReached?"Максимум":"Купить"}
+
+</button>
+
+</div>
+`;
+
+}).join("");
+
+setupGiftAnimationObserver();
+}
+
+/* ================================
    ПОКУПКА
-================================= */
+================================ */
 
-let selectedBuyGift = null;
+function buyGift(giftId){
 
-let selectedBuyQuantity = 1;
+const gift=giftShop.find(item=>
+Number(item.id)===Number(giftId)
+);
 
-
-function buyGift(giftId) {
-
-    const gift =
-        giftShop.find(
-            function(item) {
-
-                return Number(
-                    item.id
-                ) ===
-                Number(
-                    giftId
-                );
-
-            }
-        );
-
-
-    if (!gift) {
-
-        showToast(
-            "❌ Подарок не найден"
-        );
-
-        return;
-
-    }
-
-
-    const owned =
-        inventory.find(
-            function(item) {
-
-                return Number(
-                    item.gift_id
-                ) ===
-                Number(
-                    giftId
-                );
-
-            }
-        );
-
-
-    const ownedQuantity =
-        owned
-            ? Number(
-                owned.quantity || 0
-            )
-            : 0;
-
-
-    const remaining =
-        Math.max(
-            0,
-            5 - ownedQuantity
-        );
-
-
-    if (remaining <= 0) {
-
-        showToast(
-            "❌ Максимум 5 одинаковых подарков"
-        );
-
-        return;
-
-    }
-
-
-    selectedBuyGift =
-        gift;
-
-    selectedBuyQuantity =
-        1;
-
-
-    const modal =
-        document.getElementById(
-            "buyModal"
-        );
-
-
-    document
-        .getElementById(
-            "buyModalGift"
-        )
-        .textContent =
-        gift.emoji || "🎁";
-
-
-    document
-        .getElementById(
-            "buyModalTitle"
-        )
-        .textContent =
-        gift.name;
-
-
-    document
-        .getElementById(
-            "buyModalPrice"
-        )
-        .textContent =
-        Number(gift.price) +
-        " ⭐ за 1 шт.";
-
-
-    document
-        .getElementById(
-            "buyQuantity"
-        )
-        .textContent =
-        "1";
-
-
-    updateBuyTotal();
-
-
-    modal.classList.add(
-        "show"
-    );
-
+if(!gift){
+showToast("❌ Подарок не найден");
+return;
 }
 
+const owned=inventory.find(item=>
+Number(item.gift_id)===Number(giftId)
+);
 
-function changeBuyQuantity(
-    change
-) {
+const ownedQuantity=owned?Number(owned.quantity||0):0;
 
-    if (!selectedBuyGift) {
-        return;
-    }
+const remaining=Math.max(0,5-ownedQuantity);
 
-
-    const owned =
-        inventory.find(
-            function(item) {
-
-                return Number(
-                    item.gift_id
-                ) ===
-                Number(
-                    selectedBuyGift.id
-                );
-
-            }
-        );
-
-
-    const ownedQuantity =
-        owned
-            ? Number(
-                owned.quantity || 0
-            )
-            : 0;
-
-
-    const maxQuantity =
-        Math.min(
-            5,
-            Math.max(
-                1,
-                5 - ownedQuantity
-            )
-        );
-
-
-    selectedBuyQuantity +=
-        Number(change);
-
-
-    if (
-        selectedBuyQuantity < 1
-    ) {
-
-        selectedBuyQuantity =
-            1;
-
-    }
-
-
-    if (
-        selectedBuyQuantity >
-        maxQuantity
-    ) {
-
-        selectedBuyQuantity =
-            maxQuantity;
-
-    }
-
-
-    document
-        .getElementById(
-            "buyQuantity"
-        )
-        .textContent =
-        selectedBuyQuantity;
-
-
-    updateBuyTotal();
-
+if(remaining<=0){
+showToast("❌ Максимум 5 одинаковых подарков");
+return;
 }
 
+selectedBuyGift=gift;
+selectedBuyQuantity=1;
 
-function updateBuyTotal() {
+const modal=document.getElementById("buyModal");
 
-    if (!selectedBuyGift) {
-        return;
-    }
+document.getElementById("buyModalGift").textContent=gift.emoji||"🎁";
+document.getElementById("buyModalTitle").textContent=gift.name;
+document.getElementById("buyModalPrice").textContent=Number(gift.price)+" ⭐ за 1 шт.";
+document.getElementById("buyQuantity").textContent="1";
 
+updateBuyTotal();
 
-    const total =
-        Number(
-            selectedBuyGift.price
-        ) *
-        selectedBuyQuantity;
-
-
-    document
-        .getElementById(
-            "buyTotal"
-        )
-        .textContent =
-        total +
-        " ⭐";
-
+modal.classList.add("show");
 }
 
+function changeBuyQuantity(change){
 
-function closeBuyModal() {
+if(!selectedBuyGift)return;
 
-    document
-        .getElementById(
-            "buyModal"
-        )
-        .classList.remove(
-            "show"
-        );
+const owned=inventory.find(item=>
+Number(item.gift_id)===Number(selectedBuyGift.id)
+);
 
+const ownedQuantity=owned?Number(owned.quantity||0):0;
 
-    selectedBuyGift =
-        null;
+const maxQuantity=Math.min(
+5,
+Math.max(1,5-ownedQuantity)
+);
 
-    selectedBuyQuantity =
-        1;
+selectedBuyQuantity+=Number(change);
 
+if(selectedBuyQuantity<1){
+selectedBuyQuantity=1;
 }
 
-
-async function confirmBuyGift() {
-
-    if (!selectedBuyGift) {
-        return;
-    }
-
-
-    const gift =
-        selectedBuyGift;
-
-
-    const quantity =
-        selectedBuyQuantity;
-
-
-    const totalPrice =
-        Number(
-            gift.price
-        ) *
-        quantity;
-
-
-    if (
-        balance <
-        totalPrice
-    ) {
-
-        showToast(
-            "❌ Недостаточно ⭐"
-        );
-
-        return;
-
-    }
-
-
-    try {
-
-        showToast(
-            "⏳ Покупаем..."
-        );
-
-
-        const data =
-            await apiRequest(
-                "/api/gifts/buy",
-                {
-                    gift_id:
-                        Number(
-                            gift.id
-                        ),
-
-                    quantity:
-                        quantity
-                }
-            );
-
-
-        if (data.player) {
-
-            player =
-                data.player;
-
-            balance =
-                Number(
-                    player.balance
-                );
-
-            income =
-                Number(
-                    player.income
-                );
-
-            updateScreen();
-
-        }
-
-
-        inventoryLoaded =
-            false;
-
-
-        await loadInventory(
-            true
-        );
-
-
-        renderGiftShop();
-
-        closeBuyModal();
-
-
-        showToast(
-            "🎁 Куплено: " +
-            quantity +
-            " × " +
-            gift.name
-        );
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        showToast(
-            "❌ " +
-            error.message
-        );
-
-    }
-
+if(selectedBuyQuantity>maxQuantity){
+selectedBuyQuantity=maxQuantity;
 }
 
+document.getElementById("buyQuantity").textContent=selectedBuyQuantity;
 
-/* =================================
+updateBuyTotal();
+}
+
+function updateBuyTotal(){
+
+if(!selectedBuyGift)return;
+
+const total=Number(selectedBuyGift.price)*selectedBuyQuantity;
+
+document.getElementById("buyTotal").textContent=total+" ⭐";
+}
+
+function closeBuyModal(){
+
+document.getElementById("buyModal").classList.remove("show");
+
+selectedBuyGift=null;
+selectedBuyQuantity=1;
+}
+
+async function confirmBuyGift(){
+
+if(!selectedBuyGift)return;
+
+const gift=selectedBuyGift;
+const quantity=selectedBuyQuantity;
+
+const totalPrice=Number(gift.price)*quantity;
+
+if(balance<totalPrice){
+showToast("❌ Недостаточно ⭐");
+return;
+}
+
+try{
+
+showToast("⏳ Покупаем...");
+
+const data=await apiRequest("/api/gifts/buy",{
+gift_id:Number(gift.id),
+quantity:quantity
+});
+
+if(data.player){
+
+player=data.player;
+balance=Number(player.balance);
+income=Number(player.income);
+
+updateScreen();
+}
+
+inventoryLoaded=false;
+
+await loadInventory(true);
+
+renderGiftShop();
+closeBuyModal();
+
+showToast("🎁 Куплено: "+quantity+" × "+gift.name);
+
+}catch(error){
+
+console.error(error);
+showToast("❌ "+error.message);
+}
+}
+
+/* ================================
    ИНВЕНТАРЬ
-================================= */
+================================ */
 
-async function loadInventory(
-    forceReload = false
-) {
+async function loadInventory(forceReload=false){
 
-    if (
-        inventoryLoaded &&
-        !forceReload
-    ) {
+if(inventoryLoaded&&!forceReload)return;
 
-        return;
+const list=document.getElementById("inventoryList");
 
-    }
+try{
 
+if(!inventory.length){
 
-    const list =
-        document.getElementById(
-            "inventoryList"
-        );
-
-
-    try {
-
-        if (!inventory.length) {
-
-            list.innerHTML = `
-
-                <div class="empty-inventory">
-
-                    🔄 Загружаем инвентарь...
-
-                </div>
-
-            `;
-
-        }
-
-
-        const tgUser =
-            getTelegramUser();
-
-
-        const telegramId =
-            String(
-                tgUser.id
-            );
-
-
-        const response =
-            await fetch(
-                API +
-                "/api/inventory?telegram_id=" +
-                encodeURIComponent(
-                    telegramId
-                )
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!data.ok) {
-
-            throw new Error(
-                data.error ||
-                "Не удалось загрузить инвентарь"
-            );
-
-        }
-
-
-        inventory =
-            Array.isArray(
-                data.inventory
-            )
-                ? data.inventory
-                : [];
-
-
-        inventoryLoaded =
-            true;
-
-
-        renderInventory();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-
-        list.innerHTML = `
-
-            <div class="empty-inventory">
-
-                ❌ Не удалось загрузить инвентарь
-
-                <br><br>
-
-                ${escapeHtml(
-                    error.message
-                )}
-
-            </div>
-
-        `;
-
-    }
-
+list.innerHTML=`
+<div class="empty-inventory">
+🔄 Загружаем инвентарь...
+</div>`;
 }
 
+const tgUser=getTelegramUser();
+const telegramId=String(tgUser.id);
 
-/* =================================
+const response=await fetch(
+API+"/api/inventory?telegram_id="+encodeURIComponent(telegramId)
+);
+
+const data=await response.json();
+
+if(!data.ok){
+throw new Error(data.error||"Не удалось загрузить инвентарь");
+}
+
+inventory=Array.isArray(data.inventory)?data.inventory:[];
+
+inventoryLoaded=true;
+
+renderInventory();
+
+}catch(error){
+
+console.error(error);
+
+list.innerHTML=`
+<div class="empty-inventory">
+❌ Не удалось загрузить инвентарь
+<br><br>
+${escapeHtml(error.message)}
+</div>`;
+}
+}
+
+/* ================================
    РЕНДЕР ИНВЕНТАРЯ
-================================= */
+================================ */
 
-function renderInventory() {
+function renderInventory(){
 
-    const list =
-        document.getElementById(
-            "inventoryList"
-        );
+const list=document.getElementById("inventoryList");
 
+if(!list)return;
 
-    if (!list) return;
+if(!inventory.length){
 
+list.innerHTML=`
+<div class="empty-inventory">
+🎒 Инвентарь пуст
+<br><br>
+Купи подарок в магазине.
+</div>`;
 
-    if (!inventory.length) {
-
-        list.innerHTML = `
-
-            <div class="empty-inventory">
-
-                🎒 Инвентарь пуст
-
-                <br><br>
-
-                Купи подарок в магазине.
-
-            </div>
-
-        `;
-
-        setupGiftAnimationObserver();
-
-        return;
-
-    }
-
-
-    list.innerHTML =
-        inventory
-            .map(
-                function(item) {
-
-                    const gift =
-                        item.gift ||
-                        item;
-
-
-                    const purchases =
-                        Array.isArray(
-                            item.purchases
-                        )
-                            ? item.purchases
-                            : [];
-
-
-                    const animationClass =
-                        getGiftAnimationClass(
-                            gift
-                        );
-
-
-                    return `
-
-                        <div
-                            class="inventory-card">
-
-                            <div
-                                class="inventory-top">
-
-                                <div
-                                    class="
-                                        inventory-emoji
-                                        ${animationClass}
-                                    ">
-
-                                    ${escapeHtml(
-                                        gift.emoji ||
-                                        "🎁"
-                                    )}
-
-                                </div>
-
-                                <div
-                                    class="inventory-info">
-
-                                    <div
-                                        class="inventory-name">
-
-                                        ${escapeHtml(
-                                            gift.name ||
-                                            "Подарок"
-                                        )}
-
-                                    </div>
-
-                                    <div
-                                        class="inventory-count">
-
-                                        Количество:
-                                        ${
-                                            Number(
-                                                item.quantity ||
-                                                0
-                                            )
-                                        }
-                                        / 5
-
-                                    </div>
-
-                                    <div
-                                        class="inventory-income">
-
-                                        +${
-                                            Number(
-                                                gift.income ||
-                                                1
-                                            ) *
-                                            Number(
-                                                item.quantity ||
-                                                0
-                                            )
-                                        }
-                                        ⭐/час
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            ${
-                                purchases.length
-                                    ? `
-
-                                        <div
-                                            class="
-                                                inventory-purchases
-                                            ">
-
-                                            ${purchases
-                                                .map(
-                                                    function(
-                                                        purchase
-                                                    ) {
-
-                                                        const purchasedAt =
-                                                            new Date(
-                                                                purchase.purchased_at
-                                                            );
-
-                                                        const canSellAt =
-                                                            purchasedAt.getTime() +
-                                                            5 *
-                                                            60 *
-                                                            60 *
-                                                            1000;
-
-                                                        const ready =
-                                                            Date.now() >=
-                                                            canSellAt;
-
-                                                        return `
-
-                                                            <div
-                                                                class="
-                                                                    purchase-row
-                                                                ">
-
-                                                                <div>
-
-                                                                    <div>
-                                                                        🎁 Покупка
-                                                                    </div>
-
-                                                                    <div
-                                                                        class="
-                                                                            purchase-time
-                                                                        ">
-
-                                                                        ${
-                                                                            purchasedAt.toLocaleString(
-                                                                                "ru-RU"
-                                                                            )
-                                                                        }
-
-                                                                    </div>
-
-                                                                    ${
-                                                                        ready
-                                                                            ? `
-                                                                                <div
-                                                                                    style="
-                                                                                        color:#72ff72;
-                                                                                        margin-top:4px;
-                                                                                    ">
-
-                                                                                    Можно продать
-
-                                                                                </div>
-                                                                            `
-                                                                            : `
-                                                                                <div
-                                                                                    style="
-                                                                                        color:#ff9999;
-                                                                                        margin-top:4px;
-                                                                                    ">
-
-                                                                                    Продажа через
-                                                                                    ${formatRemaining(
-                                                                                        canSellAt -
-                                                                                        Date.now()
-                                                                                    )}
-
-                                                                                </div>
-                                                                            `
-                                                                    }
-
-                                                                </div>
-
-                                                                <button
-                                                                    class="
-                                                                        sell-button
-                                                                        ${
-                                                                            ready
-                                                                                ? "ready"
-                                                                                : ""
-                                                                        }
-                                                                    "
-
-                                                                    ${
-                                                                        ready
-                                                                            ? ""
-                                                                            : "disabled"
-                                                                    }
-
-                                                                    onclick="
-                                                                        sellGift(
-                                                                            ${Number(
-                                                                                purchase.id
-                                                                            )}
-                                                                        )
-                                                                    ">
-
-                                                                    Продать
-                                                                    ${Number(
-                                                                        gift.price
-                                                                    )}
-                                                                    ⭐
-
-                                                                </button>
-
-                                                            </div>
-
-                                                        `;
-
-                                                    }
-                                                )
-                                                .join("")}
-
-                                        </div>
-
-                                      `
-                                    : ""
-                            }
-
-                        </div>
-
-                    `;
-
-                }
-            )
-            .join("");
-
-
-    setupGiftAnimationObserver();
-
+setupGiftAnimationObserver();
+return;
 }
 
+list.innerHTML=inventory.map(item=>{
 
-/* =================================
+const gift=item.gift||item;
+
+const purchases=Array.isArray(item.purchases)
+?item.purchases
+:[];
+
+const animationClass=getGiftAnimationClass(gift);
+
+return`
+<div class="inventory-card">
+
+<div class="inventory-top">
+
+<div class="inventory-emoji ${animationClass}">
+${escapeHtml(gift.emoji||"🎁")}
+</div>
+
+<div class="inventory-info">
+
+<div class="inventory-name">
+${escapeHtml(gift.name||"Подарок")}
+</div>
+
+<div class="inventory-count">
+Количество: ${Number(item.quantity||0)} / 5
+</div>
+
+<div class="inventory-income">
++${Number(gift.income||1)*Number(item.quantity||0)} ⭐/час
+</div>
+
+</div>
+</div>
+
+${purchases.length?`
+<div class="inventory-purchases">
+
+${purchases.map(purchase=>{
+
+const purchasedAt=new Date(purchase.purchased_at);
+
+const canSellAt=
+purchasedAt.getTime()+
+5*60*60*1000;
+
+const ready=Date.now()>=canSellAt;
+
+return`
+<div class="purchase-row">
+
+<div>
+
+<div>🎁 Покупка</div>
+
+<div class="purchase-time">
+${purchasedAt.toLocaleString("ru-RU")}
+</div>
+
+${ready?`
+<div style="color:#72ff72;margin-top:4px;">
+Можно продать
+</div>
+`:`
+<div style="color:#ff9999;margin-top:4px;">
+Продажа через ${formatRemaining(canSellAt-Date.now())}
+</div>
+`}
+
+</div>
+
+<button
+class="sell-button ${ready?"ready":""}"
+${ready?"":"disabled"}
+onclick="sellGift(${Number(purchase.id)})">
+
+Продать ${Number(gift.price)} ⭐
+
+</button>
+
+</div>
+`;
+
+}).join("")}
+
+</div>
+`:""}
+
+</div>
+`;
+
+}).join("");
+
+setupGiftAnimationObserver();
+}
+
+/* ================================
    ПРОДАЖА
-================================= */
+================================ */
 
-async function sellGift(
-    purchaseId
-) {
+async function sellGift(purchaseId){
 
-    try {
+try{
 
-        if (
-            !confirm(
-                "Продать этот подарок?"
-            )
-        ) {
-
-            return;
-
-        }
-
-
-        showToast(
-            "⏳ Продаём..."
-        );
-
-
-        const data =
-            await apiRequest(
-                "/api/gifts/sell",
-                {
-                    purchase_id:
-                        Number(
-                            purchaseId
-                        )
-                }
-            );
-
-
-        if (data.player) {
-
-            player =
-                data.player;
-
-            balance =
-                Number(
-                    player.balance
-                );
-
-            income =
-                Number(
-                    player.income
-                );
-
-            updateScreen();
-
-        }
-
-
-        showToast(
-            "💰 Подарок продан"
-        );
-
-
-        inventoryLoaded =
-            false;
-
-
-        await loadInventory();
-
-        renderGiftShop();
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        showToast(
-            "❌ " +
-            error.message
-        );
-
-    }
-
+if(!confirm("Продать этот подарок?")){
+return;
 }
 
+showToast("⏳ Продаём...");
 
-/* =================================
+const data=await apiRequest("/api/gifts/sell",{
+purchase_id:Number(purchaseId)
+});
+
+if(data.player){
+
+player=data.player;
+balance=Number(player.balance);
+income=Number(player.income);
+
+updateScreen();
+}
+
+showToast("💰 Подарок продан");
+
+inventoryLoaded=false;
+
+await loadInventory();
+
+renderGiftShop();
+
+}catch(error){
+
+console.error(error);
+
+showToast("❌ "+error.message);
+}
+}
+
+/* ================================
    ТАЙМЕР ПРОДАЖИ
-================================= */
+================================ */
 
-function formatRemaining(ms) {
+function formatRemaining(ms){
 
-    if (ms <= 0) {
+if(ms<=0)return"00:00:00";
 
-        return "00:00:00";
+const totalSeconds=Math.floor(ms/1000);
+const hours=Math.floor(totalSeconds/3600);
+const minutes=Math.floor((totalSeconds%3600)/60);
+const seconds=totalSeconds%60;
 
-    }
-
-
-    const totalSeconds =
-        Math.floor(
-            ms / 1000
-        );
-
-
-    const hours =
-        Math.floor(
-            totalSeconds / 3600
-        );
-
-
-    const minutes =
-        Math.floor(
-            (
-                totalSeconds % 3600
-            ) / 60
-        );
-
-
-    const seconds =
-        totalSeconds % 60;
-
-
-    return (
-        String(hours)
-            .padStart(2, "0") +
-        ":" +
-        String(minutes)
-            .padStart(2, "0") +
-        ":" +
-        String(seconds)
-            .padStart(2, "0")
-    );
-
+return(
+String(hours).padStart(2,"0")+":"+
+String(minutes).padStart(2,"0")+":"+
+String(seconds).padStart(2,"0")
+);
 }
 
-
-/* =================================
+/* ================================
    ОПТИМИЗАЦИЯ
-================================= */
+================================ */
 
-function setupGiftAnimationObserver() {
+function setupGiftAnimationObserver(){
 
-    if (giftObserver) {
+if(giftObserver){
+giftObserver.disconnect();
+}
 
-        giftObserver.disconnect();
+if(!("IntersectionObserver" in window)){
+return;
+}
 
-    }
+giftObserver=new IntersectionObserver(entries=>{
 
+entries.forEach(entry=>{
 
-    if (
-        !(
-            "IntersectionObserver"
-            in window
-        )
-    ) {
+const element=entry.target;
 
-        return;
+if(entry.isIntersecting){
 
-    }
+element.classList.remove("gift-paused");
+element.classList.remove("inventory-paused");
 
+}else{
 
-    giftObserver =
-        new IntersectionObserver(
-            function(entries) {
-
-                entries.forEach(
-                    function(entry) {
-
-                        const element =
-                            entry.target;
-
-
-                        if (
-                            entry.isIntersecting
-                        ) {
-
-                            element.classList.remove(
-                                "gift-paused"
-                            );
-
-                            element.classList.remove(
-                                "inventory-paused"
-                            );
-
-                        } else {
-
-                            element.classList.add(
-                                "gift-paused"
-                            );
-
-                            element.classList.add(
-                                "inventory-paused"
-                            );
-
-                        }
-
-                    }
-                );
-
-            },
-            {
-                root: null,
-
-                rootMargin:
-                    "100px 0px 100px 0px",
-
-                threshold: 0.01
-            }
-        );
-
-
-    document
-        .querySelectorAll(
-            ".gift-card, .inventory-card"
-        )
-        .forEach(
-            function(element) {
-
-                giftObserver.observe(
-                    element
-                );
-
-            }
-        );
+element.classList.add("gift-paused");
+element.classList.add("inventory-paused");
 
 }
 
+});
 
-/* =================================
+},{
+root:null,
+rootMargin:"100px 0px 100px 0px",
+threshold:0.01
+});
+
+document.querySelectorAll(".gift-card,.inventory-card").forEach(element=>{
+giftObserver.observe(element);
+});
+}
+
+/* ================================
    РУЛЕТКА
-================================= */
+================================ */
 
-function openRoulette() {
+function openRoulette(){
 
-    if (
-        economyExpiresAt &&
-        new Date(
-            economyExpiresAt
-        ).getTime() >
-        Date.now()
-    ) {
+if(
+economyExpiresAt&&
+new Date(economyExpiresAt).getTime()>Date.now()
+){
 
-        showToast(
-            "⚡ Множитель уже активен"
-        );
-
-        return;
-
-    }
-
-
-    rouletteResult = null;
-
-    rouletteIssuedAt = null;
-
-    rouletteSignature = null;
-
-    rouletteSpinning = false;
-
-
-    const lock =
-        document.getElementById(
-            "rouletteLock"
-        );
-
-
-    const spinButton =
-        document.getElementById(
-            "rouletteSpinButton"
-        );
-
-
-    const claimButton =
-        document.getElementById(
-            "rouletteClaimButton"
-        );
-
-
-    const resultText =
-        document.getElementById(
-            "rouletteResult"
-        );
-
-
-    spinButton.disabled =
-        false;
-
-    spinButton.style.display =
-        "block";
-
-    spinButton.textContent =
-        "🎰 Крутить";
-
-
-    claimButton.classList.remove(
-        "show"
-    );
-
-
-    resultText.textContent =
-        "Выбери свой множитель";
-
-
-    buildRoulette();
-
-
-    lock.classList.add(
-        "show"
-    );
-
+showToast("⚡ Множитель уже активен");
+return;
 }
 
+rouletteResult=null;
+rouletteIssuedAt=null;
+rouletteSignature=null;
+rouletteSpinning=false;
 
-/* =================================
-   ПОСТРОЕНИЕ РУЛЕТКИ
-================================= */
+const lock=document.getElementById("rouletteLock");
+const spinButton=document.getElementById("rouletteSpinButton");
+const claimButton=document.getElementById("rouletteClaimButton");
+const resultText=document.getElementById("rouletteResult");
 
-function buildRoulette() {
+spinButton.disabled=false;
+spinButton.style.display="block";
+spinButton.textContent="🎰 Крутить";
 
-    const track =
-        document.getElementById(
-            "rouletteTrack"
-        );
+claimButton.classList.remove("show");
 
+resultText.textContent="Выбери свой множитель";
 
-    track.innerHTML = "";
+buildRoulette();
 
-
-    const values = [];
-
-
-    for (
-        let repeat = 0;
-        repeat < 7;
-        repeat++
-    ) {
-
-        for (
-            let i = 1;
-            i <= 20;
-            i++
-        ) {
-
-            values.push(
-                (i / 10).toFixed(1)
-            );
-
-        }
-
-    }
-
-
-    values.forEach(
-        function(value) {
-
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-
-            item.className =
-                "roulette-item";
-
-
-            item.textContent =
-                "x" +
-                value;
-
-
-            track.appendChild(
-                item
-            );
-
-        }
-    );
-
-
-    track.style.transition =
-        "none";
-
-
-    track.style.transform =
-        "translateX(0)";
-
+lock.classList.add("show");
 }
 
+/* ================================
+   РУЛЕТКА
+================================ */
 
-/* =================================
+function buildRoulette(){
+
+const track=document.getElementById("rouletteTrack");
+
+track.innerHTML="";
+
+const values=[];
+
+for(let repeat=0;repeat<7;repeat++){
+
+for(let i=1;i<=20;i++){
+
+values.push((i/10).toFixed(1));
+
+}
+}
+
+values.forEach(value=>{
+
+const item=document.createElement("div");
+
+item.className="roulette-item";
+item.textContent="x"+value;
+
+track.appendChild(item);
+});
+
+track.style.transition="none";
+track.style.transform="translateX(0)";
+}
+
+/* ================================
    КРУТИТЬ
-================================= */
+================================ */
 
-async function spinRoulette() {
+async function spinRoulette(){
 
-    if (rouletteSpinning) {
+if(rouletteSpinning)return;
 
-        return;
+rouletteSpinning=true;
 
-    }
+const spinButton=document.getElementById("rouletteSpinButton");
+const claimButton=document.getElementById("rouletteClaimButton");
+const resultText=document.getElementById("rouletteResult");
 
+spinButton.disabled=true;
+spinButton.textContent="⏳ Крутим...";
 
-    rouletteSpinning =
-        true;
+claimButton.classList.remove("show");
 
+resultText.textContent="Рулетка вращается...";
 
-    const spinButton =
-        document.getElementById(
-            "rouletteSpinButton"
-        );
+try{
 
+const data=await apiRequest("/api/roulette/spin");
 
-    const claimButton =
-        document.getElementById(
-            "rouletteClaimButton"
-        );
+rouletteResult=Number(data.multiplier);
+rouletteIssuedAt=Number(data.issuedAt);
+rouletteSignature=data.signature;
 
+animateRoulette(rouletteResult);
 
-    const resultText =
-        document.getElementById(
-            "rouletteResult"
-        );
+}catch(error){
 
+console.error(error);
 
-    spinButton.disabled =
-        true;
+rouletteSpinning=false;
 
+spinButton.disabled=false;
+spinButton.textContent="🎰 Крутить";
 
-    spinButton.textContent =
-        "⏳ Крутим...";
+resultText.textContent="Ошибка";
 
-
-    claimButton.classList.remove(
-        "show"
-    );
-
-
-    resultText.textContent =
-        "Рулетка вращается...";
-
-
-    try {
-
-        const data =
-            await apiRequest(
-                "/api/roulette/spin"
-            );
-
-
-        rouletteResult =
-            Number(
-                data.multiplier
-            );
-
-
-        rouletteIssuedAt =
-            Number(
-                data.issuedAt
-            );
-
-
-        rouletteSignature =
-            data.signature;
-
-
-        animateRoulette(
-            rouletteResult
-        );
-
-
-    } catch (error) {
-
-        console.error(error);
-
-
-        rouletteSpinning =
-            false;
-
-
-        spinButton.disabled =
-            false;
-
-
-        spinButton.textContent =
-            "🎰 Крутить";
-
-
-        resultText.textContent =
-            "Ошибка";
-
-
-        showToast(
-            "❌ " +
-            error.message
-        );
-
-    }
-
+showToast("❌ "+error.message);
+}
 }
 
-
-/* =================================
+/* ================================
    АНИМАЦИЯ РУЛЕТКИ
-================================= */
+================================ */
 
-function animateRoulette(
-    result
-) {
+function animateRoulette(result){
 
-    const track =
-        document.getElementById(
-            "rouletteTrack"
-        );
+const track=document.getElementById("rouletteTrack");
 
+const items=track.querySelectorAll(".roulette-item");
 
-    const items =
-        track.querySelectorAll(
-            ".roulette-item"
-        );
+const resultIndex=120+Math.floor(Math.random()*8);
 
+let targetIndex=resultIndex;
 
-    const resultIndex =
-        120 +
-        Math.floor(
-            Math.random() * 8
-        );
+for(let i=resultIndex;i<items.length;i++){
 
+if(
+Number(
+items[i].textContent.replace("x","")
+)===result
+){
 
-    let targetIndex =
-        resultIndex;
-
-
-    for (
-        let i = resultIndex;
-        i < items.length;
-        i++
-    ) {
-
-        if (
-            Number(
-                items[i]
-                    .textContent
-                    .replace(
-                        "x",
-                        ""
-                    )
-            ) === result
-        ) {
-
-            targetIndex =
-                i;
-
-            break;
-
-        }
-
-    }
-
-
-    const item =
-        items[targetIndex];
-
-
-    if (!item) {
-
-        finishRoulette();
-
-        return;
-
-    }
-
-
-    const container =
-        document.querySelector(
-            ".roulette-window"
-        );
-
-
-    const containerCenter =
-        container.offsetWidth / 2;
-
-
-    const itemCenter =
-        item.offsetLeft +
-        item.offsetWidth / 2;
-
-
-    const offset =
-        containerCenter -
-        itemCenter;
-
-
-    track.style.transition =
-        "transform 5s cubic-bezier(.08,.72,.12,1)";
-
-
-    track.style.transform =
-        "translateX(" +
-        offset +
-        "px)";
-
-
-    setTimeout(
-        function() {
-
-            items.forEach(
-                function(el) {
-
-                    el.classList.remove(
-                        "selected"
-                    );
-
-                }
-            );
-
-
-            item.classList.add(
-                "selected"
-            );
-
-
-            finishRoulette();
-
-        },
-        5100
-    );
-
+targetIndex=i;
+break;
+}
 }
 
+const item=items[targetIndex];
 
-/* =================================
-   РЕЗУЛЬТАТ РУЛЕТКИ
-================================= */
-
-function finishRoulette() {
-
-    rouletteSpinning =
-        false;
-
-
-    const spinButton =
-        document.getElementById(
-            "rouletteSpinButton"
-        );
-
-
-    const claimButton =
-        document.getElementById(
-            "rouletteClaimButton"
-        );
-
-
-    const resultText =
-        document.getElementById(
-            "rouletteResult"
-        );
-
-
-    spinButton.style.display =
-        "none";
-
-
-    resultText.textContent =
-        "Выпало: x" +
-        rouletteResult.toFixed(1);
-
-
-    claimButton.textContent =
-        "Забрать x" +
-        rouletteResult.toFixed(1);
-
-
-    claimButton.classList.add(
-        "show"
-    );
-
+if(!item){
+finishRoulette();
+return;
 }
 
+const container=document.querySelector(".roulette-window");
 
-/* =================================
-   ЗАБРАТЬ РУЛЕТКУ
-================================= */
+const containerCenter=container.offsetWidth/2;
 
-async function claimRoulette() {
+const itemCenter=item.offsetLeft+item.offsetWidth/2;
 
-    if (
-        rouletteResult === null ||
-        rouletteIssuedAt === null ||
-        !rouletteSignature
-    ) {
+const offset=containerCenter-itemCenter;
 
-        return;
+track.style.transition="transform 5s cubic-bezier(.08,.72,.12,1)";
+track.style.transform="translateX("+offset+"px)";
 
-    }
+setTimeout(()=>{
 
+items.forEach(el=>{
+el.classList.remove("selected");
+});
 
-    const claimButton =
-        document.getElementById(
-            "rouletteClaimButton"
-        );
+item.classList.add("selected");
 
+finishRoulette();
 
-    claimButton.disabled =
-        true;
-
-
-    claimButton.textContent =
-        "⏳ Активируем...";
-
-
-    try {
-
-        const data =
-            await apiRequest(
-                "/api/roulette/claim",
-                {
-                    multiplier:
-                        rouletteResult,
-
-                    issuedAt:
-                        rouletteIssuedAt,
-
-                    signature:
-                        rouletteSignature
-                }
-            );
-
-
-        player =
-            data.player;
-
-
-        balance =
-            Number(
-                player.balance
-            );
-
-
-        income =
-            Number(
-                player.income
-            );
-
-
-        economyMultiplier =
-            Number(
-                player.economy_multiplier ||
-                1
-            );
-
-
-        economyExpiresAt =
-            player.economy_expires_at ||
-            null;
-
-
-        updateScreen();
-
-
-        document
-            .getElementById(
-                "rouletteLock"
-            )
-            .classList
-            .remove(
-                "show"
-            );
-
-
-        rouletteResult = null;
-
-        rouletteIssuedAt = null;
-
-        rouletteSignature = null;
-
-
-        showToast(
-            "🔥 Множитель активирован"
-        );
-
-
-    } catch (error) {
-
-        console.error(error);
-
-
-        claimButton.disabled =
-            false;
-
-
-        claimButton.textContent =
-            "Забрать x" +
-            rouletteResult.toFixed(1);
-
-
-        showToast(
-            "❌ " +
-            error.message
-        );
-
-    }
-
+},5100);
 }
 
+/* ================================
+   РЕЗУЛЬТАТ
+================================ */
 
-/* =================================
+function finishRoulette(){
+
+rouletteSpinning=false;
+
+const spinButton=document.getElementById("rouletteSpinButton");
+const claimButton=document.getElementById("rouletteClaimButton");
+const resultText=document.getElementById("rouletteResult");
+
+spinButton.style.display="none";
+
+resultText.textContent="Выпало: x"+rouletteResult.toFixed(1);
+
+claimButton.textContent="Забрать x"+rouletteResult.toFixed(1);
+
+claimButton.classList.add("show");
+}
+
+/* ================================
+   ЗАБРАТЬ
+================================ */
+
+async function claimRoulette(){
+
+if(
+rouletteResult===null||
+rouletteIssuedAt===null||
+!rouletteSignature
+){
+return;
+}
+
+const claimButton=document.getElementById("rouletteClaimButton");
+
+claimButton.disabled=true;
+claimButton.textContent="⏳ Активируем...";
+
+try{
+
+const data=await apiRequest("/api/roulette/claim",{
+multiplier:rouletteResult,
+issuedAt:rouletteIssuedAt,
+signature:rouletteSignature
+});
+
+player=data.player;
+
+balance=Number(player.balance);
+income=Number(player.income);
+economyMultiplier=Number(player.economy_multiplier||1);
+economyExpiresAt=player.economy_expires_at||null;
+
+updateScreen();
+
+document.getElementById("rouletteLock").classList.remove("show");
+
+rouletteResult=null;
+rouletteIssuedAt=null;
+rouletteSignature=null;
+
+showToast("🔥 Множитель активирован");
+
+}catch(error){
+
+console.error(error);
+
+claimButton.disabled=false;
+claimButton.textContent="Забрать x"+rouletteResult.toFixed(1);
+
+showToast("❌ "+error.message);
+}
+}
+
+/* ================================
    БОНУС
-================================= */
+================================ */
 
-async function collect() {
+async function collect(){
 
-    try {
+try{
 
-        const button =
-            document.getElementById(
-                "bonusButton"
-            );
+const button=document.getElementById("bonusButton");
 
+button.disabled=true;
+button.textContent="⏳ Получаем...";
 
-        button.disabled =
-            true;
+const data=await apiRequest("/api/collect");
 
+player=data.player;
 
-        button.textContent =
-            "⏳ Получаем...";
+balance=Number(player.balance);
+income=Number(player.income);
 
+updateScreen();
 
-        const data =
-            await apiRequest(
-                "/api/collect"
-            );
+showToast("🔥 +1000 ⭐");
 
+button.textContent="✅ Получено";
 
-        player =
-            data.player;
+}catch(error){
 
+console.error(error);
 
-        balance =
-            Number(
-                player.balance
-            );
+showToast("❌ "+error.message);
 
+const button=document.getElementById("bonusButton");
 
-        income =
-            Number(
-                player.income
-            );
-
-
-        updateScreen();
-
-
-        showToast(
-            "🔥 +1000 ⭐"
-        );
-
-
-        button.textContent =
-            "✅ Получено";
-
-
-    } catch (error) {
-
-        console.error(error);
-
-
-        showToast(
-            "❌ " +
-            error.message
-        );
-
-
-        const button =
-            document.getElementById(
-                "bonusButton"
-            );
-
-
-        button.disabled =
-            false;
-
-
-        button.textContent =
-            "Забрать +1000 ⭐";
-
-    }
-
+button.disabled=false;
+button.textContent="Забрать +1000 ⭐";
+}
 }
 
-
-/* =================================
+/* ================================
    ПРИГЛАСИТЬ
-================================= */
+================================ */
 
-function inviteFriend() {
+function inviteFriend(){
 
-    try {
+try{
 
-        const tgUser =
-            getTelegramUser();
+const tgUser=getTelegramUser();
+const telegramId=String(tgUser.id);
 
+const link=
+"https://t.me/RaneGameBot?start=ref_"+telegramId;
 
-        const telegramId =
-            String(
-                tgUser.id
-            );
+const shareUrl=
+"https://t.me/share/url"+
+"?url="+encodeURIComponent(link)+
+"&text="+encodeURIComponent("Залетай в RaneGame!");
 
+if(tg&&tg.openTelegramLink){
 
-        const link =
-            "https://" +
-            "t.me/" +
-            "RaneGameBot" +
-            "?start=ref_" +
-            telegramId;
+tg.openTelegramLink(shareUrl);
 
+}else{
 
-        const shareUrl =
-            "https://t.me/share/url" +
-            "?url=" +
-            encodeURIComponent(
-                link
-            ) +
-            "&text=" +
-            encodeURIComponent(
-                "Залетай в RaneGame!"
-            );
-
-
-        if (
-            tg &&
-            tg.openTelegramLink
-        ) {
-
-            tg.openTelegramLink(
-                shareUrl
-            );
-
-        } else {
-
-            navigator.clipboard
-                .writeText(
-                    link
-                )
-                .then(
-                    function() {
-
-                        showToast(
-                            "🔗 Ссылка скопирована"
-                        );
-
-                    }
-                );
-
-        }
-
-    } catch (error) {
-
-        showToast(
-            "❌ Открой игру через Telegram"
-        );
-
-    }
+navigator.clipboard.writeText(link).then(()=>{
+showToast("🔗 Ссылка скопирована");
+});
 
 }
 
+}catch(error){
 
-/* =================================
+showToast("❌ Открой игру через Telegram");
+}
+}
+
+/* ================================
    КОПИРОВАТЬ
-================================= */
+================================ */
 
-function copyInviteLink() {
+function copyInviteLink(){
 
-    try {
+try{
 
-        const tgUser =
-            getTelegramUser();
+const tgUser=getTelegramUser();
 
+const telegramId=String(tgUser.id);
 
-        const telegramId =
-            String(
-                tgUser.id
-            );
+const link=
+"https://t.me/RaneGameBot?start=ref_"+telegramId;
 
+navigator.clipboard.writeText(link)
+.then(()=>{
+showToast("🔗 Ссылка скопирована");
+})
+.catch(()=>{
+showToast("❌ Не удалось скопировать");
+});
 
-        const link =
-            "https://t.me/RaneGameBot?start=ref_" +
-            telegramId;
+}catch(error){
 
-
-        navigator.clipboard
-            .writeText(
-                link
-            )
-            .then(
-                function() {
-
-                    showToast(
-                        "🔗 Ссылка скопирована"
-                    );
-
-                }
-            )
-            .catch(
-                function() {
-
-                    showToast(
-                        "❌ Не удалось скопировать"
-                    );
-
-                }
-            );
-
-    } catch (error) {
-
-        showToast(
-            "❌ Открой игру через Telegram"
-        );
-
-    }
-
+showToast("❌ Открой игру через Telegram");
+}
 }
 
-
-/* =================================
+/* ================================
    TOAST
-================================= */
+================================ */
 
-function showToast(text) {
+function showToast(text){
 
-    const toast =
-        document.getElementById(
-            "toast"
-        );
+const toast=document.getElementById("toast");
 
+toast.textContent=text;
+toast.style.display="block";
 
-    toast.textContent =
-        text;
+clearTimeout(window.toastTimer);
 
-
-    toast.style.display =
-        "block";
-
-
-    clearTimeout(
-        window.toastTimer
-    );
-
-
-    window.toastTimer =
-        setTimeout(
-            function() {
-
-                toast.style.display =
-                    "none";
-
-            },
-            2500
-        );
-
+window.toastTimer=setTimeout(()=>{
+toast.style.display="none";
+},2500);
 }
 
-
-/* =================================
+/* ================================
    ESCAPE HTML
-================================= */
+================================ */
 
-function escapeHtml(text) {
+function escapeHtml(text){
 
-    return String(text)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
+return String(text)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 }
 
-
-/* =================================
+/* ================================
    ЗАПУСК
-================================= */
+================================ */
 
+startMultiplierTimer();
 loadPlayer();
 
 </script>
-
 </body>
 </html>
