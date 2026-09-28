@@ -2,9 +2,12 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-      maximum-scale=1.0, user-scalable=no,
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no,
       viewport-fit=cover">
 
 <title>RaneGame</title>
@@ -12,12 +15,18 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
 *{
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
 }
 
-html,body{
+html,
+body{
     margin:0;
     padding:0;
     width:100%;
@@ -32,19 +41,34 @@ body{
     padding-bottom:95px;
 }
 
-/* =========================
+
+/* =========================================================
    BACKGROUND
-========================= */
+========================================================= */
 
 body::before{
     content:"";
     position:fixed;
     inset:-50%;
     z-index:-5;
+
     background:
-        radial-gradient(circle at 50% 15%,rgba(255,0,0,.13),transparent 28%),
-        radial-gradient(circle at 10% 70%,rgba(180,0,0,.07),transparent 25%),
-        radial-gradient(circle at 90% 80%,rgba(255,0,0,.06),transparent 25%);
+        radial-gradient(
+            circle at 50% 15%,
+            rgba(255,0,0,.13),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 10% 70%,
+            rgba(180,0,0,.07),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 90% 80%,
+            rgba(255,0,0,.06),
+            transparent 25%
+        );
+
     animation:bgMove 8s ease-in-out infinite alternate;
 }
 
@@ -54,6 +78,7 @@ body::after{
     inset:0;
     pointer-events:none;
     z-index:100;
+
     background:
         linear-gradient(
             115deg,
@@ -63,23 +88,39 @@ body::after{
             transparent 55%,
             transparent 100%
         );
+
     background-size:250% 250%;
     animation:screenFlow 7s linear infinite;
 }
 
 @keyframes bgMove{
-    from{transform:translate3d(-2%,-1%,0) scale(1);}
-    to{transform:translate3d(2%,2%,0) scale(1.08);}
+
+    from{
+        transform:translate3d(-2%,-1%,0) scale(1);
+    }
+
+    to{
+        transform:translate3d(2%,2%,0) scale(1.08);
+    }
+
 }
 
 @keyframes screenFlow{
-    0%{background-position:200% 0;}
-    100%{background-position:-100% 100%;}
+
+    0%{
+        background-position:200% 0;
+    }
+
+    100%{
+        background-position:-100% 100%;
+    }
+
 }
 
-/* =========================
+
+/* =========================================================
    APP
-========================= */
+========================================================= */
 
 .app{
     width:100%;
@@ -88,15 +129,19 @@ body::after{
     padding:14px 13px 25px;
 }
 
-/* =========================
+
+/* =========================================================
    PROFILE
-========================= */
+========================================================= */
 
 .profile{
     position:relative;
+
     display:flex;
     align-items:center;
+
     gap:11px;
+
     height:68px;
     padding:8px 11px;
 
@@ -104,7 +149,8 @@ body::after{
     border-radius:19px;
 
     background:
-        linear-gradient(135deg,
+        linear-gradient(
+            135deg,
             rgba(255,0,0,.10),
             rgba(20,20,20,.9) 48%,
             rgba(255,0,0,.05)
@@ -119,31 +165,47 @@ body::after{
 
 .profile::before{
     content:"";
+
     position:absolute;
     top:0;
     left:-120%;
+
     width:70%;
     height:100%;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,0,0,.20),
-        transparent
-    );
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,0,0,.20),
+            transparent
+        );
+
     transform:skewX(-25deg);
+
     animation:shine 4s linear infinite;
 }
 
 @keyframes shine{
-    0%{left:-120%;}
-    55%,100%{left:150%;}
+
+    0%{
+        left:-120%;
+    }
+
+    55%,
+    100%{
+        left:150%;
+    }
+
 }
 
 .avatar{
     position:relative;
+
     width:49px;
     height:49px;
     min-width:49px;
+
     border-radius:50%;
 
     display:flex;
@@ -151,6 +213,7 @@ body::after{
     justify-content:center;
 
     background:#120000;
+
     border:2px solid #ff1515;
 
     box-shadow:
@@ -158,6 +221,7 @@ body::after{
         0 0 22px rgba(255,0,0,.25);
 
     font-size:25px;
+
     z-index:2;
 }
 
@@ -170,6 +234,7 @@ body::after{
 .profile-name{
     font-size:17px;
     font-weight:800;
+
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -177,6 +242,7 @@ body::after{
 
 .profile-username{
     margin-top:3px;
+
     color:#8d8d8d;
     font-size:12px;
 }
@@ -190,9 +256,11 @@ body::after{
 .circle-btn{
     width:38px;
     height:38px;
+
     border-radius:50%;
 
     border:1px solid rgba(255,0,0,.45);
+
     background:#0d0d0d;
     color:#fff;
 
@@ -201,6 +269,7 @@ body::after{
     justify-content:center;
 
     font-size:17px;
+
     cursor:pointer;
 
     transition:.2s;
@@ -208,13 +277,17 @@ body::after{
 
 .circle-btn:active{
     transform:scale(.91);
+
     background:#250000;
-    box-shadow:0 0 15px rgba(255,0,0,.35);
+
+    box-shadow:
+        0 0 15px rgba(255,0,0,.35);
 }
 
-/* =========================
+
+/* =========================================================
    PAGES
-========================= */
+========================================================= */
 
 .page{
     display:none;
@@ -226,34 +299,47 @@ body::after{
 }
 
 @keyframes pageIn{
+
     from{
         opacity:0;
         transform:translateY(8px);
     }
+
     to{
         opacity:1;
         transform:translateY(0);
     }
+
 }
 
-/* =========================
+
+/* =========================================================
    HERO
-========================= */
+========================================================= */
 
 .hero{
     position:relative;
+
     margin-top:14px;
+
     padding:22px 18px 19px;
 
     border-radius:23px;
+
     border:1px solid rgba(255,0,0,.40);
 
     background:
-        radial-gradient(circle at 50% 0%,
+        radial-gradient(
+            circle at 50% 0%,
             rgba(255,0,0,.17),
             transparent 45%
         ),
-        linear-gradient(145deg,#110000,#080808 55%,#120000);
+        linear-gradient(
+            145deg,
+            #110000,
+            #080808 55%,
+            #120000
+        );
 
     box-shadow:
         0 0 25px rgba(255,0,0,.10),
@@ -264,42 +350,64 @@ body::after{
 
 .hero::after{
     content:"";
+
     position:absolute;
+
     left:-30%;
     bottom:-50%;
+
     width:160%;
     height:100%;
-    background:linear-gradient(
-        110deg,
-        transparent 40%,
-        rgba(255,0,0,.08) 50%,
-        transparent 60%
-    );
+
+    background:
+        linear-gradient(
+            110deg,
+            transparent 40%,
+            rgba(255,0,0,.08) 50%,
+            transparent 60%
+        );
+
     animation:heroSweep 5s linear infinite;
 }
 
 @keyframes heroSweep{
-    0%{transform:translateX(-30%);}
-    100%{transform:translateX(30%);}
+
+    0%{
+        transform:translateX(-30%);
+    }
+
+    100%{
+        transform:translateX(30%);
+    }
+
 }
 
 .hero-title{
     position:relative;
     z-index:2;
+
     color:#888;
+
     text-align:center;
+
     text-transform:uppercase;
+
     letter-spacing:2px;
+
     font-size:11px;
 }
 
 .balance{
     position:relative;
     z-index:2;
+
     margin-top:5px;
+
     text-align:center;
+
     font-size:39px;
     line-height:1.1;
+
     font-weight:900;
 
     text-shadow:
@@ -313,18 +421,23 @@ body::after{
 
 .coin{
     display:inline-flex;
+
     align-items:center;
     justify-content:center;
 
     width:24px;
     height:24px;
+
     margin-left:5px;
 
     border-radius:50%;
+
     background:#ff1717;
+
     color:#000;
 
     font-size:13px;
+
     font-weight:900;
 
     box-shadow:
@@ -334,9 +447,13 @@ body::after{
 .multiplier{
     position:relative;
     z-index:2;
+
     margin-top:7px;
+
     text-align:center;
+
     color:#777;
+
     font-size:12px;
 }
 
@@ -344,64 +461,94 @@ body::after{
     color:#ff2222;
 }
 
+#starTimer{
+    position:relative;
+    z-index:2;
+
+    transition:.2s;
+}
+
 .balance-buttons{
     position:relative;
     z-index:2;
+
     display:grid;
+
     grid-template-columns:1fr 1fr;
+
     gap:9px;
+
     margin-top:18px;
 }
 
 .main-btn{
     height:48px;
+
     border:none;
     border-radius:14px;
 
     color:#fff;
+
     font-weight:800;
     font-size:14px;
 
     background:
-        linear-gradient(135deg,#ff1919,#8b0000);
+        linear-gradient(
+            135deg,
+            #ff1919,
+            #8b0000
+        );
 
     box-shadow:
         0 0 13px rgba(255,0,0,.24),
         inset 0 1px 0 rgba(255,255,255,.12);
 
     cursor:pointer;
+
     position:relative;
+
     overflow:hidden;
 }
 
 .main-btn::after{
     content:"";
+
     position:absolute;
     inset:0;
-    background:linear-gradient(
-        105deg,
-        transparent 25%,
-        rgba(255,255,255,.15) 50%,
-        transparent 75%
-    );
+
+    background:
+        linear-gradient(
+            105deg,
+            transparent 25%,
+            rgba(255,255,255,.15) 50%,
+            transparent 75%
+        );
+
     transform:translateX(-100%);
+
     animation:buttonFlow 3.5s linear infinite;
 }
 
 @keyframes buttonFlow{
-    to{transform:translateX(100%);}
+
+    to{
+        transform:translateX(100%);
+    }
+
 }
 
 .main-btn:active{
     transform:scale(.97);
 }
 
-/* =========================
-   SMALL CARDS
-========================= */
+
+/* =========================================================
+   SECTION
+========================================================= */
 
 .section-title{
     display:flex;
+
     justify-content:space-between;
     align-items:center;
 
@@ -413,19 +560,23 @@ body::after{
 
 .section-title span{
     color:#777;
+
     font-size:11px;
     font-weight:500;
 }
 
-/* =========================
+
+/* =========================================================
    REFERRAL
-========================= */
+========================================================= */
 
 .referral{
     position:relative;
+
     padding:16px;
 
     border:1px solid rgba(255,0,0,.25);
+
     border-radius:18px;
 
     background:#0b0b0b;
@@ -435,13 +586,19 @@ body::after{
 
 .referral::before{
     content:"";
+
     position:absolute;
+
     width:100px;
     height:100px;
+
     right:-45px;
     top:-45px;
+
     border-radius:50%;
+
     background:rgba(255,0,0,.10);
+
     filter:blur(5px);
 }
 
@@ -452,25 +609,33 @@ body::after{
 
 .referral-text{
     margin-top:6px;
+
     color:#777;
+
     font-size:12px;
     line-height:1.4;
 }
 
 .referral-bottom{
     display:flex;
+
     align-items:center;
+
     gap:8px;
+
     margin-top:13px;
 }
 
 .referral-input{
     flex:1;
     min-width:0;
+
     padding:11px;
 
     border-radius:11px;
+
     border:1px solid #292929;
+
     background:#070707;
     color:#aaa;
 
@@ -480,42 +645,61 @@ body::after{
 .copy-btn{
     width:44px;
     height:42px;
+
     border:1px solid rgba(255,0,0,.35);
+
     border-radius:11px;
+
     background:#170000;
+
     color:#ff1717;
+
     cursor:pointer;
 }
 
-/* =========================
+
+/* =========================================================
    GIFT GRID
-========================= */
+========================================================= */
 
 .gift-grid{
     display:grid;
+
     grid-template-columns:1fr 1fr;
+
     gap:10px;
 }
 
 .gift{
     position:relative;
+
     min-height:130px;
 
     padding:13px;
 
     border-radius:17px;
+
     border:1px solid rgba(255,0,0,.20);
+
     background:
-        linear-gradient(145deg,#101010,#080808);
+        linear-gradient(
+            145deg,
+            #101010,
+            #080808
+        );
 
     overflow:hidden;
+
     cursor:pointer;
+
     transition:.2s;
 }
 
 .gift:hover{
     border-color:rgba(255,0,0,.55);
-    box-shadow:0 0 20px rgba(255,0,0,.12);
+
+    box-shadow:
+        0 0 20px rgba(255,0,0,.12);
 }
 
 .gift:active{
@@ -524,19 +708,32 @@ body::after{
 
 .gift::after{
     content:"";
+
     position:absolute;
+
     top:-100%;
     left:-50%;
+
     width:50%;
     height:300%;
+
     background:rgba(255,0,0,.08);
+
     transform:rotate(25deg);
+
     animation:giftFlow 5s linear infinite;
 }
 
 @keyframes giftFlow{
-    0%{left:-70%;}
-    100%{left:170%;}
+
+    0%{
+        left:-70%;
+    }
+
+    100%{
+        left:170%;
+    }
+
 }
 
 .gift-icon{
@@ -547,11 +744,14 @@ body::after{
     height:49px;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
     border-radius:14px;
+
     background:#160000;
+
     border:1px solid rgba(255,0,0,.35);
 
     font-size:26px;
@@ -560,7 +760,9 @@ body::after{
 .gift-name{
     position:relative;
     z-index:2;
+
     margin-top:10px;
+
     font-size:13px;
     font-weight:800;
 }
@@ -568,21 +770,29 @@ body::after{
 .gift-price{
     position:relative;
     z-index:2;
+
     margin-top:4px;
+
     color:#ff1717;
+
     font-size:12px;
     font-weight:800;
 }
 
-/* =========================
+
+/* =========================================================
    INVENTORY
-========================= */
+========================================================= */
 
 .inventory{
     display:flex;
+
     gap:9px;
+
     overflow-x:auto;
+
     padding-bottom:5px;
+
     scrollbar-width:none;
 }
 
@@ -595,62 +805,87 @@ body::after{
     height:93px;
 
     border-radius:15px;
+
     border:1px solid rgba(255,0,0,.23);
 
     background:#0b0b0b;
 
     display:flex;
+
     flex-direction:column;
+
     align-items:center;
     justify-content:center;
 
     position:relative;
+
     overflow:hidden;
 }
 
 .inventory-item::before{
     content:"";
+
     position:absolute;
+
     width:80px;
     height:20px;
+
     background:rgba(255,0,0,.12);
+
     filter:blur(10px);
+
     transform:rotate(-25deg);
+
     animation:itemFlow 3s linear infinite;
 }
 
 @keyframes itemFlow{
-    from{left:-100px;}
-    to{left:130px;}
+
+    from{
+        left:-100px;
+    }
+
+    to{
+        left:130px;
+    }
+
 }
 
 .inventory-icon{
     position:relative;
     z-index:2;
+
     font-size:26px;
 }
 
 .inventory-name{
     position:relative;
     z-index:2;
+
     margin-top:5px;
+
     color:#aaa;
+
     font-size:10px;
 }
 
-/* =========================
-   POT / CAULDRON
-========================= */
+
+/* =========================================================
+   POT
+========================================================= */
 
 .pot{
     position:relative;
+
     padding:18px;
 
     border-radius:21px;
+
     border:1px solid rgba(255,0,0,.38);
 
     background:
-        radial-gradient(circle at 50% 100%,
+        radial-gradient(
+            circle at 50% 100%,
             rgba(255,0,0,.15),
             transparent 50%
         ),
@@ -661,24 +896,38 @@ body::after{
 
 .pot::before{
     content:"";
+
     position:absolute;
+
     left:-30%;
     top:0;
+
     width:70%;
     height:100%;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,0,0,.12),
-        transparent
-    );
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,0,0,.12),
+            transparent
+        );
+
     transform:skewX(-20deg);
+
     animation:potShine 4s linear infinite;
 }
 
 @keyframes potShine{
-    from{left:-80%;}
-    to{left:150%;}
+
+    from{
+        left:-80%;
+    }
+
+    to{
+        left:150%;
+    }
+
 }
 
 .pot-head{
@@ -686,6 +935,7 @@ body::after{
     z-index:2;
 
     display:flex;
+
     justify-content:space-between;
     align-items:center;
 }
@@ -697,6 +947,7 @@ body::after{
 
 .pot-prize{
     color:#ff1a1a;
+
     font-size:13px;
     font-weight:900;
 }
@@ -706,10 +957,13 @@ body::after{
     z-index:2;
 
     margin-top:14px;
+
     height:10px;
 
     background:#1a1a1a;
+
     border-radius:10px;
+
     overflow:hidden;
 }
 
@@ -718,7 +972,11 @@ body::after{
     height:100%;
 
     background:
-        linear-gradient(90deg,#8d0000,#ff1616);
+        linear-gradient(
+            90deg,
+            #8d0000,
+            #ff1616
+        );
 
     border-radius:10px;
 
@@ -730,20 +988,31 @@ body::after{
 
 .progress-fill::after{
     content:"";
+
     position:absolute;
     inset:0;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.25),
-        transparent
-    );
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.25),
+            transparent
+        );
+
     animation:progressFlow 2s linear infinite;
 }
 
 @keyframes progressFlow{
-    from{transform:translateX(-100%);}
-    to{transform:translateX(100%);}
+
+    from{
+        transform:translateX(-100%);
+    }
+
+    to{
+        transform:translateX(100%);
+    }
+
 }
 
 .pot-info{
@@ -751,11 +1020,13 @@ body::after{
     z-index:2;
 
     display:flex;
+
     justify-content:space-between;
 
     margin-top:8px;
 
     color:#666;
+
     font-size:10px;
 }
 
@@ -764,18 +1035,23 @@ body::after{
     z-index:2;
 
     display:flex;
+
     gap:7px;
+
     margin-top:16px;
 }
 
 .player-mini{
     flex:1;
+
     padding:9px 4px;
 
     text-align:center;
 
     border-radius:12px;
+
     background:#0d0d0d;
+
     border:1px solid #1c1c1c;
 }
 
@@ -785,34 +1061,46 @@ body::after{
 
 .player-mini-name{
     margin-top:3px;
+
     color:#999;
+
     font-size:9px;
 }
 
-/* =========================
+
+/* =========================================================
    SHOP
-========================= */
+========================================================= */
 
 .tabs{
     display:grid;
+
     grid-template-columns:1fr 1fr;
+
     gap:7px;
 
     margin-top:15px;
+
     padding:4px;
 
     border-radius:13px;
+
     background:#0a0a0a;
+
     border:1px solid #1b1b1b;
 }
 
 .tab{
     height:39px;
+
     border:none;
+
     border-radius:10px;
 
     background:transparent;
+
     color:#777;
+
     font-weight:800;
 
     cursor:pointer;
@@ -820,28 +1108,37 @@ body::after{
 
 .tab.active{
     color:#fff;
+
     background:#250000;
-    box-shadow:0 0 12px rgba(255,0,0,.12);
+
+    box-shadow:
+        0 0 12px rgba(255,0,0,.12);
 }
 
 .shop-grid{
     display:grid;
+
     grid-template-columns:1fr 1fr;
+
     gap:10px;
+
     margin-top:12px;
 }
 
-/* =========================
-   AUCTION / TOP
-========================= */
+
+/* =========================================================
+   EMPTY
+========================================================= */
 
 .empty{
     margin-top:15px;
+
     padding:35px 20px;
 
     text-align:center;
 
     border:1px dashed #292929;
+
     border-radius:18px;
 
     color:#666;
@@ -849,27 +1146,32 @@ body::after{
 
 .empty-icon{
     font-size:34px;
+
     margin-bottom:9px;
 }
 
 .empty-title{
     color:#aaa;
+
     font-size:14px;
     font-weight:800;
 }
 
 .empty-text{
     margin-top:6px;
+
     font-size:11px;
     line-height:1.5;
 }
 
-/* =========================
+
+/* =========================================================
    BOTTOM NAV
-========================= */
+========================================================= */
 
 .bottom-nav{
     position:fixed;
+
     z-index:90;
 
     left:50%;
@@ -878,18 +1180,23 @@ body::after{
     transform:translateX(-50%);
 
     width:calc(100% - 20px);
+
     max-width:600px;
+
     height:67px;
 
     display:grid;
+
     grid-template-columns:repeat(5,1fr);
 
     padding:6px;
 
     border-radius:21px;
+
     border:1px solid rgba(255,0,0,.30);
 
     background:rgba(8,8,8,.94);
+
     backdrop-filter:blur(18px);
 
     box-shadow:
@@ -901,15 +1208,20 @@ body::after{
     position:relative;
 
     border:none;
+
     border-radius:15px;
 
     background:transparent;
+
     color:#656565;
 
     display:flex;
+
     flex-direction:column;
+
     align-items:center;
     justify-content:center;
+
     gap:3px;
 
     font-size:9px;
@@ -924,39 +1236,50 @@ body::after{
 
 .nav-btn.active{
     color:#ff1a1a;
+
     background:#170000;
 
-    text-shadow:0 0 9px rgba(255,0,0,.6);
+    text-shadow:
+        0 0 9px rgba(255,0,0,.6);
 }
 
 .nav-btn.active::after{
     content:"";
+
     position:absolute;
+
     bottom:4px;
 
     width:19px;
     height:2px;
 
     border-radius:5px;
+
     background:#ff1515;
 
-    box-shadow:0 0 9px #ff0000;
+    box-shadow:
+        0 0 9px #ff0000;
 }
 
-/* =========================
+
+/* =========================================================
    MODAL
-========================= */
+========================================================= */
 
 .modal{
     position:fixed;
+
     inset:0;
+
     z-index:200;
 
     display:none;
+
     align-items:flex-end;
     justify-content:center;
 
     background:rgba(0,0,0,.72);
+
     backdrop-filter:blur(7px);
 }
 
@@ -971,15 +1294,18 @@ body::after{
     max-width:620px;
 
     max-height:90vh;
+
     overflow:auto;
 
     padding:22px 17px 25px;
 
     border-radius:27px 27px 0 0;
+
     border:1px solid rgba(255,0,0,.35);
 
     background:
-        radial-gradient(circle at 50% 0%,
+        radial-gradient(
+            circle at 50% 0%,
             rgba(255,0,0,.14),
             transparent 40%
         ),
@@ -993,21 +1319,27 @@ body::after{
 }
 
 @keyframes modalUp{
+
     from{
         transform:translateY(100%);
         opacity:.4;
     }
+
     to{
         transform:translateY(0);
         opacity:1;
     }
+
 }
 
 .modal-handle{
     width:42px;
     height:4px;
+
     border-radius:5px;
+
     background:#383838;
+
     margin:0 auto 18px;
 }
 
@@ -1018,12 +1350,15 @@ body::after{
 
 .modal-subtitle{
     margin-top:5px;
+
     color:#666;
+
     font-size:11px;
 }
 
 .close{
     position:absolute;
+
     right:15px;
     top:15px;
 
@@ -1031,27 +1366,42 @@ body::after{
     height:35px;
 
     border-radius:50%;
+
     border:1px solid #252525;
 
     background:#101010;
+
     color:#aaa;
 
     cursor:pointer;
 }
 
-/* =========================
+
+/* =========================================================
    ROULETTE
-========================= */
+========================================================= */
+
+.roulette-wrap{
+    position:relative;
+
+    width:240px;
+    height:240px;
+
+    margin:22px auto 10px;
+}
 
 .roulette{
+    position:absolute;
+
+    left:15px;
+    top:15px;
+
     width:210px;
     height:210px;
 
-    margin:20px auto;
-
     border-radius:50%;
 
-    border:8px solid #260000;
+    border:8px solid #350000;
 
     background:
         conic-gradient(
@@ -1066,54 +1416,170 @@ body::after{
         );
 
     box-shadow:
-        0 0 25px rgba(255,0,0,.3);
+        0 0 20px rgba(255,0,0,.35),
+        inset 0 0 20px rgba(0,0,0,.8);
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
-    animation:rouletteIdle 5s linear infinite;
+    transform:rotate(0deg);
 }
 
-@keyframes rouletteIdle{
-    to{transform:rotate(360deg);}
+.roulette-sectors{
+    position:absolute;
+
+    inset:0;
+
+    border-radius:50%;
+}
+
+.roulette-sectors div{
+    position:absolute;
+
+    width:50%;
+    height:50%;
+
+    left:25%;
+    top:25%;
+
+    display:flex;
+
+    align-items:flex-start;
+    justify-content:center;
+
+    padding-top:5px;
+
+    font-size:12px;
+    font-weight:900;
+
+    color:#fff;
+
+    transform-origin:50% 50%;
+}
+
+.roulette-sectors div:nth-child(1){
+    transform:
+        rotate(22.5deg)
+        translateY(-82px);
+}
+
+.roulette-sectors div:nth-child(2){
+    transform:
+        rotate(67.5deg)
+        translateY(-82px);
+}
+
+.roulette-sectors div:nth-child(3){
+    transform:
+        rotate(112.5deg)
+        translateY(-82px);
+}
+
+.roulette-sectors div:nth-child(4){
+    transform:
+        rotate(157.5deg)
+        translateY(-82px);
+}
+
+.roulette-sectors div:nth-child(5){
+    transform:
+        rotate(202.5deg)
+        translateY(-82px);
+}
+
+.roulette-sectors div:nth-child(6){
+    transform:
+        rotate(247.5deg)
+        translateY(-82px);
+}
+
+.roulette-sectors div:nth-child(7){
+    transform:
+        rotate(292.5deg)
+        translateY(-82px);
+}
+
+.roulette-sectors div:nth-child(8){
+    transform:
+        rotate(337.5deg)
+        translateY(-82px);
 }
 
 .roulette-center{
-    width:68px;
-    height:68px;
+    position:relative;
+
+    z-index:5;
+
+    width:66px;
+    height:66px;
 
     border-radius:50%;
 
-    background:#090909;
+    background:#080808;
+
     border:2px solid #ff1111;
 
     display:flex;
+
     align-items:center;
     justify-content:center;
 
     font-size:23px;
 
-    box-shadow:0 0 17px rgba(255,0,0,.5);
+    box-shadow:
+        0 0 15px rgba(255,0,0,.6);
 }
 
-/* =========================
+.roulette-pointer{
+    position:absolute;
+
+    z-index:20;
+
+    top:-4px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    color:#ff1111;
+
+    font-size:30px;
+
+    text-shadow:
+        0 0 8px #ff0000,
+        0 0 20px rgba(255,0,0,.7);
+}
+
+#spinButton:disabled{
+    opacity:.4;
+
+    cursor:not-allowed;
+
+    filter:grayscale(.4);
+}
+
+
+/* =========================================================
    FORM
-========================= */
+========================================================= */
 
 .input{
     width:100%;
     height:48px;
 
     margin-top:13px;
+
     padding:0 14px;
 
     border-radius:13px;
+
     border:1px solid #272727;
 
     outline:none;
 
     background:#050505;
+
     color:#fff;
 
     font-size:14px;
@@ -1121,7 +1587,9 @@ body::after{
 
 .input:focus{
     border-color:#9b0000;
-    box-shadow:0 0 12px rgba(255,0,0,.10);
+
+    box-shadow:
+        0 0 12px rgba(255,0,0,.10);
 }
 
 .modal-button{
@@ -1131,31 +1599,49 @@ body::after{
     margin-top:12px;
 
     border:0;
+
     border-radius:13px;
 
-    background:linear-gradient(135deg,#ff1717,#8b0000);
+    background:
+        linear-gradient(
+            135deg,
+            #ff1717,
+            #8b0000
+        );
+
     color:#fff;
 
     font-weight:900;
+
     cursor:pointer;
 
-    box-shadow:0 0 15px rgba(255,0,0,.18);
+    box-shadow:
+        0 0 15px rgba(255,0,0,.18);
 }
 
-/* =========================
+.modal-button:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+
+/* =========================================================
    TOAST
-========================= */
+========================================================= */
 
 .toast{
     position:fixed;
+
     z-index:500;
 
     left:50%;
     bottom:90px;
 
-    transform:translate(-50%,20px);
+    transform:
+        translate(-50%,20px);
 
     opacity:0;
+
     pointer-events:none;
 
     max-width:90%;
@@ -1167,27 +1653,33 @@ body::after{
     border:1px solid rgba(255,0,0,.35);
 
     background:#110000;
+
     color:#fff;
 
     font-size:12px;
     font-weight:700;
 
-    box-shadow:0 0 20px rgba(255,0,0,.18);
+    box-shadow:
+        0 0 20px rgba(255,0,0,.18);
 
     transition:.25s;
 }
 
 .toast.show{
     opacity:1;
-    transform:translate(-50%,0);
+
+    transform:
+        translate(-50%,0);
 }
 
-/* =========================
+
+/* =========================================================
    ADMIN
-========================= */
+========================================================= */
 
 .admin-category{
     margin-top:10px;
+
     padding:14px;
 
     border-radius:17px;
@@ -1204,7 +1696,9 @@ body::after{
 
 .admin-category-description{
     margin-top:4px;
+
     color:#666;
+
     font-size:10px;
 }
 
@@ -1215,18 +1709,22 @@ body::after{
     margin-top:10px;
 
     border:1px solid rgba(255,0,0,.35);
+
     border-radius:11px;
 
     background:#170000;
+
     color:#ff2222;
 
     font-weight:800;
+
     cursor:pointer;
 }
 
-/* =========================
+
+/* =========================================================
    RESPONSIVE
-========================= */
+========================================================= */
 
 @media(max-width:380px){
 
@@ -1253,44 +1751,143 @@ body::after{
         width:calc(100% - 12px);
         bottom:6px;
     }
+
 }
+
 </style>
 </head>
 
+
 <body>
+
 
 <div class="app">
 
-    <!-- PROFILE -->
 
-    <div class="profile">
+<!-- =====================================================
+     PROFILE
+====================================================== -->
 
-        <div class="avatar" id="avatar">
-            🧑
+<div class="profile">
+
+    <div class="avatar" id="avatar">
+        🧑
+    </div>
+
+    <div class="profile-info">
+
+        <div class="profile-name" id="username">
+            Игрок
         </div>
 
-        <div class="profile-info">
+        <div class="profile-username" id="tgusername">
+            @Telegram
+        </div>
 
-            <div class="profile-name" id="username">
-                Игрок
-            </div>
+    </div>
 
-            <div class="profile-username" id="tgusername">
-                @Telegram
-            </div>
+    <div class="profile-actions">
+
+        <button class="circle-btn"
+                onclick="showNotifications()">
+            🔔
+        </button>
+
+        <button class="circle-btn"
+                onclick="showSettings()">
+            ⚙️
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     ADMIN
+====================================================== -->
+
+<div id="adminCategory"
+     class="admin-category"
+     style="display:none;">
+
+    <div class="admin-category-title">
+        ⚙️ Админ Панель
+    </div>
+
+    <div class="admin-category-description">
+        Управление игрой
+    </div>
+
+    <button class="admin-button"
+            onclick="openAdminLogin()">
+        🔐 Открыть админ панель
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     HOME
+====================================================== -->
+
+<section id="homePage"
+         class="page active">
+
+
+    <div class="hero">
+
+        <div class="hero-title">
+            Твой баланс
+        </div>
+
+
+        <div class="balance">
+
+            <span id="balance">
+                0
+            </span>
+
+            <span class="coin">
+                🪙
+            </span>
 
         </div>
 
-        <div class="profile-actions">
 
-            <button class="circle-btn"
-                    onclick="showNotifications()">
-                🔔
+        <div class="multiplier">
+
+            Коэффициент:
+
+            <b id="multiplier">
+                x1.00
+            </b>
+
+        </div>
+
+
+        <div id="starTimer">
+
+            ⭐ Следующая звезда через 60 сек
+
+        </div>
+
+
+        <div class="balance-buttons">
+
+            <button class="main-btn"
+                    onclick="openRoulette()">
+
+                🎰 РУЛЕТКА
+
             </button>
 
-            <button class="circle-btn"
-                    onclick="showSettings()">
-                ⚙️
+
+            <button class="main-btn"
+                    onclick="collectBonus()">
+
+                🎁 НЕДЕЛЬНЫЙ БОНУС
+
             </button>
 
         </div>
@@ -1298,407 +1895,529 @@ body::after{
     </div>
 
 
-    <!-- ADMIN -->
+    <!-- =================================================
+         REFERRAL
+    ================================================== -->
 
-    <div id="adminCategory"
-         class="admin-category"
-         style="display:none;">
+    <div class="section-title">
 
-        <div class="admin-category-title">
-            ⚙️ Админ Панель
+        Пригласи друзей
+
+        <span>
+            + монеты
+        </span>
+
+    </div>
+
+
+    <div class="referral">
+
+        <div class="referral-title">
+            👥 Позови 2 друзей
         </div>
 
-        <div class="admin-category-description">
-            Управление игрой
+        <div class="referral-text">
+
+            Приглашай друзей и получай
+            дополнительные монеты
+            за каждого нового игрока.
+
         </div>
 
-        <button class="admin-button"
-                onclick="openAdminLogin()">
-            🔐 Открыть админ панель
+
+        <div class="referral-bottom">
+
+            <input
+                id="referralLink"
+                class="referral-input"
+                readonly
+                value="https://t.me/RaneGameBot?start=ref">
+
+
+            <button class="copy-btn"
+                    onclick="copyReferral()">
+
+                📋
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         INVENTORY
+    ================================================== -->
+
+    <div class="section-title">
+
+        Инвентарь
+
+        <span onclick="goShop()">
+            Все →
+        </span>
+
+    </div>
+
+
+    <div class="inventory">
+
+        <div class="inventory-item">
+
+            <div class="inventory-icon">
+                🎁
+            </div>
+
+            <div class="inventory-name">
+                Red Gift
+            </div>
+
+        </div>
+
+
+        <div class="inventory-item">
+
+            <div class="inventory-icon">
+                🔥
+            </div>
+
+            <div class="inventory-name">
+                Fire
+            </div>
+
+        </div>
+
+
+        <div class="inventory-item">
+
+            <div class="inventory-icon">
+                💎
+            </div>
+
+            <div class="inventory-name">
+                Diamond
+            </div>
+
+        </div>
+
+
+        <div class="inventory-item">
+
+            <div class="inventory-icon">
+                👑
+            </div>
+
+            <div class="inventory-name">
+                Crown
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         POT
+    ================================================== -->
+
+    <div class="section-title">
+
+        Котёл
+
+        <span>
+            Розыгрыш
+        </span>
+
+    </div>
+
+
+    <div class="pot">
+
+        <div class="pot-head">
+
+            <div class="pot-title">
+                🔥 Большой котёл
+            </div>
+
+            <div class="pot-prize">
+                10 000 🪙
+            </div>
+
+        </div>
+
+
+        <div class="progress">
+
+            <div class="progress-fill"></div>
+
+        </div>
+
+
+        <div class="pot-info">
+
+            <span>
+                67% заполнено
+            </span>
+
+            <span>
+                До розыгрыша: 33%
+            </span>
+
+        </div>
+
+
+        <div class="players">
+
+            <div class="player-mini">
+
+                <div class="player-mini-avatar">
+                    🧑
+                </div>
+
+                <div class="player-mini-name">
+                    Rane
+                </div>
+
+            </div>
+
+
+            <div class="player-mini">
+
+                <div class="player-mini-avatar">
+                    👤
+                </div>
+
+                <div class="player-mini-name">
+                    Player
+                </div>
+
+            </div>
+
+
+            <div class="player-mini">
+
+                <div class="player-mini-avatar">
+                    👤
+                </div>
+
+                <div class="player-mini-name">
+                    Player
+                </div>
+
+            </div>
+
+
+            <div class="player-mini">
+
+                <div class="player-mini-avatar">
+                    ➕
+                </div>
+
+                <div class="player-mini-name">
+                    Войти
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SHOP
+====================================================== -->
+
+<section id="shopPage"
+         class="page">
+
+    <div class="section-title">
+
+        Магазин
+
+        <span>
+            Предметы
+        </span>
+
+    </div>
+
+
+    <div class="tabs">
+
+        <button id="shopTab"
+                class="tab active"
+                onclick="switchShop('shop')">
+
+            🛒 Магазин
+
+        </button>
+
+
+        <button id="inventoryTab"
+                class="tab"
+                onclick="switchShop('inventory')">
+
+            🎒 Инвентарь
+
         </button>
 
     </div>
 
 
-    <!-- =========================
-         HOME
-    ========================== -->
+    <div id="shopContent">
 
-    <section id="homePage" class="page active">
+        <div class="shop-grid">
 
-        <div class="hero">
 
-            <div class="hero-title">
-                Твой баланс
+            <div class="gift"
+                 onclick="buyGift('Red Gift',100)">
+
+                <div class="gift-icon">
+                    🎁
+                </div>
+
+                <div class="gift-name">
+                    Red Gift
+                </div>
+
+                <div class="gift-price">
+                    100 🪙
+                </div>
+
             </div>
 
-            <div class="balance">
-                <span id="balance">0</span>
-                <span class="coin">🪙</span>
+
+            <div class="gift"
+                 onclick="buyGift('Fire',250)">
+
+                <div class="gift-icon">
+                    🔥
+                </div>
+
+                <div class="gift-name">
+                    Fire
+                </div>
+
+                <div class="gift-price">
+                    250 🪙
+                </div>
+
             </div>
 
-            <div class="multiplier">
-                Множитель:
-                <b id="multiplier">x1.00</b>
+
+            <div class="gift"
+                 onclick="buyGift('Red Diamond',500)">
+
+                <div class="gift-icon">
+                    💎
+                </div>
+
+                <div class="gift-name">
+                    Red Diamond
+                </div>
+
+                <div class="gift-price">
+                    500 🪙
+                </div>
+
             </div>
 
-            <div class="balance-buttons">
 
-                <button class="main-btn"
-                        onclick="openRoulette()">
-                    🎰 РУЛЕТКА
-                </button>
+            <div class="gift"
+                 onclick="buyGift('Red Crown',1000)">
 
-                <button class="main-btn"
-                        onclick="collectBonus()">
-                    🎁 ЗАБРАТЬ БОНУС
-                </button>
+                <div class="gift-icon">
+                    👑
+                </div>
+
+                <div class="gift-name">
+                    Red Crown
+                </div>
+
+                <div class="gift-price">
+                    1 000 🪙
+                </div>
 
             </div>
 
         </div>
 
+    </div>
 
-        <!-- REFERRAL -->
+
+    <div id="inventoryContent"
+         style="display:none;">
 
         <div class="section-title">
-            Пригласи друзей
-            <span>+ монеты</span>
-        </div>
-
-        <div class="referral">
-
-            <div class="referral-title">
-                👥 Позови 2 друзей
-            </div>
-
-            <div class="referral-text">
-                Приглашай друзей и получай дополнительные монеты
-                за каждого нового игрока.
-            </div>
-
-            <div class="referral-bottom">
-
-                <input
-                    id="referralLink"
-                    class="referral-input"
-                    readonly
-                    value="https://t.me/RaneGameBot?start=ref">
-
-                <button class="copy-btn"
-                        onclick="copyReferral()">
-                    📋
-                </button>
-
-            </div>
-
+            Твои предметы
         </div>
 
 
-        <!-- INVENTORY -->
-
-        <div class="section-title">
-            Инвентарь
-            <span onclick="goShop()">Все →</span>
-        </div>
-
-        <div class="inventory">
+        <div class="inventory"
+             style="flex-wrap:wrap;">
 
             <div class="inventory-item">
-                <div class="inventory-icon">🎁</div>
-                <div class="inventory-name">Red Gift</div>
+
+                <div class="inventory-icon">
+                    🎁
+                </div>
+
+                <div class="inventory-name">
+                    Red Gift
+                </div>
+
             </div>
+
 
             <div class="inventory-item">
-                <div class="inventory-icon">🔥</div>
-                <div class="inventory-name">Fire</div>
+
+                <div class="inventory-icon">
+                    🔥
+                </div>
+
+                <div class="inventory-name">
+                    Fire
+                </div>
+
             </div>
+
 
             <div class="inventory-item">
-                <div class="inventory-icon">💎</div>
-                <div class="inventory-name">Diamond</div>
+
+                <div class="inventory-icon">
+                    💎
+                </div>
+
+                <div class="inventory-name">
+                    Diamond
+                </div>
+
             </div>
+
 
             <div class="inventory-item">
-                <div class="inventory-icon">👑</div>
-                <div class="inventory-name">Crown</div>
-            </div>
 
-        </div>
-
-
-        <!-- POT -->
-
-        <div class="section-title">
-            Котёл
-            <span>Розыгрыш</span>
-        </div>
-
-        <div class="pot">
-
-            <div class="pot-head">
-
-                <div class="pot-title">
-                    🔥 Большой котёл
+                <div class="inventory-icon">
+                    👑
                 </div>
 
-                <div class="pot-prize">
-                    10 000 🪙
-                </div>
-
-            </div>
-
-            <div class="progress">
-                <div class="progress-fill"></div>
-            </div>
-
-            <div class="pot-info">
-                <span>67% заполнено</span>
-                <span>До розыгрыша: 33%</span>
-            </div>
-
-            <div class="players">
-
-                <div class="player-mini">
-                    <div class="player-mini-avatar">🧑</div>
-                    <div class="player-mini-name">Rane</div>
-                </div>
-
-                <div class="player-mini">
-                    <div class="player-mini-avatar">👤</div>
-                    <div class="player-mini-name">Player</div>
-                </div>
-
-                <div class="player-mini">
-                    <div class="player-mini-avatar">👤</div>
-                    <div class="player-mini-name">Player</div>
-                </div>
-
-                <div class="player-mini">
-                    <div class="player-mini-avatar">➕</div>
-                    <div class="player-mini-name">Войти</div>
+                <div class="inventory-name">
+                    Crown
                 </div>
 
             </div>
 
         </div>
 
-    </section>
+    </div>
+
+</section>
 
 
-    <!-- =========================
-         SHOP
-    ========================== -->
+<!-- =====================================================
+     AUCTION
+====================================================== -->
 
-    <section id="shopPage" class="page">
+<section id="auctionPage"
+         class="page">
 
-        <div class="section-title">
-            Магазин
-            <span>Предметы</span>
+    <div class="section-title">
+
+        Аукцион
+
+        <span>
+            Скоро
+        </span>
+
+    </div>
+
+
+    <div class="empty">
+
+        <div class="empty-icon">
+            🔨
         </div>
 
-        <div class="tabs">
-
-            <button id="shopTab"
-                    class="tab active"
-                    onclick="switchShop('shop')">
-                🛒 Магазин
-            </button>
-
-            <button id="inventoryTab"
-                    class="tab"
-                    onclick="switchShop('inventory')">
-                🎒 Инвентарь
-            </button>
-
+        <div class="empty-title">
+            Аукцион пока пуст
         </div>
 
+        <div class="empty-text">
 
-        <div id="shopContent">
-
-            <div class="shop-grid">
-
-                <div class="gift"
-                     onclick="buyGift('Red Gift',100)">
-
-                    <div class="gift-icon">🎁</div>
-
-                    <div class="gift-name">
-                        Red Gift
-                    </div>
-
-                    <div class="gift-price">
-                        100 🪙
-                    </div>
-
-                </div>
-
-
-                <div class="gift"
-                     onclick="buyGift('Fire',250)">
-
-                    <div class="gift-icon">🔥</div>
-
-                    <div class="gift-name">
-                        Fire
-                    </div>
-
-                    <div class="gift-price">
-                        250 🪙
-                    </div>
-
-                </div>
-
-
-                <div class="gift"
-                     onclick="buyGift('Red Diamond',500)">
-
-                    <div class="gift-icon">💎</div>
-
-                    <div class="gift-name">
-                        Red Diamond
-                    </div>
-
-                    <div class="gift-price">
-                        500 🪙
-                    </div>
-
-                </div>
-
-
-                <div class="gift"
-                     onclick="buyGift('Red Crown',1000)">
-
-                    <div class="gift-icon">👑</div>
-
-                    <div class="gift-name">
-                        Red Crown
-                    </div>
-
-                    <div class="gift-price">
-                        1 000 🪙
-                    </div>
-
-                </div>
-
-            </div>
+            Здесь появятся предметы игроков,
+            которые можно будет купить или продать.
 
         </div>
 
+    </div>
 
-        <div id="inventoryContent"
-             style="display:none;">
+</section>
 
-            <div class="section-title">
-                Твои предметы
-            </div>
 
-            <div class="inventory"
-                 style="flex-wrap:wrap;">
+<!-- =====================================================
+     TOP
+====================================================== -->
 
-                <div class="inventory-item">
-                    <div class="inventory-icon">🎁</div>
-                    <div class="inventory-name">Red Gift</div>
-                </div>
+<section id="topPage"
+         class="page">
 
-                <div class="inventory-item">
-                    <div class="inventory-icon">🔥</div>
-                    <div class="inventory-name">Fire</div>
-                </div>
+    <div class="section-title">
 
-                <div class="inventory-item">
-                    <div class="inventory-icon">💎</div>
-                    <div class="inventory-name">Diamond</div>
-                </div>
+        Топ игроков
 
-                <div class="inventory-item">
-                    <div class="inventory-icon">👑</div>
-                    <div class="inventory-name">Crown</div>
-                </div>
+        <span>
+            Рейтинг
+        </span>
 
-            </div>
+    </div>
+
+
+    <div class="empty">
+
+        <div class="empty-icon">
+            🏆
+        </div>
+
+        <div class="empty-title">
+            Таблица лидеров
+        </div>
+
+        <div class="empty-text">
+
+            Здесь будут отображаться
+            лучшие игроки RaneGame.
 
         </div>
 
-    </section>
+    </div>
 
+</section>
 
-    <!-- =========================
-         AUCTION
-    ========================== -->
-
-    <section id="auctionPage" class="page">
-
-        <div class="section-title">
-            Аукцион
-            <span>Скоро</span>
-        </div>
-
-        <div class="empty">
-
-            <div class="empty-icon">
-                🔨
-            </div>
-
-            <div class="empty-title">
-                Аукцион пока пуст
-            </div>
-
-            <div class="empty-text">
-                Здесь появятся предметы игроков,
-                которые можно будет купить или продать.
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =========================
-         TOP
-    ========================== -->
-
-    <section id="topPage" class="page">
-
-        <div class="section-title">
-            Топ игроков
-            <span>Рейтинг</span>
-        </div>
-
-        <div class="empty">
-
-            <div class="empty-icon">
-                🏆
-            </div>
-
-            <div class="empty-title">
-                Таблица лидеров
-            </div>
-
-            <div class="empty-text">
-                Здесь будут отображаться лучшие игроки
-                RaneGame.
-            </div>
-
-        </div>
-
-    </section>
 
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      BOTTOM NAV
-========================= -->
+====================================================== -->
 
 <nav class="bottom-nav">
+
 
     <button id="navHome"
             class="nav-btn active"
             onclick="showPage('home')">
 
-        <div class="nav-icon">⌂</div>
-        <div>Главная</div>
+        <div class="nav-icon">
+            ⌂
+        </div>
+
+        <div>
+            Главная
+        </div>
 
     </button>
 
@@ -1707,8 +2426,13 @@ body::after{
             class="nav-btn"
             onclick="showPage('shop')">
 
-        <div class="nav-icon">🛒</div>
-        <div>Магазин</div>
+        <div class="nav-icon">
+            🛒
+        </div>
+
+        <div>
+            Магазин
+        </div>
 
     </button>
 
@@ -1717,8 +2441,13 @@ body::after{
             class="nav-btn"
             onclick="showPage('auction')">
 
-        <div class="nav-icon">🔨</div>
-        <div>Аукцион</div>
+        <div class="nav-icon">
+            🔨
+        </div>
+
+        <div>
+            Аукцион
+        </div>
 
     </button>
 
@@ -1727,8 +2456,13 @@ body::after{
             class="nav-btn"
             onclick="showPage('top')">
 
-        <div class="nav-icon">🏆</div>
-        <div>Топ</div>
+        <div class="nav-icon">
+            🏆
+        </div>
+
+        <div>
+            Топ
+        </div>
 
     </button>
 
@@ -1736,17 +2470,22 @@ body::after{
     <button class="nav-btn"
             onclick="showSettings()">
 
-        <div class="nav-icon">⚙️</div>
-        <div>Ещё</div>
+        <div class="nav-icon">
+            ⚙️
+        </div>
+
+        <div>
+            Ещё
+        </div>
 
     </button>
 
 </nav>
 
 
-<!-- =========================
+<!-- =====================================================
      ADMIN MODAL
-========================= -->
+====================================================== -->
 
 <div id="adminModal"
      class="modal"
@@ -1756,28 +2495,30 @@ body::after{
 
         <div class="modal-handle"></div>
 
+
         <button class="close"
                 onclick="closeModal('adminModal')">
+
             ✕
+
         </button>
+
 
         <div class="modal-title">
             🔐 Админ панель
         </div>
 
+
         <div class="modal-subtitle">
-            Введи пароль администратора
+            Авторизация администратора
         </div>
 
-        <input
-            id="adminPassword"
-            class="input"
-            type="password"
-            placeholder="Пароль">
 
         <button class="modal-button"
                 onclick="loginAdmin()">
-            Войти
+
+            🔐 ВОЙТИ
+
         </button>
 
     </div>
@@ -1785,9 +2526,9 @@ body::after{
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      ROULETTE MODAL
-========================= -->
+====================================================== -->
 
 <div id="rouletteModal"
      class="modal"
@@ -1797,31 +2538,111 @@ body::after{
 
         <div class="modal-handle"></div>
 
+
         <button class="close"
                 onclick="closeModal('rouletteModal')">
+
             ✕
+
         </button>
+
 
         <div class="modal-title">
             🎰 Рулетка
         </div>
 
+
         <div class="modal-subtitle">
             Испытай удачу
         </div>
 
-        <div class="roulette"
-             id="roulette">
 
-            <div class="roulette-center">
-                🎁
+        <div class="roulette-wrap">
+
+            <div class="roulette-pointer">
+                ▼
+            </div>
+
+
+            <div class="roulette"
+                 id="roulette">
+
+                <div class="roulette-sectors">
+
+                    <div>
+                        x0.1
+                    </div>
+
+                    <div>
+                        x0.25
+                    </div>
+
+                    <div>
+                        x0.5
+                    </div>
+
+                    <div>
+                        x0.75
+                    </div>
+
+                    <div>
+                        x1
+                    </div>
+
+                    <div>
+                        x1.25
+                    </div>
+
+                    <div>
+                        x1.5
+                    </div>
+
+                    <div>
+                        x2
+                    </div>
+
+                </div>
+
+
+                <div class="roulette-center">
+                    ⭐
+                </div>
+
             </div>
 
         </div>
 
-        <button class="modal-button"
+
+        <div id="rouletteResult"
+             style="
+                text-align:center;
+                margin-top:8px;
+                min-height:20px;
+                color:#ff1717;
+                font-weight:900;
+                font-size:15px;
+             ">
+
+        </div>
+
+
+        <div id="rouletteCooldown"
+             style="
+                text-align:center;
+                margin-top:6px;
+                color:#666;
+                font-size:11px;
+             ">
+
+        </div>
+
+
+        <button id="spinButton"
+                class="modal-button"
                 onclick="spinRoulette()">
-            КРУТИТЬ
+
+            🎰 КРУТИТЬ
+
         </button>
 
     </div>
@@ -1829,9 +2650,9 @@ body::after{
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      SETTINGS MODAL
-========================= -->
+====================================================== -->
 
 <div id="settingsModal"
      class="modal"
@@ -1841,27 +2662,38 @@ body::after{
 
         <div class="modal-handle"></div>
 
+
         <button class="close"
                 onclick="closeModal('settingsModal')">
+
             ✕
+
         </button>
+
 
         <div class="modal-title">
             ⚙️ Настройки
         </div>
 
+
         <div class="modal-subtitle">
             Настройки RaneGame
         </div>
 
+
         <button class="modal-button"
                 onclick="showNotifications();closeModal('settingsModal')">
+
             🔔 Уведомления
+
         </button>
+
 
         <button class="modal-button"
                 onclick="toast('Настройки сохранены')">
+
             💾 Сохранить
+
         </button>
 
     </div>
@@ -1869,9 +2701,9 @@ body::after{
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      TOAST
-========================= -->
+====================================================== -->
 
 <div id="toast"
      class="toast">
@@ -1880,9 +2712,9 @@ body::after{
 
 <script>
 
-/* =========================
+/* =========================================================
    TELEGRAM
-========================= */
+========================================================= */
 
 const tg =
     window.Telegram &&
@@ -1890,26 +2722,33 @@ const tg =
         ? window.Telegram.WebApp
         : null;
 
+
 if(tg){
 
     tg.ready();
+
     tg.expand();
 
     try{
+
         tg.setHeaderColor("#050505");
+
         tg.setBackgroundColor("#050505");
+
     }catch(e){}
 
 }
 
 
-/* =========================
+/* =========================================================
    USER
-========================= */
+========================================================= */
 
-const DEV_TELEGRAM_ID = "8791077915";
+const DEV_TELEGRAM_ID =
+    "8791077915";
 
 let player = null;
+
 
 if(
     tg &&
@@ -1917,72 +2756,297 @@ if(
     tg.initDataUnsafe.user
 ){
 
-    player = tg.initDataUnsafe.user;
+    player =
+        tg.initDataUnsafe.user;
+
 
     const firstName =
-        player.first_name || "Игрок";
+        player.first_name ||
+        "Игрок";
 
-    document.getElementById("username")
-        .textContent = firstName;
 
-    document.getElementById("tgusername")
+    document
+        .getElementById("username")
+        .textContent =
+            firstName;
+
+
+    document
+        .getElementById("tgusername")
         .textContent =
             player.username
                 ? "@" + player.username
                 : "Telegram";
+
 
     if(
         String(player.id) ===
         String(DEV_TELEGRAM_ID)
     ){
 
-        document.getElementById(
-            "adminCategory"
-        ).style.display = "block";
+        document
+            .getElementById("adminCategory")
+            .style.display =
+                "block";
 
     }
 
 }
 
 
-/* =========================
+/* =========================================================
    DATA
-========================= */
+========================================================= */
 
-let balance = 0;
-let multiplier = 1;
+let balance =
+    Number(
+        localStorage.getItem(
+            "rane_balance"
+        ) || 0
+    );
+
+
+let multiplier =
+    Number(
+        localStorage.getItem(
+            "rane_multiplier"
+        ) || 1
+    );
+
+
+let rouletteLastSpin =
+    Number(
+        localStorage.getItem(
+            "rane_roulette_last_spin"
+        ) || 0
+    );
+
+
+let weeklyBonus =
+    Number(
+        localStorage.getItem(
+            "rane_weekly_bonus"
+        ) || 0
+    );
+
+
+let stars =
+    Number(
+        localStorage.getItem(
+            "rane_stars"
+        ) || 0
+    );
+
+
+let lastStarTime =
+    Number(
+        localStorage.getItem(
+            "rane_last_star_time"
+        ) || Date.now()
+    );
+
+
+let rouletteSpinning =
+    false;
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
 const balanceElement =
-    document.getElementById("balance");
+    document.getElementById(
+        "balance"
+    );
+
 
 const multiplierElement =
-    document.getElementById("multiplier");
+    document.getElementById(
+        "multiplier"
+    );
 
 
-function updateBalance(){
+const starTimer =
+    document.getElementById(
+        "starTimer"
+    );
 
-    balanceElement.textContent =
-        Number(balance).toLocaleString("ru-RU");
 
-    multiplierElement.textContent =
-        "x" + multiplier.toFixed(2);
+/* =========================================================
+   SAVE
+========================================================= */
+
+function saveGame(){
+
+    localStorage.setItem(
+        "rane_balance",
+        String(balance)
+    );
+
+
+    localStorage.setItem(
+        "rane_multiplier",
+        String(multiplier)
+    );
+
+
+    localStorage.setItem(
+        "rane_roulette_last_spin",
+        String(rouletteLastSpin)
+    );
+
+
+    localStorage.setItem(
+        "rane_weekly_bonus",
+        String(weeklyBonus)
+    );
+
+
+    localStorage.setItem(
+        "rane_stars",
+        String(stars)
+    );
+
+
+    localStorage.setItem(
+        "rane_last_star_time",
+        String(lastStarTime)
+    );
 
 }
 
 
-/* =========================
+/* =========================================================
+   UPDATE BALANCE
+========================================================= */
+
+function updateBalance(){
+
+    balanceElement.textContent =
+        Number(balance)
+            .toLocaleString("ru-RU");
+
+
+    multiplierElement.textContent =
+        "x" +
+        Number(multiplier)
+            .toFixed(2);
+
+}
+
+
+/* =========================================================
+   STARS
+========================================================= */
+
+function updateStars(){
+
+    const now =
+        Date.now();
+
+
+    const minute =
+        60 * 1000;
+
+
+    const elapsed =
+        now -
+        lastStarTime;
+
+
+    if(elapsed >= minute){
+
+        const earned =
+            Math.floor(
+                elapsed /
+                minute
+            );
+
+
+        stars += earned;
+
+
+        lastStarTime +=
+            earned *
+            minute;
+
+
+        saveGame();
+
+
+        if(earned === 1){
+
+            toast(
+                "⭐ +1 звезда"
+            );
+
+        }else{
+
+            toast(
+                "⭐ +" +
+                earned +
+                " звёзд"
+            );
+
+        }
+
+    }
+
+
+    const remaining =
+        Math.max(
+            0,
+            minute -
+            (
+                Date.now() -
+                lastStarTime
+            )
+        );
+
+
+    const seconds =
+        Math.ceil(
+            remaining /
+            1000
+        );
+
+
+    if(starTimer){
+
+        starTimer.textContent =
+            "⭐ Следующая звезда через " +
+            seconds +
+            " сек";
+
+    }
+
+}
+
+
+/* =========================================================
    NAVIGATION
-========================= */
+========================================================= */
 
 function showPage(page){
 
     document
         .querySelectorAll(".page")
-        .forEach(p => p.classList.remove("active"));
+        .forEach(
+            p =>
+                p.classList.remove(
+                    "active"
+                )
+        );
+
 
     document
         .querySelectorAll(".nav-btn")
-        .forEach(b => b.classList.remove("active"));
+        .forEach(
+            b =>
+                b.classList.remove(
+                    "active"
+                )
+        );
 
 
     if(page === "home"){
@@ -1990,6 +3054,7 @@ function showPage(page){
         document
             .getElementById("homePage")
             .classList.add("active");
+
 
         document
             .getElementById("navHome")
@@ -2004,6 +3069,7 @@ function showPage(page){
             .getElementById("shopPage")
             .classList.add("active");
 
+
         document
             .getElementById("navShop")
             .classList.add("active");
@@ -2016,6 +3082,7 @@ function showPage(page){
         document
             .getElementById("auctionPage")
             .classList.add("active");
+
 
         document
             .getElementById("navAuction")
@@ -2030,6 +3097,7 @@ function showPage(page){
             .getElementById("topPage")
             .classList.add("active");
 
+
         document
             .getElementById("navTop")
             .classList.add("active");
@@ -2040,55 +3108,93 @@ function showPage(page){
 
 
 function goShop(){
+
     showPage("shop");
+
 }
 
 
-/* =========================
+/* =========================================================
    SHOP TABS
-========================= */
+========================================================= */
 
 function switchShop(type){
 
     const shop =
-        document.getElementById("shopContent");
+        document.getElementById(
+            "shopContent"
+        );
+
 
     const inventory =
-        document.getElementById("inventoryContent");
+        document.getElementById(
+            "inventoryContent"
+        );
+
 
     const shopTab =
-        document.getElementById("shopTab");
+        document.getElementById(
+            "shopTab"
+        );
+
 
     const inventoryTab =
-        document.getElementById("inventoryTab");
+        document.getElementById(
+            "inventoryTab"
+        );
 
 
     if(type === "shop"){
 
-        shop.style.display = "block";
-        inventory.style.display = "none";
+        shop.style.display =
+            "block";
 
-        shopTab.classList.add("active");
-        inventoryTab.classList.remove("active");
+
+        inventory.style.display =
+            "none";
+
+
+        shopTab.classList.add(
+            "active"
+        );
+
+
+        inventoryTab.classList.remove(
+            "active"
+        );
 
     }else{
 
-        shop.style.display = "none";
-        inventory.style.display = "block";
+        shop.style.display =
+            "none";
 
-        shopTab.classList.remove("active");
-        inventoryTab.classList.add("active");
+
+        inventory.style.display =
+            "block";
+
+
+        shopTab.classList.remove(
+            "active"
+        );
+
+
+        inventoryTab.classList.add(
+            "active"
+        );
 
     }
 
 }
 
 
-/* =========================
+/* =========================================================
    GIFTS
-========================= */
+========================================================= */
 
-function buyGift(name,price){
+function buyGift(
+    name,
+    price
+){
 
     if(balance < price){
 
@@ -2100,41 +3206,131 @@ function buyGift(name,price){
 
     }
 
+
     balance -= price;
+
+
+    saveGame();
+
 
     updateBalance();
 
+
     toast(
-        name + " куплен!"
+        name +
+        " куплен!"
     );
 
 }
 
 
-/* =========================
-   BONUS
-========================= */
+/* =========================================================
+   WEEKLY BONUS
+========================================================= */
 
 function collectBonus(){
 
-    const bonus = 100;
+    const now =
+        Date.now();
 
-    balance += bonus;
+
+    const week =
+        7 *
+        24 *
+        60 *
+        60 *
+        1000;
+
+
+    if(
+        weeklyBonus &&
+        now -
+        weeklyBonus <
+        week
+    ){
+
+        const remaining =
+            week -
+            (
+                now -
+                weeklyBonus
+            );
+
+
+        const days =
+            Math.floor(
+                remaining /
+                (
+                    24 *
+                    60 *
+                    60 *
+                    1000
+                )
+            );
+
+
+        const hours =
+            Math.floor(
+                (
+                    remaining %
+                    (
+                        24 *
+                        60 *
+                        60 *
+                        1000
+                    )
+                ) /
+                (
+                    60 *
+                    60 *
+                    1000
+                )
+            );
+
+
+        toast(
+            "🎁 Бонус уже получен. " +
+            "Через " +
+            days +
+            "д " +
+            hours +
+            "ч"
+        );
+
+
+        return;
+
+    }
+
+
+    const bonus =
+        1000;
+
+
+    balance +=
+        bonus;
+
+
+    weeklyBonus =
+        now;
+
+
+    saveGame();
+
 
     updateBalance();
 
+
     toast(
-        "+" +
-        bonus +
-        " 🪙 Бонус получен!"
+        "🎁 +1 000 🪙 недельный бонус!"
     );
 
 }
 
 
-/* =========================
+/* =========================================================
    REFERRAL
-========================= */
+========================================================= */
 
 function copyReferral(){
 
@@ -2142,6 +3338,7 @@ function copyReferral(){
         document.getElementById(
             "referralLink"
         );
+
 
     if(
         navigator.clipboard &&
@@ -2155,9 +3352,13 @@ function copyReferral(){
     }else{
 
         input.select();
-        document.execCommand("copy");
+
+        document.execCommand(
+            "copy"
+        );
 
     }
+
 
     toast(
         "Реферальная ссылка скопирована"
@@ -2166,105 +3367,443 @@ function copyReferral(){
 }
 
 
-/* =========================
+/* =========================================================
    ROULETTE
-========================= */
+========================================================= */
 
 function openRoulette(){
 
     document
-        .getElementById("rouletteModal")
-        .classList.add("show");
+        .getElementById(
+            "rouletteModal"
+        )
+        .classList.add(
+            "show"
+        );
+
+
+    updateRouletteButton();
+
+}
+
+
+function canSpinRoulette(){
+
+    const threeHours =
+        3 *
+        60 *
+        60 *
+        1000;
+
+
+    if(!rouletteLastSpin){
+
+        return true;
+
+    }
+
+
+    return (
+        Date.now() -
+        rouletteLastSpin >=
+        threeHours
+    );
+
+}
+
+
+function getRouletteRemaining(){
+
+    const threeHours =
+        3 *
+        60 *
+        60 *
+        1000;
+
+
+    return Math.max(
+        0,
+        threeHours -
+        (
+            Date.now() -
+            rouletteLastSpin
+        )
+    );
+
+}
+
+
+function formatTime(ms){
+
+    const totalSeconds =
+        Math.ceil(
+            ms / 1000
+        );
+
+
+    const hours =
+        Math.floor(
+            totalSeconds /
+            3600
+        );
+
+
+    const minutes =
+        Math.floor(
+            (
+                totalSeconds %
+                3600
+            ) /
+            60
+        );
+
+
+    const seconds =
+        totalSeconds %
+        60;
+
+
+    return (
+
+        String(hours)
+            .padStart(2,"0")
+
+        +
+
+        ":"
+
+        +
+
+        String(minutes)
+            .padStart(2,"0")
+
+        +
+
+        ":"
+
+        +
+
+        String(seconds)
+            .padStart(2,"0")
+
+    );
+
+}
+
+
+function updateRouletteButton(){
+
+    const button =
+        document.getElementById(
+            "spinButton"
+        );
+
+
+    const cooldown =
+        document.getElementById(
+            "rouletteCooldown"
+        );
+
+
+    if(!button){
+
+        return;
+
+    }
+
+
+    if(rouletteSpinning){
+
+        button.disabled =
+            true;
+
+
+        button.textContent =
+            "🎰 КРУТИТСЯ...";
+
+
+        return;
+
+    }
+
+
+    if(canSpinRoulette()){
+
+        button.disabled =
+            false;
+
+
+        button.textContent =
+            "🎰 КРУТИТЬ";
+
+
+        cooldown.textContent =
+            "Можно крутить прямо сейчас";
+
+
+        return;
+
+    }
+
+
+    button.disabled =
+        true;
+
+
+    button.textContent =
+        "⏳ РУЛЕТКА ЗАКРЫТА";
+
+
+    cooldown.textContent =
+        "Следующая попытка через " +
+        formatTime(
+            getRouletteRemaining()
+        );
 
 }
 
 
 function spinRoulette(){
 
+    if(rouletteSpinning){
+
+        return;
+
+    }
+
+
+    if(!canSpinRoulette()){
+
+        toast(
+            "🎰 Рулетка будет доступна через " +
+            formatTime(
+                getRouletteRemaining()
+            )
+        );
+
+
+        updateRouletteButton();
+
+
+        return;
+
+    }
+
+
     const roulette =
-        document.getElementById("roulette");
+        document.getElementById(
+            "roulette"
+        );
 
-    roulette.style.animation = "none";
 
-    void roulette.offsetWidth;
+    const result =
+        document.getElementById(
+            "rouletteResult"
+        );
+
+
+    rouletteSpinning =
+        true;
+
+
+    updateRouletteButton();
+
+
+    result.textContent =
+        "🎰 Рулетка крутится...";
+
+
+    const rewards = [
+
+        0.10,
+        0.25,
+        0.50,
+        0.75,
+        1.00,
+        1.25,
+        1.50,
+        2.00
+
+    ];
+
+
+    const index =
+        Math.floor(
+            Math.random() *
+            rewards.length
+        );
+
+
+    const reward =
+        rewards[index];
+
+
+    const sector =
+        index *
+        45;
+
+
+    const extraTurns =
+        360 *
+        6;
+
+
+    const targetRotation =
+        extraTurns +
+        (
+            360 -
+            sector
+        ) +
+        22.5;
+
 
     roulette.style.transition =
-        "transform 3s cubic-bezier(.1,.8,.15,1)";
+        "transform 3.5s cubic-bezier(.12,.72,.16,1)";
 
-    const rotation =
-        1440 +
-        Math.floor(Math.random() * 360);
 
     roulette.style.transform =
-        "rotate(" + rotation + "deg)";
+        "rotate(" +
+        targetRotation +
+        "deg)";
 
 
     setTimeout(() => {
 
-        const rewards = [
-            50,
-            100,
-            250,
-            500
-        ];
+        multiplier =
+            reward;
 
-        const reward =
-            rewards[
-                Math.floor(
-                    Math.random() *
-                    rewards.length
-                )
-            ];
 
-        balance += reward;
+        rouletteLastSpin =
+            Date.now();
+
+
+        saveGame();
+
 
         updateBalance();
 
+
+        rouletteSpinning =
+            false;
+
+
+        result.textContent =
+            "🎉 Выпало: x" +
+            reward.toFixed(2);
+
+
         toast(
-            "🎉 Ты выиграл " +
-            reward +
-            " 🪙"
+            "🎰 Твой коэффициент: x" +
+            reward.toFixed(2)
         );
 
-    },3100);
+
+        updateRouletteButton();
+
+    },3600);
 
 }
 
 
-/* =========================
+/* =========================================================
+   ROULETTE TIMER
+========================================================= */
+
+setInterval(() => {
+
+    updateRouletteButton();
+
+},1000);
+
+
+/* =========================================================
    ADMIN
-========================= */
+========================================================= */
 
 function openAdminLogin(){
 
     document
-        .getElementById("adminModal")
-        .classList.add("show");
+        .getElementById(
+            "adminModal"
+        )
+        .classList.add(
+            "show"
+        );
 
 }
 
 
-function loginAdmin(){
+async function loginAdmin(){
 
-    const password =
-        document.getElementById(
-            "adminPassword"
-        ).value;
-
-    /*
-       ВАЖНО:
-       Это временная клиентская проверка.
-       Для настоящей защиты пароль должен
-       проверяться на сервере.
-    */
-
-    if(password === "LexaJordon1122"){
-
-        closeModal("adminModal");
+    if(
+        !tg ||
+        !tg.initData
+    ){
 
         toast(
-            "Админ панель открыта"
+            "Открой RaneGame через Telegram"
         );
+
+        return;
+
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/admin/auth",
+                {
+
+                    method:
+                        "POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            initData:
+                                tg.initData
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(
+            !response.ok ||
+            !data.ok
+        ){
+
+            toast(
+                data.error ||
+                "Доступ запрещён"
+            );
+
+            return;
+
+        }
+
+
+        closeModal(
+            "adminModal"
+        );
+
+
+        toast(
+            "🔐 Админ доступ подтверждён"
+        );
+
 
         setTimeout(() => {
 
@@ -2273,10 +3812,16 @@ function loginAdmin(){
 
         },500);
 
-    }else{
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
 
         toast(
-            "Неверный пароль"
+            "Ошибка соединения с сервером"
         );
 
     }
@@ -2284,15 +3829,19 @@ function loginAdmin(){
 }
 
 
-/* =========================
+/* =========================================================
    SETTINGS
-========================= */
+========================================================= */
 
 function showSettings(){
 
     document
-        .getElementById("settingsModal")
-        .classList.add("show");
+        .getElementById(
+            "settingsModal"
+        )
+        .classList.add(
+            "show"
+        );
 
 }
 
@@ -2306,22 +3855,29 @@ function showNotifications(){
 }
 
 
-/* =========================
+/* =========================================================
    MODALS
-========================= */
+========================================================= */
 
 function closeModal(id){
 
     document
         .getElementById(id)
-        .classList.remove("show");
+        .classList.remove(
+            "show"
+        );
 
 }
 
 
-function outsideClose(event,id){
+function outsideClose(
+    event,
+    id
+){
 
-    if(event.target.id === id){
+    if(
+        event.target.id === id
+    ){
 
         closeModal(id);
 
@@ -2330,38 +3886,56 @@ function outsideClose(event,id){
 }
 
 
-/* =========================
+/* =========================================================
    TOAST
-========================= */
+========================================================= */
 
-let toastTimer = null;
+let toastTimer =
+    null;
+
 
 function toast(message){
 
     const element =
-        document.getElementById("toast");
+        document.getElementById(
+            "toast"
+        );
 
-    element.textContent = message;
 
-    element.classList.add("show");
+    element.textContent =
+        message;
 
-    clearTimeout(toastTimer);
+
+    element.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        toastTimer
+    );
+
 
     toastTimer =
         setTimeout(() => {
 
-            element.classList.remove("show");
+            element.classList.remove(
+                "show"
+            );
 
         },2500);
 
 }
 
 
-/* =========================
+/* =========================================================
    TELEGRAM BACK BUTTON
-========================= */
+========================================================= */
 
-if(tg && tg.BackButton){
+if(
+    tg &&
+    tg.BackButton
+){
 
     tg.BackButton.onClick(() => {
 
@@ -2370,13 +3944,18 @@ if(tg && tg.BackButton){
                 ".modal.show"
             );
 
+
         if(opened){
 
-            opened.classList.remove("show");
+            opened.classList.remove(
+                "show"
+            );
 
         }else{
 
-            showPage("home");
+            showPage(
+                "home"
+            );
 
         }
 
@@ -2385,11 +3964,22 @@ if(tg && tg.BackButton){
 }
 
 
-/* =========================
+/* =========================================================
    INIT
-========================= */
+========================================================= */
 
 updateBalance();
+
+updateStars();
+
+updateRouletteButton();
+
+
+setInterval(() => {
+
+    updateStars();
+
+},1000);
 
 </script>
 
