@@ -131,7 +131,7 @@ body::after{
 
 
 /* =========================================================
-   PROFILE
+   TOP PROFILE BAR
 ========================================================= */
 
 .profile{
@@ -1166,6 +1166,252 @@ body::after{
 
 
 /* =========================================================
+   PROFILE PAGE
+========================================================= */
+
+.profile-page-card{
+    position:relative;
+
+    margin-top:14px;
+
+    padding:20px 16px;
+
+    border-radius:23px;
+
+    border:1px solid rgba(255,0,0,.35);
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(255,0,0,.15),
+            transparent 45%
+        ),
+        linear-gradient(
+            145deg,
+            #110000,
+            #080808 55%,
+            #120000
+        );
+
+    box-shadow:
+        0 0 25px rgba(255,0,0,.10),
+        inset 0 0 25px rgba(255,0,0,.035);
+
+    overflow:hidden;
+}
+
+.profile-page-card::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-120%;
+
+    width:70%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,0,0,.13),
+            transparent
+        );
+
+    transform:skewX(-25deg);
+
+    animation:profilePageShine 4s linear infinite;
+}
+
+@keyframes profilePageShine{
+
+    0%{
+        left:-120%;
+    }
+
+    55%,
+    100%{
+        left:150%;
+    }
+
+}
+
+.profile-page-head{
+    position:relative;
+    z-index:2;
+
+    text-align:center;
+
+    padding:7px 0 19px;
+}
+
+.profile-page-avatar{
+    width:76px;
+    height:76px;
+
+    margin:0 auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:#120000;
+
+    border:2px solid #ff1515;
+
+    font-size:38px;
+
+    box-shadow:
+        0 0 12px rgba(255,0,0,.8),
+        0 0 28px rgba(255,0,0,.25);
+}
+
+.profile-page-title{
+    margin-top:12px;
+
+    font-size:22px;
+    font-weight:900;
+}
+
+.profile-page-subtitle{
+    margin-top:5px;
+
+    color:#777;
+
+    font-size:11px;
+}
+
+.profile-stat{
+    position:relative;
+    z-index:2;
+
+    display:flex;
+    align-items:center;
+
+    gap:12px;
+
+    margin-top:10px;
+
+    padding:15px;
+
+    border-radius:16px;
+
+    border:1px solid rgba(255,0,0,.20);
+
+    background:#0a0a0a;
+}
+
+.profile-stat-icon{
+    width:44px;
+    height:44px;
+    min-width:44px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:13px;
+
+    background:#160000;
+
+    border:1px solid rgba(255,0,0,.30);
+
+    font-size:22px;
+}
+
+.profile-stat-info{
+    min-width:0;
+    flex:1;
+}
+
+.profile-stat-title{
+    color:#777;
+
+    font-size:10px;
+}
+
+.profile-stat-value{
+    margin-top:4px;
+
+    font-size:15px;
+    font-weight:900;
+
+    word-break:break-word;
+}
+
+.profile-referral{
+    position:relative;
+    z-index:2;
+
+    margin-top:10px;
+
+    padding:15px;
+
+    border-radius:16px;
+
+    border:1px solid rgba(255,0,0,.20);
+
+    background:#0a0a0a;
+}
+
+.profile-referral-title{
+    font-size:13px;
+    font-weight:900;
+}
+
+.profile-referral-bottom{
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-top:10px;
+}
+
+.profile-referral-input{
+    flex:1;
+    min-width:0;
+
+    height:42px;
+
+    padding:0 10px;
+
+    border-radius:10px;
+
+    border:1px solid #292929;
+
+    background:#050505;
+
+    color:#999;
+
+    font-size:10px;
+
+    outline:none;
+}
+
+.profile-copy-btn{
+    width:44px;
+    height:42px;
+
+    border-radius:10px;
+
+    border:1px solid rgba(255,0,0,.35);
+
+    background:#170000;
+
+    color:#ff1717;
+
+    cursor:pointer;
+
+    font-size:17px;
+}
+
+
+/* =========================================================
    BOTTOM NAV
 ========================================================= */
 
@@ -1765,7 +2011,7 @@ body::after{
 
 
 <!-- =====================================================
-     PROFILE
+     TOP PROFILE BAR
 ====================================================== -->
 
 <div class="profile">
@@ -1791,11 +2037,6 @@ body::after{
         <button class="circle-btn"
                 onclick="showNotifications()">
             🔔
-        </button>
-
-        <button class="circle-btn"
-                onclick="showSettings()">
-            ⚙️
         </button>
 
     </div>
@@ -2397,6 +2638,150 @@ body::after{
 </section>
 
 
+<!-- =====================================================
+     PROFILE PAGE
+====================================================== -->
+
+<section id="profilePage"
+         class="page">
+
+    <div class="section-title">
+
+        Профиль
+
+        <span>
+            Игрок
+        </span>
+
+    </div>
+
+
+    <div class="profile-page-card">
+
+
+        <div class="profile-page-head">
+
+            <div class="profile-page-avatar">
+                🎮
+            </div>
+
+            <div class="profile-page-title">
+                Профиль
+            </div>
+
+            <div class="profile-page-subtitle">
+                Статистика игрока RaneGame
+            </div>
+
+        </div>
+
+
+        <!-- НИК НА СЕРВЕРЕ -->
+
+        <div class="profile-stat">
+
+            <div class="profile-stat-icon">
+                🎮
+            </div>
+
+            <div class="profile-stat-info">
+
+                <div class="profile-stat-title">
+                    Ник на сервере
+                </div>
+
+                <div class="profile-stat-value"
+                     id="serverNickname">
+                    Не указан
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- НАИГРАНО -->
+
+        <div class="profile-stat">
+
+            <div class="profile-stat-icon">
+                ⏱️
+            </div>
+
+            <div class="profile-stat-info">
+
+                <div class="profile-stat-title">
+                    Сколько наиграл
+                </div>
+
+                <div class="profile-stat-value"
+                     id="playTime">
+                    0ч 0м
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ДРУЗЬЯ -->
+
+        <div class="profile-stat">
+
+            <div class="profile-stat-icon">
+                👥
+            </div>
+
+            <div class="profile-stat-info">
+
+                <div class="profile-stat-title">
+                    Приглашено друзей
+                </div>
+
+                <div class="profile-stat-value"
+                     id="friendsCount">
+                    0
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- РЕФЕРАЛЬНАЯ ССЫЛКА -->
+
+        <div class="profile-referral">
+
+            <div class="profile-referral-title">
+                🔗 Реферальная ссылка
+            </div>
+
+            <div class="profile-referral-bottom">
+
+                <input
+                    id="profileReferralLink"
+                    class="profile-referral-input"
+                    readonly
+                    value="https://t.me/RaneGameBot?start=ref">
+
+
+                <button class="profile-copy-btn"
+                        onclick="copyProfileReferral()">
+
+                    📋
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
 </div>
 
 
@@ -2467,15 +2852,16 @@ body::after{
     </button>
 
 
-    <button class="nav-btn"
-            onclick="showSettings()">
+    <button id="navProfile"
+            class="nav-btn"
+            onclick="showPage('profile')">
 
         <div class="nav-icon">
-            ⚙️
+            👤
         </div>
 
         <div>
-            Ещё
+            Профиль
         </div>
 
     </button>
@@ -2651,57 +3037,6 @@ body::after{
 
 
 <!-- =====================================================
-     SETTINGS MODAL
-====================================================== -->
-
-<div id="settingsModal"
-     class="modal"
-     onclick="outsideClose(event,'settingsModal')">
-
-    <div class="modal-box">
-
-        <div class="modal-handle"></div>
-
-
-        <button class="close"
-                onclick="closeModal('settingsModal')">
-
-            ✕
-
-        </button>
-
-
-        <div class="modal-title">
-            ⚙️ Настройки
-        </div>
-
-
-        <div class="modal-subtitle">
-            Настройки RaneGame
-        </div>
-
-
-        <button class="modal-button"
-                onclick="showNotifications();closeModal('settingsModal')">
-
-            🔔 Уведомления
-
-        </button>
-
-
-        <button class="modal-button"
-                onclick="toast('Настройки сохранены')">
-
-            💾 Сохранить
-
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================================
      TOAST
 ====================================================== -->
 
@@ -2790,6 +3125,230 @@ if(
                 "block";
 
     }
+
+}
+
+
+/* =========================================================
+   PROFILE DATA
+========================================================= */
+
+let serverNickname =
+    localStorage.getItem(
+        "rane_server_nickname"
+    ) || "Не указан";
+
+
+let playTimeSeconds =
+    Number(
+        localStorage.getItem(
+            "rane_play_time"
+        ) || 0
+    );
+
+
+let friendsCount =
+    Number(
+        localStorage.getItem(
+            "rane_friends_count"
+        ) || 0
+    );
+
+
+function updateProfile(){
+
+    const nicknameElement =
+        document.getElementById(
+            "serverNickname"
+        );
+
+
+    const playTimeElement =
+        document.getElementById(
+            "playTime"
+        );
+
+
+    const friendsElement =
+        document.getElementById(
+            "friendsCount"
+        );
+
+
+    if(nicknameElement){
+
+        nicknameElement.textContent =
+            serverNickname;
+
+    }
+
+
+    if(playTimeElement){
+
+        const hours =
+            Math.floor(
+                playTimeSeconds /
+                3600
+            );
+
+
+        const minutes =
+            Math.floor(
+                (
+                    playTimeSeconds %
+                    3600
+                ) /
+                60
+            );
+
+
+        playTimeElement.textContent =
+            hours +
+            "ч " +
+            minutes +
+            "м";
+
+    }
+
+
+    if(friendsElement){
+
+        friendsElement.textContent =
+            friendsCount;
+
+    }
+
+}
+
+
+function saveProfile(){
+
+    localStorage.setItem(
+        "rane_server_nickname",
+        serverNickname
+    );
+
+
+    localStorage.setItem(
+        "rane_play_time",
+        String(playTimeSeconds)
+    );
+
+
+    localStorage.setItem(
+        "rane_friends_count",
+        String(friendsCount)
+    );
+
+}
+
+
+/* =========================================================
+   PLAY TIME
+========================================================= */
+
+setInterval(() => {
+
+    playTimeSeconds++;
+
+    saveProfile();
+
+    updateProfile();
+
+},1000);
+
+
+/* =========================================================
+   PROFILE REFERRAL
+========================================================= */
+
+function getReferralLink(){
+
+    if(
+        player &&
+        player.id
+    ){
+
+        return (
+            "https://t.me/RaneGameBot?start=ref_" +
+            player.id
+        );
+
+    }
+
+
+    return "https://t.me/RaneGameBot?start=ref";
+
+}
+
+
+function updateReferralLinks(){
+
+    const link =
+        getReferralLink();
+
+
+    const homeLink =
+        document.getElementById(
+            "referralLink"
+        );
+
+
+    const profileLink =
+        document.getElementById(
+            "profileReferralLink"
+        );
+
+
+    if(homeLink){
+
+        homeLink.value =
+            link;
+
+    }
+
+
+    if(profileLink){
+
+        profileLink.value =
+            link;
+
+    }
+
+}
+
+
+function copyProfileReferral(){
+
+    const input =
+        document.getElementById(
+            "profileReferralLink"
+        );
+
+
+    if(
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+    ){
+
+        navigator.clipboard.writeText(
+            input.value
+        );
+
+    }else{
+
+        input.select();
+
+        document.execCommand(
+            "copy"
+        );
+
+    }
+
+
+    toast(
+        "Реферальная ссылка скопирована"
+    );
 
 }
 
@@ -3101,6 +3660,23 @@ function showPage(page){
         document
             .getElementById("navTop")
             .classList.add("active");
+
+    }
+
+
+    if(page === "profile"){
+
+        document
+            .getElementById("profilePage")
+            .classList.add("active");
+
+
+        document
+            .getElementById("navProfile")
+            .classList.add("active");
+
+
+        updateProfile();
 
     }
 
@@ -3437,7 +4013,8 @@ function formatTime(ms){
 
     const totalSeconds =
         Math.ceil(
-            ms / 1000
+            ms /
+            1000
         );
 
 
@@ -3830,21 +4407,8 @@ async function loginAdmin(){
 
 
 /* =========================================================
-   SETTINGS
+   NOTIFICATIONS
 ========================================================= */
-
-function showSettings(){
-
-    document
-        .getElementById(
-            "settingsModal"
-        )
-        .classList.add(
-            "show"
-        );
-
-}
-
 
 function showNotifications(){
 
@@ -3973,6 +4537,10 @@ updateBalance();
 updateStars();
 
 updateRouletteButton();
+
+updateProfile();
+
+updateReferralLinks();
 
 
 setInterval(() => {
