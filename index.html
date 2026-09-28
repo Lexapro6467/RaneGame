@@ -44,21 +44,9 @@ body::before{
     z-index:-5;
 
     background:
-        radial-gradient(
-            circle at 50% 15%,
-            rgba(255,0,0,.13),
-            transparent 28%
-        ),
-        radial-gradient(
-            circle at 10% 70%,
-            rgba(180,0,0,.07),
-            transparent 25%
-        ),
-        radial-gradient(
-            circle at 90% 80%,
-            rgba(255,0,0,.06),
-            transparent 25%
-        );
+        radial-gradient(circle at 50% 15%,rgba(255,0,0,.13),transparent 28%),
+        radial-gradient(circle at 10% 70%,rgba(180,0,0,.07),transparent 25%),
+        radial-gradient(circle at 90% 80%,rgba(255,0,0,.06),transparent 25%);
 
     animation:bgMove 8s ease-in-out infinite alternate;
 }
@@ -88,7 +76,6 @@ body::after{
     from{
         transform:translate3d(-2%,-1%,0) scale(1);
     }
-
     to{
         transform:translate3d(2%,2%,0) scale(1.08);
     }
@@ -98,7 +85,6 @@ body::after{
     0%{
         background-position:200% 0;
     }
-
     100%{
         background-position:-100% 100%;
     }
@@ -116,12 +102,9 @@ body::after{
 
 .profile{
     position:relative;
-
     display:flex;
     align-items:center;
-
     gap:11px;
-
     height:68px;
     padding:8px 11px;
 
@@ -145,11 +128,9 @@ body::after{
 
 .profile::before{
     content:"";
-
     position:absolute;
     top:0;
     left:-120%;
-
     width:70%;
     height:100%;
 
@@ -162,7 +143,6 @@ body::after{
         );
 
     transform:skewX(-25deg);
-
     animation:shine 4s linear infinite;
 }
 
@@ -171,8 +151,7 @@ body::after{
         left:-120%;
     }
 
-    55%,
-    100%{
+    55%,100%{
         left:150%;
     }
 }
@@ -191,7 +170,6 @@ body::after{
     justify-content:center;
 
     background:#120000;
-
     border:2px solid #ff1515;
 
     box-shadow:
@@ -199,7 +177,6 @@ body::after{
         0 0 22px rgba(255,0,0,.25);
 
     font-size:25px;
-
     z-index:2;
 }
 
@@ -220,7 +197,6 @@ body::after{
 
 .profile-username{
     margin-top:3px;
-
     color:#8d8d8d;
     font-size:12px;
 }
@@ -236,7 +212,6 @@ body::after{
     height:38px;
 
     border-radius:50%;
-
     border:1px solid rgba(255,0,0,.45);
 
     background:#0d0d0d;
@@ -247,15 +222,12 @@ body::after{
     justify-content:center;
 
     font-size:17px;
-
     cursor:pointer;
-
     transition:.2s;
 }
 
 .circle-btn:active{
     transform:scale(.91);
-
     background:#250000;
 
     box-shadow:
@@ -293,11 +265,9 @@ body::after{
     position:relative;
 
     margin-top:14px;
-
     padding:22px 18px 19px;
 
     border-radius:23px;
-
     border:1px solid rgba(255,0,0,.40);
 
     background:
@@ -357,18 +327,14 @@ body::after{
     z-index:2;
 
     color:#888;
-
     text-align:center;
-
     text-transform:uppercase;
-
     letter-spacing:2px;
-
     font-size:11px;
 }
 
 
-/* БАЛАНС + ЗВЁЗДЫ */
+/* BALANCE */
 
 .balance{
     position:relative;
@@ -388,15 +354,10 @@ body::after{
         0 0 22px rgba(255,0,0,.35);
 }
 
-.balance span{
-    color:#ff1616;
-}
-
 .star-balance{
     display:inline-flex;
     align-items:center;
     justify-content:center;
-
     gap:6px;
 
     color:#ff1616;
@@ -419,7 +380,6 @@ body::after{
     text-align:center;
 
     color:#777;
-
     font-size:12px;
 }
 
@@ -432,9 +392,7 @@ body::after{
     z-index:2;
 
     display:grid;
-
     grid-template-columns:1fr 1fr;
-
     gap:9px;
 
     margin-top:18px;
@@ -463,9 +421,7 @@ body::after{
         inset 0 1px 0 rgba(255,255,255,.12);
 
     cursor:pointer;
-
     position:relative;
-
     overflow:hidden;
 }
 
@@ -484,7 +440,6 @@ body::after{
         );
 
     transform:translateX(-100%);
-
     animation:buttonFlow 3.5s linear infinite;
 }
 
@@ -515,7 +470,6 @@ body::after{
 
 .section-title span{
     color:#777;
-
     font-size:11px;
     font-weight:500;
 }
@@ -529,7 +483,6 @@ body::after{
     padding:16px;
 
     border:1px solid rgba(255,0,0,.25);
-
     border-radius:18px;
 
     background:#0b0b0b;
@@ -551,7 +504,6 @@ body::after{
     border-radius:50%;
 
     background:rgba(255,0,0,.10);
-
     filter:blur(5px);
 }
 
@@ -571,11 +523,8 @@ body::after{
 
 .referral-bottom{
     display:flex;
-
     align-items:center;
-
     gap:8px;
-
     margin-top:13px;
 }
 
@@ -586,7 +535,6 @@ body::after{
     padding:11px;
 
     border-radius:11px;
-
     border:1px solid #292929;
 
     background:#070707;
@@ -600,11 +548,9 @@ body::after{
     height:42px;
 
     border:1px solid rgba(255,0,0,.35);
-
     border-radius:11px;
 
     background:#170000;
-
     color:#ff1717;
 
     cursor:pointer;
@@ -615,9 +561,7 @@ body::after{
 
 .gift-grid{
     display:grid;
-
     grid-template-columns:1fr 1fr;
-
     gap:10px;
 }
 
@@ -625,11 +569,9 @@ body::after{
     position:relative;
 
     min-height:130px;
-
     padding:13px;
 
     border-radius:17px;
-
     border:1px solid rgba(255,0,0,.20);
 
     background:
@@ -640,9 +582,7 @@ body::after{
         );
 
     overflow:hidden;
-
     cursor:pointer;
-
     transition:.2s;
 }
 
@@ -671,7 +611,6 @@ body::after{
     background:rgba(255,0,0,.08);
 
     transform:rotate(25deg);
-
     animation:giftFlow 5s linear infinite;
 }
 
@@ -693,14 +632,12 @@ body::after{
     height:49px;
 
     display:flex;
-
     align-items:center;
     justify-content:center;
 
     border-radius:14px;
 
     background:#160000;
-
     border:1px solid rgba(255,0,0,.35);
 
     font-size:26px;
@@ -733,11 +670,9 @@ body::after{
 
 .inventory{
     display:flex;
-
     gap:9px;
 
     overflow-x:auto;
-
     padding-bottom:5px;
 
     scrollbar-width:none;
@@ -752,7 +687,6 @@ body::after{
     height:93px;
 
     border-radius:15px;
-
     border:1px solid rgba(255,0,0,.23);
 
     background:#0b0b0b;
@@ -1162,8 +1096,7 @@ body::after{
         left:-120%;
     }
 
-    55%,
-    100%{
+    55%,100%{
         left:150%;
     }
 }
@@ -1190,7 +1123,6 @@ body::after{
     border-radius:50%;
 
     background:#120000;
-
     border:2px solid #ff1515;
 
     font-size:38px;
@@ -1573,27 +1505,9 @@ body::after{
     border:8px solid #350000;
 
     background:
-        conic-gradient(
+        repeating-conic-gradient(
             #ff1111 0deg 18deg,
-            #160000 18deg 36deg,
-            #ff1111 36deg 54deg,
-            #160000 54deg 72deg,
-            #ff1111 72deg 90deg,
-            #160000 90deg 108deg,
-            #ff1111 108deg 126deg,
-            #160000 126deg 144deg,
-            #ff1111 144deg 162deg,
-            #160000 162deg 180deg,
-            #ff1111 180deg 198deg,
-            #160000 198deg 216deg,
-            #ff1111 216deg 234deg,
-            #160000 234deg 252deg,
-            #ff1111 252deg 270deg,
-            #160000 270deg 288deg,
-            #ff1111 288deg 306deg,
-            #160000 306deg 324deg,
-            #ff1111 324deg 342deg,
-            #160000 342deg 360deg
+            #160000 18deg 36deg
         );
 
     box-shadow:
@@ -1610,7 +1524,9 @@ body::after{
 
 .roulette-sectors{
     position:absolute;
+
     inset:0;
+
     border-radius:50%;
 }
 
@@ -1631,92 +1547,12 @@ body::after{
     align-items:center;
     justify-content:center;
 
-    font-size:10px;
+    font-size:9px;
     font-weight:900;
 
     color:#fff;
 
     transform-origin:24px 12px;
-}
-
-.roulette-sectors div:nth-child(1){
-    transform:rotate(9deg) translateY(-96px) rotate(-9deg);
-}
-
-.roulette-sectors div:nth-child(2){
-    transform:rotate(27deg) translateY(-96px) rotate(-27deg);
-}
-
-.roulette-sectors div:nth-child(3){
-    transform:rotate(45deg) translateY(-96px) rotate(-45deg);
-}
-
-.roulette-sectors div:nth-child(4){
-    transform:rotate(63deg) translateY(-96px) rotate(-63deg);
-}
-
-.roulette-sectors div:nth-child(5){
-    transform:rotate(81deg) translateY(-96px) rotate(-81deg);
-}
-
-.roulette-sectors div:nth-child(6){
-    transform:rotate(99deg) translateY(-96px) rotate(-99deg);
-}
-
-.roulette-sectors div:nth-child(7){
-    transform:rotate(117deg) translateY(-96px) rotate(-117deg);
-}
-
-.roulette-sectors div:nth-child(8){
-    transform:rotate(135deg) translateY(-96px) rotate(-135deg);
-}
-
-.roulette-sectors div:nth-child(9){
-    transform:rotate(153deg) translateY(-96px) rotate(-153deg);
-}
-
-.roulette-sectors div:nth-child(10){
-    transform:rotate(171deg) translateY(-96px) rotate(-171deg);
-}
-
-.roulette-sectors div:nth-child(11){
-    transform:rotate(189deg) translateY(-96px) rotate(-189deg);
-}
-
-.roulette-sectors div:nth-child(12){
-    transform:rotate(207deg) translateY(-96px) rotate(-207deg);
-}
-
-.roulette-sectors div:nth-child(13){
-    transform:rotate(225deg) translateY(-96px) rotate(-225deg);
-}
-
-.roulette-sectors div:nth-child(14){
-    transform:rotate(243deg) translateY(-96px) rotate(-243deg);
-}
-
-.roulette-sectors div:nth-child(15){
-    transform:rotate(261deg) translateY(-96px) rotate(-261deg);
-}
-
-.roulette-sectors div:nth-child(16){
-    transform:rotate(279deg) translateY(-96px) rotate(-279deg);
-}
-
-.roulette-sectors div:nth-child(17){
-    transform:rotate(297deg) translateY(-96px) rotate(-297deg);
-}
-
-.roulette-sectors div:nth-child(18){
-    transform:rotate(315deg) translateY(-96px) rotate(-315deg);
-}
-
-.roulette-sectors div:nth-child(19){
-    transform:rotate(333deg) translateY(-96px) rotate(-333deg);
-}
-
-.roulette-sectors div:nth-child(20){
-    transform:rotate(351deg) translateY(-96px) rotate(-351deg);
 }
 
 .roulette-center{
@@ -1845,8 +1681,7 @@ body::after{
     left:50%;
     bottom:90px;
 
-    transform:
-        translate(-50%,20px);
+    transform:translate(-50%,20px);
 
     opacity:0;
 
@@ -1876,8 +1711,7 @@ body::after{
 .toast.show{
     opacity:1;
 
-    transform:
-        translate(-50%,0);
+    transform:translate(-50%,0);
 }
 
 
@@ -1965,7 +1799,6 @@ body::after{
 
 <div class="app">
 
-
 <!-- TOP PROFILE -->
 
 <div class="profile">
@@ -2048,7 +1881,7 @@ body::after{
         <div class="multiplier">
 
             <b id="multiplier">
-                x1.00
+                x0.00
             </b>
 
         </div>
@@ -2821,7 +2654,6 @@ body::after{
 
         <div class="modal-handle"></div>
 
-
         <button class="close"
                 onclick="closeModal('rouletteModal')">
 
@@ -2829,16 +2661,13 @@ body::after{
 
         </button>
 
-
         <div class="modal-title">
             🎰 Рулетка
         </div>
 
-
         <div class="modal-subtitle">
             Испытай удачу
         </div>
-
 
         <div class="roulette-wrap">
 
@@ -2846,35 +2675,12 @@ body::after{
                 ▼
             </div>
 
-
             <div class="roulette"
                  id="roulette">
 
-                <div class="roulette-sectors">
-
-                    <div>x0.10</div>
-                    <div>x0.20</div>
-                    <div>x0.30</div>
-                    <div>x0.40</div>
-                    <div>x0.50</div>
-                    <div>x0.60</div>
-                    <div>x0.70</div>
-                    <div>x0.80</div>
-                    <div>x0.90</div>
-                    <div>x1.00</div>
-                    <div>x1.10</div>
-                    <div>x1.20</div>
-                    <div>x1.30</div>
-                    <div>x1.40</div>
-                    <div>x1.50</div>
-                    <div>x1.60</div>
-                    <div>x1.70</div>
-                    <div>x1.80</div>
-                    <div>x1.90</div>
-                    <div>x2.00</div>
-
+                <div class="roulette-sectors"
+                     id="rouletteSectors">
                 </div>
-
 
                 <div class="roulette-center">
                     ⭐
@@ -2883,7 +2689,6 @@ body::after{
             </div>
 
         </div>
-
 
         <div id="rouletteResult"
              style="
@@ -2896,7 +2701,6 @@ body::after{
              ">
         </div>
 
-
         <div id="rouletteCooldown"
              style="
                 text-align:center;
@@ -2905,7 +2709,6 @@ body::after{
                 font-size:11px;
              ">
         </div>
-
 
         <button id="spinButton"
                 class="modal-button"
@@ -2941,13 +2744,11 @@ const tg =
 if(tg){
 
     tg.ready();
-
     tg.expand();
 
     try{
 
         tg.setHeaderColor("#050505");
-
         tg.setBackgroundColor("#050505");
 
     }catch(e){}
@@ -2972,17 +2773,14 @@ if(
     player =
         tg.initDataUnsafe.user;
 
-
     const firstName =
         player.first_name ||
         "Игрок";
-
 
     document
         .getElementById("username")
         .textContent =
             firstName;
-
 
     document
         .getElementById("tgusername")
@@ -2990,7 +2788,6 @@ if(
             player.username
                 ? "@" + player.username
                 : "Telegram";
-
 
     if(
         String(player.id) ===
@@ -3038,18 +2835,15 @@ function updateProfile(){
             "serverNickname"
         );
 
-
     const playTimeElement =
         document.getElementById(
             "playTime"
         );
 
-
     const friendsElement =
         document.getElementById(
             "friendsCount"
         );
-
 
     if(nicknameElement){
 
@@ -3058,7 +2852,6 @@ function updateProfile(){
 
     }
 
-
     if(playTimeElement){
 
         const hours =
@@ -3066,7 +2859,6 @@ function updateProfile(){
                 playTimeSeconds /
                 3600
             );
-
 
         const minutes =
             Math.floor(
@@ -3077,7 +2869,6 @@ function updateProfile(){
                 60
             );
 
-
         playTimeElement.textContent =
             hours +
             "ч " +
@@ -3085,7 +2876,6 @@ function updateProfile(){
             "м";
 
     }
-
 
     if(friendsElement){
 
@@ -3104,12 +2894,10 @@ function saveProfile(){
         serverNickname
     );
 
-
     localStorage.setItem(
         "rane_play_time",
         String(playTimeSeconds)
     );
-
 
     localStorage.setItem(
         "rane_friends_count",
@@ -3148,7 +2936,6 @@ function getReferralLink(){
 
     }
 
-
     return "https://t.me/RaneGameBot?start=ref";
 
 }
@@ -3159,18 +2946,15 @@ function updateReferralLinks(){
     const link =
         getReferralLink();
 
-
     const homeLink =
         document.getElementById(
             "referralLink"
         );
 
-
     const profileLink =
         document.getElementById(
             "profileReferralLink"
         );
-
 
     if(homeLink){
 
@@ -3178,7 +2962,6 @@ function updateReferralLinks(){
             link;
 
     }
-
 
     if(profileLink){
 
@@ -3196,7 +2979,6 @@ function copyProfileReferral(){
         document.getElementById(
             "profileReferralLink"
         );
-
 
     if(
         navigator.clipboard &&
@@ -3217,7 +2999,6 @@ function copyProfileReferral(){
 
     }
 
-
     toast(
         "Реферальная ссылка скопирована"
     );
@@ -3225,7 +3006,7 @@ function copyProfileReferral(){
 }
 
 
-/* DATA */
+/* GAME DATA */
 
 let balance =
     Number(
@@ -3235,11 +3016,20 @@ let balance =
     );
 
 
+/*
+    ВАЖНО:
+
+    Новый игрок начинается с x0.00.
+
+    Если множитель уже был сохранён,
+    загружаем именно его.
+*/
+
 let multiplier =
     Number(
         localStorage.getItem(
             "rane_multiplier"
-        ) || 1
+        ) || 0
     );
 
 
@@ -3268,13 +3058,10 @@ let stars =
 
 
 /*
-    Звезда начисляется каждые 60 секунд.
+    +1 звезда за каждую полную минуту.
 
-    ВАЖНО:
-    multiplier здесь НЕ используется.
-
-    Всегда:
-    +1 ⭐ за полную минуту.
+    Множитель на количество звёзд
+    НИКАК не влияет.
 */
 
 let lastStarTime =
@@ -3291,12 +3078,6 @@ let rouletteSpinning =
 
 /* ELEMENTS */
 
-const balanceElement =
-    document.getElementById(
-        "balance"
-    );
-
-
 const multiplierElement =
     document.getElementById(
         "multiplier"
@@ -3309,7 +3090,7 @@ const starsElement =
     );
 
 
-/* SAVE */
+/* SAVE GAME */
 
 function saveGame(){
 
@@ -3318,30 +3099,25 @@ function saveGame(){
         String(balance)
     );
 
-
     localStorage.setItem(
         "rane_multiplier",
-        String(multiplier)
+        Number(multiplier).toFixed(2)
     );
-
 
     localStorage.setItem(
         "rane_roulette_last_spin",
         String(rouletteLastSpin)
     );
 
-
     localStorage.setItem(
         "rane_weekly_bonus",
         String(weeklyBonus)
     );
 
-
     localStorage.setItem(
         "rane_stars",
         String(stars)
     );
-
 
     localStorage.setItem(
         "rane_last_star_time",
@@ -3351,19 +3127,17 @@ function saveGame(){
 }
 
 
-/* UPDATE BALANCE */
+/* UPDATE BALANCE / MULTIPLIER */
 
 function updateBalance(){
 
-    balanceElement.textContent =
-        Number(balance)
-            .toLocaleString("ru-RU");
+    if(multiplierElement){
 
+        multiplierElement.textContent =
+            "x" +
+            Number(multiplier).toFixed(2);
 
-    multiplierElement.textContent =
-        "x" +
-        Number(multiplier)
-            .toFixed(2);
+    }
 
 }
 
@@ -3375,10 +3149,8 @@ function updateStars(){
     const now =
         Date.now();
 
-
     const minute =
         60 * 1000;
-
 
     const elapsed =
         now -
@@ -3387,9 +3159,7 @@ function updateStars(){
 
     /*
         За каждую полностью прошедшую минуту
-        добавляется ровно 1 звезда.
-
-        Множитель здесь специально НЕ используется.
+        выдаём ровно 1 звезду.
     */
 
     if(elapsed >= minute){
@@ -3400,15 +3170,12 @@ function updateStars(){
                 minute
             );
 
-
         stars +=
             earned;
-
 
         lastStarTime +=
             earned *
             minute;
-
 
         saveGame();
 
@@ -3473,7 +3240,6 @@ function showPage(page){
             .getElementById("homePage")
             .classList.add("active");
 
-
         document
             .getElementById("navHome")
             .classList.add("active");
@@ -3486,7 +3252,6 @@ function showPage(page){
         document
             .getElementById("shopPage")
             .classList.add("active");
-
 
         document
             .getElementById("navShop")
@@ -3501,7 +3266,6 @@ function showPage(page){
             .getElementById("auctionPage")
             .classList.add("active");
 
-
         document
             .getElementById("navAuction")
             .classList.add("active");
@@ -3514,7 +3278,6 @@ function showPage(page){
         document
             .getElementById("topPage")
             .classList.add("active");
-
 
         document
             .getElementById("navTop")
@@ -3529,11 +3292,9 @@ function showPage(page){
             .getElementById("profilePage")
             .classList.add("active");
 
-
         document
             .getElementById("navProfile")
             .classList.add("active");
-
 
         updateProfile();
 
@@ -3558,18 +3319,15 @@ function switchShop(type){
             "shopContent"
         );
 
-
     const inventory =
         document.getElementById(
             "inventoryContent"
         );
 
-
     const shopTab =
         document.getElementById(
             "shopTab"
         );
-
 
     const inventoryTab =
         document.getElementById(
@@ -3582,15 +3340,12 @@ function switchShop(type){
         shop.style.display =
             "block";
 
-
         inventory.style.display =
             "none";
-
 
         shopTab.classList.add(
             "active"
         );
-
 
         inventoryTab.classList.remove(
             "active"
@@ -3601,15 +3356,12 @@ function switchShop(type){
         shop.style.display =
             "none";
 
-
         inventory.style.display =
             "block";
-
 
         shopTab.classList.remove(
             "active"
         );
-
 
         inventoryTab.classList.add(
             "active"
@@ -3641,12 +3393,9 @@ function buyGift(
     balance -=
         price;
 
-
     saveGame();
 
-
     updateBalance();
-
 
     toast(
         name +
@@ -3662,7 +3411,6 @@ function collectBonus(){
 
     const now =
         Date.now();
-
 
     const week =
         7 *
@@ -3727,7 +3475,6 @@ function collectBonus(){
             "ч"
         );
 
-
         return;
 
     }
@@ -3746,7 +3493,6 @@ function collectBonus(){
 
 
     saveGame();
-
 
     updateBalance();
 
@@ -3796,6 +3542,87 @@ function copyReferral(){
 
 
 /* ROULETTE */
+
+const ROULETTE_REWARDS = [
+
+    0.10,
+    0.20,
+    0.30,
+    0.40,
+    0.50,
+    0.60,
+    0.70,
+    0.80,
+    0.90,
+    1.00,
+    1.10,
+    1.20,
+    1.30,
+    1.40,
+    1.50,
+    1.60,
+    1.70,
+    1.80,
+    1.90,
+    2.00
+
+];
+
+
+function createRouletteSectors(){
+
+    const container =
+        document.getElementById(
+            "rouletteSectors"
+        );
+
+    if(!container){
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    ROULETTE_REWARDS.forEach(
+        (reward,index) => {
+
+            const sector =
+                document.createElement(
+                    "div"
+                );
+
+
+            const angle =
+                index * 18 + 9;
+
+
+            sector.textContent =
+                "x" +
+                reward.toFixed(2);
+
+
+            sector.style.transform =
+                "rotate(" +
+                angle +
+                "deg) " +
+                "translateY(-96px) " +
+                "rotate(-" +
+                angle +
+                "deg)";
+
+
+            container.appendChild(
+                sector
+            );
+
+        }
+    );
+
+}
+
 
 function openRoulette(){
 
@@ -3891,28 +3718,18 @@ function formatTime(ms){
 
 
     return (
-
         String(hours)
             .padStart(2,"0")
-
         +
-
         ":"
-
         +
-
         String(minutes)
             .padStart(2,"0")
-
         +
-
         ":"
-
         +
-
         String(seconds)
             .padStart(2,"0")
-
     );
 
 }
@@ -3944,10 +3761,8 @@ function updateRouletteButton(){
         button.disabled =
             true;
 
-
         button.textContent =
             "🎰 КРУТИТСЯ...";
-
 
         return;
 
@@ -3959,14 +3774,15 @@ function updateRouletteButton(){
         button.disabled =
             false;
 
-
         button.textContent =
             "🎰 КРУТИТЬ";
 
+        if(cooldown){
 
-        cooldown.textContent =
-            "Можно крутить прямо сейчас";
+            cooldown.textContent =
+                "Можно крутить прямо сейчас";
 
+        }
 
         return;
 
@@ -3976,30 +3792,34 @@ function updateRouletteButton(){
     button.disabled =
         true;
 
-
     button.textContent =
         "⏳ РУЛЕТКА ЗАКРЫТА";
 
 
-    cooldown.textContent =
-        "Следующая попытка через " +
-        formatTime(
-            getRouletteRemaining()
-        );
+    if(cooldown){
+
+        cooldown.textContent =
+            "Следующая попытка через " +
+            formatTime(
+                getRouletteRemaining()
+            );
+
+    }
 
 }
 
 
 /*
-    РУЛЕТКА:
+    РУЛЕТКА
 
-    Только:
     x0.10
     x0.20
-    x0.30
     ...
     x1.90
     x2.00
+
+    Выпавший multiplier
+    реально сохраняется.
 */
 
 function spinRoulette(){
@@ -4023,7 +3843,6 @@ function spinRoulette(){
 
         updateRouletteButton();
 
-
         return;
 
     }
@@ -4041,6 +3860,13 @@ function spinRoulette(){
         );
 
 
+    if(!roulette){
+
+        return;
+
+    }
+
+
     rouletteSpinning =
         true;
 
@@ -4048,45 +3874,27 @@ function spinRoulette(){
     updateRouletteButton();
 
 
-    result.textContent =
-        "🎰 Рулетка крутится...";
+    if(result){
+
+        result.textContent =
+            "🎰 Рулетка крутится...";
+
+    }
 
 
-    const rewards = [
-
-        0.10,
-        0.20,
-        0.30,
-        0.40,
-        0.50,
-        0.60,
-        0.70,
-        0.80,
-        0.90,
-        1.00,
-        1.10,
-        1.20,
-        1.30,
-        1.40,
-        1.50,
-        1.60,
-        1.70,
-        1.80,
-        1.90,
-        2.00
-
-    ];
-
+    /*
+        Выбираем одно из 20 значений.
+    */
 
     const index =
         Math.floor(
             Math.random() *
-            rewards.length
+            ROULETTE_REWARDS.length
         );
 
 
     const reward =
-        rewards[index];
+        ROULETTE_REWARDS[index];
 
 
     const sectorAngle =
@@ -4098,9 +3906,14 @@ function spinRoulette(){
         sectorAngle;
 
 
+    /*
+        Каждый новый спин начинается
+        от текущего положения, но добавляет
+        полные обороты.
+    */
+
     const extraTurns =
-        360 *
-        6;
+        360 * 6;
 
 
     const targetRotation =
@@ -4124,16 +3937,48 @@ function spinRoulette(){
 
     setTimeout(() => {
 
-        multiplier =
-            reward;
+        /*
+            ГЛАВНОЕ:
 
+            Выпавший множитель
+            присваивается игроку.
+        */
+
+        multiplier =
+            Number(
+                reward.toFixed(2)
+            );
+
+
+        /*
+            Записываем время спина.
+        */
 
         rouletteLastSpin =
             Date.now();
 
 
+        /*
+            СНАЧАЛА сохраняем новый multiplier.
+        */
+
+        localStorage.setItem(
+            "rane_multiplier",
+            multiplier.toFixed(2)
+        );
+
+
+        /*
+            Сохраняем всю игру.
+        */
+
         saveGame();
 
+
+        /*
+            Обновляем x-множитель
+            на экране.
+        */
 
         updateBalance();
 
@@ -4142,14 +3987,18 @@ function spinRoulette(){
             false;
 
 
-        result.textContent =
-            "🎉 Выпало: x" +
-            reward.toFixed(2);
+        if(result){
+
+            result.textContent =
+                "🎉 Выпало: x" +
+                multiplier.toFixed(2);
+
+        }
 
 
         toast(
-            "🎰 Твой коэффициент: x" +
-            reward.toFixed(2)
+            "🎰 Твой множитель: x" +
+            multiplier.toFixed(2)
         );
 
 
@@ -4334,6 +4183,13 @@ function toast(message){
         );
 
 
+    if(!element){
+
+        return;
+
+    }
+
+
     element.textContent =
         message;
 
@@ -4396,6 +4252,8 @@ if(
 
 /* INIT */
 
+createRouletteSectors();
+
 updateBalance();
 
 updateStars();
@@ -4408,11 +4266,9 @@ updateReferralLinks();
 
 
 /*
-    Проверяем звёзды каждую секунду,
-    но на экране никакого таймера нет.
+    Проверяем звёзды каждую секунду.
 
-    Как только проходит полная минута —
-    автоматически добавляется +1 ⭐.
+    Таймера на экране нет.
 */
 
 setInterval(() => {
