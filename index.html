@@ -199,55 +199,28 @@ button{
 /* BALANCE */
 
 .balance-card{
-    position:relative;
-    overflow:hidden;
-    padding:19px;
-    border-radius:21px;
-    background:
-        radial-gradient(circle at 90% 15%,rgba(255,0,0,.18),transparent 30%),
-        linear-gradient(145deg,#171717,#0c0c0c);
-    border:1px solid rgba(255,35,35,.2);
-    box-shadow:0 12px 35px rgba(0,0,0,.35);
+    background:linear-gradient(135deg,#7d1111,#3b0808);
+    border-radius:22px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
 }
 
-.balance-label{
-    color:#777;
-    font-size:11px;
-    font-weight:800;
-    text-transform:uppercase;
-    letter-spacing:.8px;
+.balance-title{
+    font-size:14px;
+    color:#ddd;
+    margin-bottom:8px;
 }
 
-.balance-value{
-    margin-top:7px;
-    font-size:34px;
-    line-height:1;
-    font-weight:1000;
+.balance{
+    font-size:42px;
+    font-weight:900;
+    margin-bottom:8px;
 }
 
-.balance-star{
-    color:#ff2929;
-    font-size:23px;
-}
-
-.balance-bottom{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:16px;
-}
-
-.info-chip{
-    padding:8px 10px;
-    border-radius:10px;
-    background:#111;
-    border:1px solid rgba(255,255,255,.06);
-    color:#a2a2a2;
-    font-size:11px;
-}
-
-.info-chip b{
-    color:#fff;
+.income{
+    color:#72ff72;
+    font-weight:700;
 }
 
 /* ACTION CARDS */
@@ -1176,40 +1149,24 @@ button{
 
         <section class="balance-card">
 
-            <div class="balance-label">
-                Твой баланс
-            </div>
+            <div class="balance-card">
 
-            <div class="balance-value">
+    <div class="balance-title">
+        Твой баланс
+    </div>
 
-                <span id="balanceValue">
-                    0
-                </span>
+    <div class="balance" id="balance">
+        0
+    </div>
 
-                <span class="balance-star">
-                    ⭐
-                </span>
+    <div>
+        Доход:
+        <span class="income">
+            +<span id="income">0</span> в /час
+        </span>
+    </div>
 
-            </div>
-
-            <div class="balance-bottom">
-
-                <div class="info-chip">
-                    Доход:
-                    <b id="incomeValue">
-                        0 ⭐/ч
-                    </b>
-                </div>
-
-                <div class="info-chip">
-                    Множитель:
-                    <b id="multiplierValue">
-                        x1.00
-                    </b>
-                </div>
-
-            </div>
-
+</div>
         </section>
 
 
