@@ -8,6 +8,7 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+
 *{
     box-sizing:border-box;
     margin:0;
@@ -16,190 +17,602 @@
 }
 
 :root{
-    --bg:#070707;
-    --panel:#101010;
-    --panel2:#151515;
-    --red:#ff1e1e;
-    --red2:#b40000;
+    --bg:#050505;
+    --panel:#0d0d0d;
+    --panel2:#121212;
+
+    --red:#ff1717;
+    --red2:#a40000;
     --red3:#ff4545;
+
     --text:#fff;
     --muted:#777;
+
     --border:rgba(255,25,25,.16);
+}
+
+html{
+    background:#050505;
 }
 
 body{
     min-height:100vh;
+
     background:
-        radial-gradient(circle at 50% -10%,rgba(255,0,0,.18),transparent 35%),
-        linear-gradient(180deg,#090909,#050505);
-    color:var(--text);
-    font-family:Arial,Helvetica,sans-serif;
+        radial-gradient(
+            circle at 50% -15%,
+            rgba(255,0,0,.22),
+            transparent 36%
+        ),
+        radial-gradient(
+            circle at 100% 35%,
+            rgba(180,0,0,.07),
+            transparent 30%
+        ),
+        linear-gradient(
+            180deg,
+            #090909 0%,
+            #050303 55%,
+            #030303 100%
+        );
+
+    color:#fff;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
     overflow-x:hidden;
 }
 
-/* красное свечение */
+/* =========================================================
+   GLOBAL RED LIGHT
+========================================================= */
+
 body::before{
     content:"";
+
     position:fixed;
-    inset:-30%;
+
+    width:500px;
+    height:500px;
+
+    left:50%;
+    top:-280px;
+
+    transform:translateX(-50%);
+
     pointer-events:none;
+
     background:
-        radial-gradient(circle,rgba(255,0,0,.07),transparent 35%);
-    animation:bgPulse 5s ease-in-out infinite;
+        radial-gradient(
+            circle,
+            rgba(255,0,0,.18),
+            rgba(255,0,0,.05) 35%,
+            transparent 70%
+        );
+
+    filter:blur(20px);
+
+    animation:
+        topGlow 5s ease-in-out infinite;
+
+    z-index:-2;
+}
+
+body::after{
+    content:"";
+
+    position:fixed;
+    inset:0;
+
+    pointer-events:none;
+
+    background:
+        linear-gradient(
+            115deg,
+            transparent 0%,
+            rgba(255,0,0,.025) 45%,
+            transparent 50%
+        );
+
+    background-size:250% 250%;
+
+    animation:
+        screenFlow 8s linear infinite;
+
     z-index:-1;
 }
 
-@keyframes bgPulse{
-    0%,100%{transform:scale(1);opacity:.55}
-    50%{transform:scale(1.18);opacity:1}
+@keyframes topGlow{
+
+    0%,100%{
+        opacity:.45;
+        transform:translateX(-50%) scale(1);
+    }
+
+    50%{
+        opacity:1;
+        transform:translateX(-50%) scale(1.18);
+    }
 }
 
-/* ================= PROFILE ================= */
+@keyframes screenFlow{
+
+    0%{
+        background-position:200% 0;
+    }
+
+    100%{
+        background-position:-200% 0;
+    }
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
 
 .top{
-    margin:15px 14px 12px;
+    margin:14px 14px 12px;
 }
 
 .profile-card{
     position:relative;
+
     display:flex;
     align-items:center;
+
     gap:12px;
-    min-height:76px;
-    padding:13px 15px;
+
+    min-height:78px;
+
+    padding:13px 14px;
 
     background:
-        linear-gradient(135deg,
-            rgba(255,25,25,.14),
-            rgba(15,15,15,.96) 48%,
-            rgba(255,0,0,.07));
+        linear-gradient(
+            135deg,
+            rgba(255,25,25,.16),
+            rgba(15,15,15,.98) 48%,
+            rgba(255,0,0,.06)
+        );
 
-    border:1px solid rgba(255,30,30,.2);
+    border:
+        1px solid
+        rgba(255,30,30,.22);
+
     border-radius:22px;
 
     box-shadow:
-        0 0 30px rgba(255,0,0,.07),
+        0 0 35px rgba(255,0,0,.07),
         inset 0 0 25px rgba(255,0,0,.025);
 
     overflow:hidden;
+
+    animation:
+        profilePulse 5s ease-in-out infinite;
+}
+
+@keyframes profilePulse{
+
+    0%,100%{
+        box-shadow:
+            0 0 25px rgba(255,0,0,.05),
+            inset 0 0 20px rgba(255,0,0,.02);
+    }
+
+    50%{
+        box-shadow:
+            0 0 40px rgba(255,0,0,.11),
+            inset 0 0 25px rgba(255,0,0,.035);
+    }
 }
 
 .profile-card::before{
     content:"";
+
     position:absolute;
-    top:0;
-    left:-80%;
-    width:60%;
-    height:100%;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,60,60,.16),
-        transparent
-    );
+
+    top:-20%;
+    left:-70%;
+
+    width:55%;
+    height:140%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,45,45,.22),
+            transparent
+        );
+
     transform:skewX(-20deg);
-    animation:shine 4s infinite;
+
+    animation:
+        profileShine 4.5s ease-in-out infinite;
+
+    pointer-events:none;
 }
 
-@keyframes shine{
-    0%{left:-80%}
-    45%,100%{left:140%}
+.profile-card::after{
+    content:"";
+
+    position:absolute;
+
+    left:20%;
+    right:20%;
+    bottom:-25px;
+
+    height:35px;
+
+    background:#ff0000;
+
+    filter:blur(30px);
+
+    opacity:.10;
+
+    pointer-events:none;
+}
+
+@keyframes profileShine{
+
+    0%{
+        left:-70%;
+    }
+
+    35%,
+    100%{
+        left:140%;
+    }
 }
 
 .profile-avatar{
-    width:49px;
-    height:49px;
+    position:relative;
+    z-index:2;
+
+    width:50px;
+    height:50px;
+
     flex:none;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    border-radius:15px;
+    border-radius:16px;
 
     background:
-        linear-gradient(145deg,#ff3030,#8c0000);
+        linear-gradient(
+            145deg,
+            #ff3535,
+            #870000
+        );
+
+    border:
+        1px solid
+        rgba(255,90,90,.25);
 
     box-shadow:
-        0 0 18px rgba(255,0,0,.35),
-        inset 0 0 12px rgba(255,255,255,.08);
+        0 0 20px rgba(255,0,0,.32),
+        inset 0 0 14px rgba(255,255,255,.08);
 
     font-size:25px;
+
+    animation:
+        avatarGlow 3s ease-in-out infinite;
+}
+
+@keyframes avatarGlow{
+
+    0%,100%{
+        box-shadow:
+            0 0 15px rgba(255,0,0,.22),
+            inset 0 0 10px rgba(255,255,255,.05);
+    }
+
+    50%{
+        box-shadow:
+            0 0 28px rgba(255,0,0,.42),
+            inset 0 0 15px rgba(255,255,255,.08);
+    }
 }
 
 .profile-info{
+    position:relative;
+    z-index:2;
+
     min-width:0;
+
     flex:1;
 }
 
 .name{
+    color:#fff;
+
     font-size:18px;
-    font-weight:800;
+    font-weight:900;
+
     line-height:22px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    text-shadow:
+        0 0 10px rgba(255,0,0,.16);
 }
 
 .username{
     margin-top:3px;
+
     color:#888;
+
     font-size:13px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 .profile-notification{
-    width:40px;
-    height:40px;
+    position:relative;
+    z-index:2;
+
+    width:41px;
+    height:41px;
+
+    flex:none;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
     border-radius:13px;
-    background:rgba(255,0,0,.07);
-    border:1px solid rgba(255,0,0,.14);
+
+    background:
+        rgba(255,0,0,.065);
+
+    border:
+        1px solid
+        rgba(255,0,0,.16);
 
     font-size:19px;
 
-    box-shadow:0 0 15px rgba(255,0,0,.08);
+    box-shadow:
+        0 0 16px rgba(255,0,0,.07);
+
+    transition:.2s;
 }
 
-/* ================= PAGES ================= */
+.profile-notification:active{
+    transform:scale(.9);
+
+    background:
+        rgba(255,0,0,.16);
+
+    box-shadow:
+        0 0 25px rgba(255,0,0,.2);
+}
+
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+.admin-category{
+    position:relative;
+
+    margin-top:10px;
+
+    padding:14px;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,0,0,.13),
+            #0e0e0e 65%
+        );
+
+    border:
+        1px solid
+        rgba(255,0,0,.18);
+
+    box-shadow:
+        0 0 25px rgba(255,0,0,.045);
+
+    overflow:hidden;
+}
+
+.admin-category::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-80%;
+
+    width:70%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,40,40,.12),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    animation:
+        adminShine 4s infinite;
+}
+
+@keyframes adminShine{
+
+    0%{
+        left:-80%;
+    }
+
+    40%,100%{
+        left:140%;
+    }
+}
+
+.admin-category-title{
+    position:relative;
+
+    font-size:14px;
+    font-weight:900;
+}
+
+.admin-category-description{
+    position:relative;
+
+    margin-top:4px;
+
+    color:#777;
+
+    font-size:11px;
+}
+
+.admin-button{
+    position:relative;
+
+    width:100%;
+
+    margin-top:10px;
+
+    padding:11px;
+
+    border:
+        1px solid
+        rgba(255,0,0,.25);
+
+    border-radius:12px;
+
+    background:
+        linear-gradient(
+            100deg,
+            #190505,
+            #350808,
+            #190505
+        );
+
+    background-size:200% 100%;
+
+    color:#ff3939;
+
+    font-weight:900;
+
+    animation:
+        adminButtonFlow 3s linear infinite;
+}
+
+@keyframes adminButtonFlow{
+
+    0%{
+        background-position:0 0;
+    }
+
+    100%{
+        background-position:200% 0;
+    }
+}
+
+.admin-button:active{
+    transform:scale(.98);
+}
+
+
+/* =========================================================
+   PAGES
+========================================================= */
 
 .page{
     display:none;
-    padding:0 14px 105px;
+
+    padding:
+        0
+        14px
+        105px;
 }
 
 .page.active{
     display:block;
+
+    animation:
+        pageIn .22s ease;
 }
 
-/* ================= TITLES ================= */
+@keyframes pageIn{
+
+    from{
+        opacity:0;
+        transform:translateY(8px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+
+/* =========================================================
+   TITLES
+========================================================= */
 
 .page-title{
-    margin:18px 3px 13px;
+    margin:
+        18px
+        3px
+        13px;
 }
 
 .page-title h1{
     font-size:25px;
+
     font-weight:900;
+
+    text-shadow:
+        0 0 18px rgba(255,0,0,.08);
 }
 
 .page-title p{
     margin-top:5px;
+
     color:#777;
+
     font-size:13px;
 }
 
-/* ================= BALANCE ================= */
+
+/* =========================================================
+   BALANCE
+========================================================= */
 
 .balance-card{
     position:relative;
+
     padding:20px;
+
     border-radius:23px;
 
     background:
-        linear-gradient(135deg,#171717,#0d0d0d);
+        linear-gradient(
+            135deg,
+            #171717,
+            #0b0b0b
+        );
 
-    border:1px solid rgba(255,20,20,.2);
+    border:
+        1px solid
+        rgba(255,20,20,.2);
 
     box-shadow:
         0 0 35px rgba(255,0,0,.07),
@@ -208,48 +621,163 @@ body::before{
     overflow:hidden;
 }
 
+.balance-card::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-100%;
+
+    width:65%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,30,30,.09),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    animation:
+        cardShine 5s infinite;
+}
+
+@keyframes cardShine{
+
+    0%{
+        left:-100%;
+    }
+
+    35%,100%{
+        left:150%;
+    }
+}
+
 .balance-card::after{
     content:"";
+
     position:absolute;
-    width:160px;
-    height:160px;
-    right:-70px;
-    top:-70px;
+
+    width:170px;
+    height:170px;
+
+    right:-75px;
+    top:-75px;
+
     background:#ff0000;
+
     filter:blur(75px);
+
     opacity:.12;
+
+    animation:
+        balanceGlow 4s ease-in-out infinite;
+}
+
+@keyframes balanceGlow{
+
+    0%,100%{
+        opacity:.08;
+        transform:scale(1);
+    }
+
+    50%{
+        opacity:.17;
+        transform:scale(1.15);
+    }
 }
 
 .balance-label{
+    position:relative;
+    z-index:2;
+
     color:#777;
+
     font-size:13px;
 }
 
 .balance-value{
+    position:relative;
+    z-index:2;
+
     margin-top:7px;
+
     font-size:32px;
+
     font-weight:900;
 }
 
 .balance-value span{
     color:#ff2424;
+
+    text-shadow:
+        0 0 15px rgba(255,0,0,.25);
 }
 
-/* ================= STATS ================= */
+
+/* =========================================================
+   STATS
+========================================================= */
 
 .stats{
     display:grid;
-    grid-template-columns:1fr 1fr;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
     gap:10px;
+
     margin-top:10px;
 }
 
 .stat{
+    position:relative;
+
     padding:15px;
+
     border-radius:18px;
 
-    background:#101010;
-    border:1px solid var(--border);
+    background:
+        linear-gradient(
+            145deg,
+            #121212,
+            #0b0b0b
+        );
+
+    border:
+        1px solid
+        var(--border);
+
+    overflow:hidden;
+
+    transition:.2s;
+}
+
+.stat::before{
+    content:"";
+
+    position:absolute;
+
+    width:70px;
+    height:70px;
+
+    right:-35px;
+    top:-35px;
+
+    background:#ff0000;
+
+    filter:blur(30px);
+
+    opacity:.07;
+}
+
+.stat:active{
+    transform:scale(.98);
 }
 
 .stat-icon{
@@ -258,17 +786,24 @@ body::before{
 
 .stat-title{
     margin-top:8px;
+
     color:#777;
+
     font-size:12px;
 }
 
 .stat-value{
     margin-top:3px;
+
     font-size:17px;
+
     font-weight:800;
 }
 
-/* ================= SECTION ================= */
+
+/* =========================================================
+   SECTION
+========================================================= */
 
 .section{
     margin-top:18px;
@@ -276,8 +811,10 @@ body::before{
 
 .section-head{
     display:flex;
+
     align-items:center;
     justify-content:space-between;
+
     margin-bottom:10px;
 }
 
@@ -287,116 +824,297 @@ body::before{
 
 .section-head button{
     border:0;
+
     background:none;
+
     color:#ff3030;
+
     font-size:12px;
+
+    font-weight:700;
 }
 
-/* ================= BUTTON ================= */
+
+/* =========================================================
+   RED BUTTON
+========================================================= */
 
 .red-button{
     position:relative;
+
     width:100%;
+
     border:0;
+
     border-radius:16px;
+
     padding:14px;
 
     color:#fff;
+
     background:
-        linear-gradient(100deg,#850000,#ff1717,#850000);
+        linear-gradient(
+            100deg,
+            #720000,
+            #ff1717,
+            #720000
+        );
 
     background-size:200% 100%;
 
     font-size:14px;
-    font-weight:800;
 
-    box-shadow:0 8px 25px rgba(255,0,0,.18);
+    font-weight:900;
 
-    animation:redFlow 3s linear infinite;
+    box-shadow:
+        0 8px 25px
+        rgba(255,0,0,.18);
+
+    animation:
+        redFlow 3s linear infinite;
+
     overflow:hidden;
 }
 
+.red-button::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-70%;
+
+    width:40%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.16),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    animation:
+        buttonShine 3.5s infinite;
+}
+
 @keyframes redFlow{
-    0%{background-position:0 0}
-    100%{background-position:200% 0}
+
+    0%{
+        background-position:0 0;
+    }
+
+    100%{
+        background-position:200% 0;
+    }
+}
+
+@keyframes buttonShine{
+
+    0%,45%{
+        left:-70%;
+    }
+
+    80%,100%{
+        left:140%;
+    }
 }
 
 .red-button:active{
-    transform:scale(.98);
+    transform:scale(.97);
 }
 
-/* ================= TABS ================= */
+
+/* =========================================================
+   TABS
+========================================================= */
 
 .tabs{
     display:flex;
+
     gap:8px;
+
     padding:5px;
+
     margin-top:15px;
 
     background:#0d0d0d;
-    border:1px solid rgba(255,0,0,.1);
+
+    border:
+        1px solid
+        rgba(255,0,0,.1);
+
     border-radius:15px;
 }
 
 .tab{
     flex:1;
+
     padding:11px 5px;
+
     border:0;
+
     border-radius:11px;
 
     color:#777;
+
     background:transparent;
+
     font-size:12px;
+
     font-weight:700;
 }
 
 .tab.active{
     color:#fff;
-    background:#a80000;
-    box-shadow:0 0 15px rgba(255,0,0,.18);
+
+    background:
+        linear-gradient(
+            100deg,
+            #850000,
+            #c90000,
+            #850000
+        );
+
+    background-size:200% 100%;
+
+    box-shadow:
+        0 0 15px
+        rgba(255,0,0,.18);
+
+    animation:
+        redFlow 3s linear infinite;
 }
 
-/* ================= GIFTS ================= */
+
+/* =========================================================
+   GIFTS
+========================================================= */
 
 .gifts{
     display:grid;
-    grid-template-columns:1fr 1fr;
+
+    grid-template-columns:
+        1fr
+        1fr;
+
     gap:10px;
 }
 
 .gift{
     position:relative;
+
     min-height:190px;
+
     padding:15px;
 
     border-radius:20px;
-    background:
-        linear-gradient(145deg,#181818,#0d0d0d);
 
-    border:1px solid rgba(255,30,30,.14);
+    background:
+        linear-gradient(
+            145deg,
+            #181818,
+            #0d0d0d
+        );
+
+    border:
+        1px solid
+        rgba(255,30,30,.14);
+
     overflow:hidden;
 
-    transition:.2s;
-}
-
-.gift:hover{
-    border-color:rgba(255,30,30,.35);
-    transform:translateY(-2px);
+    transition:
+        transform .2s,
+        border-color .2s,
+        box-shadow .2s;
 }
 
 .gift::before{
     content:"";
+
     position:absolute;
-    width:100px;
-    height:100px;
-    right:-45px;
-    top:-45px;
+
+    width:110px;
+    height:110px;
+
+    right:-50px;
+    top:-50px;
+
     background:#ff0000;
-    filter:blur(45px);
-    opacity:.13;
+
+    filter:blur(48px);
+
+    opacity:.12;
+
+    animation:
+        giftGlow 4s ease-in-out infinite;
+}
+
+@keyframes giftGlow{
+
+    0%,100%{
+        opacity:.08;
+    }
+
+    50%{
+        opacity:.17;
+    }
+}
+
+.gift::after{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-100%;
+
+    width:50%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,40,40,.08),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    animation:
+        giftShine 6s infinite;
+}
+
+@keyframes giftShine{
+
+    0%,50%{
+        left:-100%;
+    }
+
+    80%,100%{
+        left:150%;
+    }
+}
+
+.gift:active{
+    transform:scale(.97);
+
+    border-color:
+        rgba(255,30,30,.35);
+
+    box-shadow:
+        0 0 25px
+        rgba(255,0,0,.08);
 }
 
 .gift-image{
+    position:relative;
+    z-index:2;
+
     height:95px;
 
     display:flex;
@@ -404,124 +1122,276 @@ body::before{
     justify-content:center;
 
     font-size:52px;
+
+    filter:
+        drop-shadow(
+            0 0 10px
+            rgba(255,0,0,.12)
+        );
 }
 
 .gift-name{
+    position:relative;
+    z-index:2;
+
     font-size:14px;
+
     font-weight:800;
 }
 
 .gift-price{
+    position:relative;
+    z-index:2;
+
     margin-top:5px;
+
     color:#ff3030;
+
     font-size:13px;
+
     font-weight:700;
 }
 
 .gift button{
+    position:relative;
+    z-index:3;
+
     margin-top:10px;
+
     width:100%;
+
     padding:9px;
 
-    border:1px solid rgba(255,0,0,.25);
+    border:
+        1px solid
+        rgba(255,0,0,.25);
+
     border-radius:10px;
 
-    background:rgba(255,0,0,.08);
+    background:
+        rgba(255,0,0,.08);
+
     color:#fff;
 
     font-size:11px;
+
     font-weight:700;
+
+    transition:.2s;
 }
 
-/* ================= REFERRAL ================= */
+.gift button:active{
+    background:
+        rgba(255,0,0,.18);
+
+    transform:scale(.96);
+}
+
+
+/* =========================================================
+   REFERRAL
+========================================================= */
 
 .referral{
     padding:17px;
+
     border-radius:20px;
 
-    background:#101010;
-    border:1px solid var(--border);
+    background:
+        linear-gradient(
+            145deg,
+            #111,
+            #0b0b0b
+        );
+
+    border:
+        1px solid
+        var(--border);
+
+    box-shadow:
+        0 0 25px
+        rgba(255,0,0,.035);
 }
 
 .referral-code{
     margin-top:9px;
+
     padding:12px;
 
     background:#080808;
+
     border-radius:12px;
 
+    border:
+        1px solid
+        rgba(255,0,0,.08);
+
     color:#ff3838;
+
     font-size:12px;
+
     word-break:break-all;
 }
 
-/* ================= NAV ================= */
+
+/* =========================================================
+   BOTTOM NAV
+========================================================= */
 
 .bottom-nav{
     position:fixed;
+
     z-index:100;
+
     bottom:12px;
+
     left:12px;
     right:12px;
 
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+
+    grid-template-columns:
+        repeat(4,1fr);
 
     padding:7px;
 
-    background:rgba(12,12,12,.94);
-    backdrop-filter:blur(15px);
+    background:
+        rgba(10,10,10,.92);
 
-    border:1px solid rgba(255,20,20,.17);
+    backdrop-filter:
+        blur(18px);
+
+    border:
+        1px solid
+        rgba(255,20,20,.17);
+
     border-radius:22px;
 
     box-shadow:
-        0 10px 40px rgba(0,0,0,.6),
-        0 0 25px rgba(255,0,0,.05);
+        0 10px 40px
+        rgba(0,0,0,.65),
+
+        0 0 25px
+        rgba(255,0,0,.05);
+}
+
+.bottom-nav::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:10%;
+    right:10%;
+
+    height:1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,0,0,.5),
+            transparent
+        );
+
+    animation:
+        navLine 4s linear infinite;
+}
+
+@keyframes navLine{
+
+    0%{
+        opacity:.2;
+        transform:scaleX(.4);
+    }
+
+    50%{
+        opacity:1;
+        transform:scaleX(1);
+    }
+
+    100%{
+        opacity:.2;
+        transform:scaleX(.4);
+    }
 }
 
 .nav-button{
+    position:relative;
+
     border:0;
+
     background:transparent;
+
     color:#666;
 
     padding:9px 3px;
+
     border-radius:15px;
 
     font-size:10px;
+
     font-weight:700;
+
+    transition:.2s;
 }
 
 .nav-button span{
     display:block;
+
     margin-bottom:3px;
+
     font-size:19px;
 }
 
 .nav-button.active{
     color:#fff;
-    background:rgba(255,0,0,.1);
+
+    background:
+        rgba(255,0,0,.09);
+
+    box-shadow:
+        inset 0 0 15px
+        rgba(255,0,0,.035);
 }
 
 .nav-button.active span{
-    filter:drop-shadow(0 0 6px red);
+    filter:
+        drop-shadow(
+            0 0 7px
+            red
+        );
 }
 
-/* ================= MODAL ================= */
+.nav-button:active{
+    transform:scale(.92);
+}
+
+
+/* =========================================================
+   MODALS
+========================================================= */
 
 .modal{
     position:fixed;
+
     inset:0;
+
     z-index:200;
 
     display:none;
+
     align-items:flex-end;
+
     justify-content:center;
 
     padding:12px;
 
-    background:rgba(0,0,0,.72);
-    backdrop-filter:blur(8px);
+    background:
+        rgba(0,0,0,.76);
+
+    backdrop-filter:
+        blur(9px);
 }
 
 .modal.show{
@@ -529,26 +1399,87 @@ body::before{
 }
 
 .modal-box{
+    position:relative;
+
     width:100%;
+
     max-width:500px;
 
     padding:20px;
 
-    border-radius:25px 25px 20px 20px;
+    border-radius:
+        25px
+        25px
+        20px
+        20px;
 
-    background:#101010;
-    border:1px solid rgba(255,20,20,.2);
+    background:
+        linear-gradient(
+            145deg,
+            #151515,
+            #0c0c0c
+        );
 
-    box-shadow:0 -10px 50px rgba(255,0,0,.1);
+    border:
+        1px solid
+        rgba(255,20,20,.2);
 
-    animation:modalIn .25s ease;
+    box-shadow:
+        0 -10px 50px
+        rgba(255,0,0,.1),
+
+        inset 0 0 30px
+        rgba(255,0,0,.02);
+
+    animation:
+        modalIn .25s ease;
+
+    overflow:hidden;
+}
+
+.modal-box::before{
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-70%;
+
+    width:50%;
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,30,30,.08),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    animation:
+        modalShine 5s infinite;
+}
+
+@keyframes modalShine{
+
+    0%,45%{
+        left:-70%;
+    }
+
+    80%,100%{
+        left:140%;
+    }
 }
 
 @keyframes modalIn{
+
     from{
         transform:translateY(50px);
         opacity:0;
     }
+
     to{
         transform:translateY(0);
         opacity:1;
@@ -556,34 +1487,63 @@ body::before{
 }
 
 .modal-title{
+    position:relative;
+
     font-size:20px;
+
     font-weight:900;
 }
 
 .modal-text{
+    position:relative;
+
     margin-top:7px;
+
     color:#777;
+
     font-size:13px;
+
     line-height:19px;
 }
 
 .modal-input{
+    position:relative;
+
     width:100%;
+
     margin-top:15px;
+
     padding:14px;
 
     outline:none;
 
     color:#fff;
+
     background:#080808;
 
-    border:1px solid rgba(255,0,0,.16);
+    border:
+        1px solid
+        rgba(255,0,0,.16);
+
     border-radius:13px;
 }
 
+.modal-input:focus{
+    border-color:
+        rgba(255,0,0,.45);
+
+    box-shadow:
+        0 0 15px
+        rgba(255,0,0,.08);
+}
+
 .modal-actions{
+    position:relative;
+
     display:flex;
+
     gap:8px;
+
     margin-top:12px;
 }
 
@@ -591,80 +1551,65 @@ body::before{
     flex:1;
 }
 
-/* ================= ADMIN ================= */
 
-.admin-category{
-    margin-top:12px;
-    padding:14px;
-
-    border-radius:17px;
-
-    background:
-        linear-gradient(135deg,rgba(255,0,0,.1),#101010);
-
-    border:1px solid rgba(255,0,0,.18);
-}
-
-.admin-category-title{
-    font-size:14px;
-    font-weight:800;
-}
-
-.admin-category-description{
-    margin-top:4px;
-    color:#777;
-    font-size:11px;
-}
-
-.admin-button{
-    width:100%;
-    margin-top:10px;
-    padding:10px;
-
-    border:1px solid rgba(255,0,0,.25);
-    border-radius:11px;
-
-    background:#190707;
-    color:#ff3939;
-
-    font-weight:800;
-}
-
-/* ================= TOAST ================= */
+/* =========================================================
+   TOAST
+========================================================= */
 
 .toast{
     position:fixed;
+
     z-index:500;
+
     left:50%;
+
     bottom:90px;
 
-    transform:translateX(-50%) translateY(20px);
+    transform:
+        translateX(-50%)
+        translateY(20px);
 
     padding:12px 18px;
 
     border-radius:14px;
 
-    background:#161616;
-    border:1px solid rgba(255,0,0,.22);
+    background:
+        rgba(20,20,20,.96);
 
-    box-shadow:0 0 25px rgba(255,0,0,.12);
+    border:
+        1px solid
+        rgba(255,0,0,.22);
+
+    box-shadow:
+        0 0 25px
+        rgba(255,0,0,.12);
 
     color:#fff;
+
     font-size:12px;
 
     opacity:0;
+
     pointer-events:none;
+
     transition:.25s;
 }
 
 .toast.show{
     opacity:1;
-    transform:translateX(-50%) translateY(0);
+
+    transform:
+        translateX(-50%)
+        translateY(0);
 }
 
-/* ================= MOBILE ================= */
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media(max-width:380px){
+
     .gifts{
         grid-template-columns:1fr;
     }
@@ -672,15 +1617,36 @@ body::before{
     .balance-value{
         font-size:28px;
     }
+
+    .profile-card{
+        min-height:72px;
+    }
+
+    .profile-avatar{
+        width:46px;
+        height:46px;
+        font-size:23px;
+    }
+
+    .profile-notification{
+        width:38px;
+        height:38px;
+    }
 }
+
 </style>
 </head>
 
+
 <body>
 
-<!-- ================= PROFILE ================= -->
+
+<!-- =========================================================
+     PROFILE
+========================================================= -->
 
 <div class="top">
+
     <div class="profile-card">
 
         <div class="profile-avatar">
@@ -688,8 +1654,23 @@ body::before{
         </div>
 
         <div class="profile-info">
-            <div class="name" id="username">Игрок</div>
-            <div class="username" id="tgusername">@Telegram</div>
+
+            <div
+                class="name"
+                id="username">
+
+                Игрок
+
+            </div>
+
+            <div
+                class="username"
+                id="tgusername">
+
+                @Telegram
+
+            </div>
+
         </div>
 
         <div class="profile-notification">
@@ -698,10 +1679,13 @@ body::before{
 
     </div>
 
+
     <!-- ADMIN -->
-    <div id="adminCategory"
-         class="admin-category"
-         style="display:none;">
+
+    <div
+        id="adminCategory"
+        class="admin-category"
+        style="display:none;">
 
         <div class="admin-category-title">
             ⚙️ Админ Панель
@@ -720,18 +1704,36 @@ body::before{
             🔐 Открыть админ панель
 
         </button>
+
     </div>
+
 </div>
 
 
-<!-- ================= HOME ================= -->
 
-<div id="homePage" class="page active">
+<!-- =========================================================
+     HOME
+========================================================= -->
+
+<div
+    id="homePage"
+    class="page active">
+
 
     <div class="page-title">
-        <h1>RaneGame</h1>
-        <p>Играй • Получай • Побеждай</p>
+
+        <h1>
+            RaneGame
+        </h1>
+
+        <p>
+            Играй • Получай • Побеждай
+        </p>
+
     </div>
+
+
+    <!-- BALANCE -->
 
     <div class="balance-card">
 
@@ -740,84 +1742,188 @@ body::before{
         </div>
 
         <div class="balance-value">
-            <span id="balance">0</span> 🪙
+
+            <span id="balance">
+                0
+            </span>
+
+            🪙
+
         </div>
 
+
         <div style="margin-top:15px;">
-            <button class="red-button" onclick="openRoulette()">
+
+            <button
+                class="red-button"
+                onclick="openRoulette()">
+
                 🎰 Открыть рулетку
+
             </button>
+
         </div>
 
     </div>
 
+
+
+    <!-- STATS -->
 
     <div class="stats">
 
         <div class="stat">
-            <div class="stat-icon">🔥</div>
-            <div class="stat-title">Множитель</div>
-            <div class="stat-value" id="multiplier">x1.0</div>
+
+            <div class="stat-icon">
+                🔥
+            </div>
+
+            <div class="stat-title">
+                Множитель
+            </div>
+
+            <div
+                class="stat-value"
+                id="multiplier">
+
+                x1.0
+
+            </div>
+
         </div>
 
+
         <div class="stat">
-            <div class="stat-icon">🎁</div>
-            <div class="stat-title">Бонус</div>
-            <div class="stat-value">Доступен</div>
+
+            <div class="stat-icon">
+                🎁
+            </div>
+
+            <div class="stat-title">
+                Бонус
+            </div>
+
+            <div class="stat-value">
+                Доступен
+            </div>
+
         </div>
 
     </div>
 
 
+
+    <!-- GIFTS -->
+
     <div class="section">
 
         <div class="section-head">
-            <h2>🎁 Подарки</h2>
-            <button onclick="showPage('shop')">
+
+            <h2>
+                🎁 Подарки
+            </h2>
+
+            <button
+                onclick="showPage('shop')">
+
                 Все →
+
             </button>
+
         </div>
+
 
         <div class="gifts">
 
-            <div class="gift">
-                <div class="gift-image">🎁</div>
-                <div class="gift-name">Red Gift</div>
-                <div class="gift-price">100 🪙</div>
-                <button onclick="buyGift('Red Gift',100)">
-                    Купить
-                </button>
-            </div>
 
             <div class="gift">
-                <div class="gift-image">🔥</div>
-                <div class="gift-name">Fire</div>
-                <div class="gift-price">500 🪙</div>
-                <button onclick="buyGift('Fire',500)">
+
+                <div class="gift-image">
+                    🎁
+                </div>
+
+                <div class="gift-name">
+                    Red Gift
+                </div>
+
+                <div class="gift-price">
+                    100 🪙
+                </div>
+
+                <button
+                    onclick="buyGift('Red Gift',100)">
+
                     Купить
+
                 </button>
+
             </div>
+
+
+            <div class="gift">
+
+                <div class="gift-image">
+                    🔥
+                </div>
+
+                <div class="gift-name">
+                    Fire
+                </div>
+
+                <div class="gift-price">
+                    500 🪙
+                </div>
+
+                <button
+                    onclick="buyGift('Fire',500)">
+
+                    Купить
+
+                </button>
+
+            </div>
+
 
         </div>
 
     </div>
 
 
+
+    <!-- REFERRALS -->
+
     <div class="section">
 
         <div class="section-head">
-            <h2>🔗 Рефералы</h2>
+
+            <h2>
+                🔗 Рефералы
+            </h2>
+
         </div>
+
 
         <div class="referral">
 
-            <div style="color:#777;font-size:12px;">
-                Приглашай друзей и получай бонусы
+            <div
+                style="
+                color:#777;
+                font-size:12px;">
+
+                Приглашай друзей
+                и получай бонусы
+
             </div>
 
-            <div class="referral-code" id="referralLink">
+
+            <div
+                class="referral-code"
+                id="referralLink">
+
                 Загрузка...
+
             </div>
+
 
             <button
                 class="red-button"
@@ -835,14 +1941,28 @@ body::before{
 </div>
 
 
-<!-- ================= SHOP ================= -->
 
-<div id="shopPage" class="page">
+<!-- =========================================================
+     SHOP
+========================================================= -->
+
+<div
+    id="shopPage"
+    class="page">
+
 
     <div class="page-title">
-        <h1>Магазин</h1>
-        <p>Выбери свой подарок</p>
+
+        <h1>
+            Магазин
+        </h1>
+
+        <p>
+            Выбери свой подарок
+        </p>
+
     </div>
+
 
     <div class="tabs">
 
@@ -853,6 +1973,7 @@ body::before{
             🎁 Магазин
 
         </button>
+
 
         <button
             class="tab"
@@ -867,43 +1988,106 @@ body::before{
 
     <div id="shopContent">
 
-        <div class="gifts" style="margin-top:13px;">
+        <div
+            class="gifts"
+            style="margin-top:13px;">
+
 
             <div class="gift">
-                <div class="gift-image">🎁</div>
-                <div class="gift-name">Red Gift</div>
-                <div class="gift-price">100 🪙</div>
-                <button onclick="buyGift('Red Gift',100)">
+
+                <div class="gift-image">
+                    🎁
+                </div>
+
+                <div class="gift-name">
+                    Red Gift
+                </div>
+
+                <div class="gift-price">
+                    100 🪙
+                </div>
+
+                <button
+                    onclick="buyGift('Red Gift',100)">
+
                     Купить
+
                 </button>
+
             </div>
 
-            <div class="gift">
-                <div class="gift-image">🔥</div>
-                <div class="gift-name">Fire</div>
-                <div class="gift-price">500 🪙</div>
-                <button onclick="buyGift('Fire',500)">
-                    Купить
-                </button>
-            </div>
 
             <div class="gift">
-                <div class="gift-image">💎</div>
-                <div class="gift-name">Red Diamond</div>
-                <div class="gift-price">1000 🪙</div>
-                <button onclick="buyGift('Red Diamond',1000)">
+
+                <div class="gift-image">
+                    🔥
+                </div>
+
+                <div class="gift-name">
+                    Fire
+                </div>
+
+                <div class="gift-price">
+                    500 🪙
+                </div>
+
+                <button
+                    onclick="buyGift('Fire',500)">
+
                     Купить
+
                 </button>
+
             </div>
 
+
             <div class="gift">
-                <div class="gift-image">👑</div>
-                <div class="gift-name">Red Crown</div>
-                <div class="gift-price">2500 🪙</div>
-                <button onclick="buyGift('Red Crown',2500)">
+
+                <div class="gift-image">
+                    💎
+                </div>
+
+                <div class="gift-name">
+                    Red Diamond
+                </div>
+
+                <div class="gift-price">
+                    1000 🪙
+                </div>
+
+                <button
+                    onclick="buyGift('Red Diamond',1000)">
+
                     Купить
+
                 </button>
+
             </div>
+
+
+            <div class="gift">
+
+                <div class="gift-image">
+                    👑
+                </div>
+
+                <div class="gift-name">
+                    Red Crown
+                </div>
+
+                <div class="gift-price">
+                    2500 🪙
+                </div>
+
+                <button
+                    onclick="buyGift('Red Crown',2500)">
+
+                    Купить
+
+                </button>
+
+            </div>
+
 
         </div>
 
@@ -912,27 +2096,62 @@ body::before{
 </div>
 
 
-<!-- ================= AUCTION ================= -->
 
-<div id="auctionPage" class="page">
+<!-- =========================================================
+     AUCTION
+========================================================= -->
+
+<div
+    id="auctionPage"
+    class="page">
+
 
     <div class="page-title">
-        <h1>Аукцион</h1>
-        <p>Покупай и продавай предметы</p>
+
+        <h1>
+            Аукцион
+        </h1>
+
+        <p>
+            Покупай и продавай предметы
+        </p>
+
     </div>
+
 
     <div class="balance-card">
 
-        <div style="font-size:45px;text-align:center;">
+        <div
+            style="
+            font-size:45px;
+            text-align:center;">
+
             🔨
+
         </div>
 
-        <div style="text-align:center;margin-top:10px;">
-            <b>Аукцион скоро будет доступен</b>
+
+        <div
+            style="
+            text-align:center;
+            margin-top:10px;">
+
+            <b>
+                Аукцион скоро будет доступен
+            </b>
+
         </div>
 
-        <div style="text-align:center;color:#777;font-size:12px;margin-top:5px;">
+
+        <div
+            style="
+            text-align:center;
+            color:#777;
+            font-size:12px;
+            margin-top:5px;">
+
             Следи за обновлениями
+
         </div>
 
     </div>
@@ -940,85 +2159,157 @@ body::before{
 </div>
 
 
-<!-- ================= TOP ================= -->
 
-<div id="topPage" class="page">
+<!-- =========================================================
+     TOP
+========================================================= -->
+
+<div
+    id="topPage"
+    class="page">
+
 
     <div class="page-title">
-        <h1>Топ игроков</h1>
-        <p>Лучшие игроки RaneGame</p>
+
+        <h1>
+            Топ игроков
+        </h1>
+
+        <p>
+            Лучшие игроки RaneGame
+        </p>
+
     </div>
 
-    <div class="stat" style="margin-top:10px;">
+
+    <div
+        class="stat"
+        style="margin-top:10px;">
+
         🥇 Первый игрок
-        <span style="float:right;color:#ff3030;">
+
+        <span
+            style="
+            float:right;
+            color:#ff3030;">
+
             —
+
         </span>
+
     </div>
 
-    <div class="stat" style="margin-top:8px;">
+
+    <div
+        class="stat"
+        style="margin-top:8px;">
+
         🥈 Второй игрок
-        <span style="float:right;color:#ff3030;">
+
+        <span
+            style="
+            float:right;
+            color:#ff3030;">
+
             —
+
         </span>
+
     </div>
 
-    <div class="stat" style="margin-top:8px;">
+
+    <div
+        class="stat"
+        style="margin-top:8px;">
+
         🥉 Третий игрок
-        <span style="float:right;color:#ff3030;">
+
+        <span
+            style="
+            float:right;
+            color:#ff3030;">
+
             —
+
         </span>
+
     </div>
 
 </div>
 
 
-<!-- ================= NAV ================= -->
+
+<!-- =========================================================
+     BOTTOM NAV
+========================================================= -->
 
 <div class="bottom-nav">
+
 
     <button
         class="nav-button active"
         onclick="showPage('home')">
 
-        <span>🏠</span>
+        <span>
+            🏠
+        </span>
+
         Главная
 
     </button>
+
 
     <button
         class="nav-button"
         onclick="showPage('shop')">
 
-        <span>🎁</span>
+        <span>
+            🎁
+        </span>
+
         Магазин
 
     </button>
+
 
     <button
         class="nav-button"
         onclick="showPage('auction')">
 
-        <span>🔨</span>
+        <span>
+            🔨
+        </span>
+
         Аукцион
 
     </button>
+
 
     <button
         class="nav-button"
         onclick="showPage('top')">
 
-        <span>🏆</span>
+        <span>
+            🏆
+        </span>
+
         Топ
 
     </button>
 
+
 </div>
 
 
-<!-- ================= ADMIN MODAL ================= -->
 
-<div id="adminModal" class="modal">
+<!-- =========================================================
+     ADMIN MODAL
+========================================================= -->
+
+<div
+    id="adminModal"
+    class="modal">
+
 
     <div class="modal-box">
 
@@ -1026,9 +2317,13 @@ body::before{
             🔐 Админ панель
         </div>
 
+
         <div class="modal-text">
+
             Введи пароль администратора.
+
         </div>
+
 
         <input
             id="adminPassword"
@@ -1036,7 +2331,9 @@ body::before{
             type="password"
             placeholder="Пароль">
 
+
         <div class="modal-actions">
+
 
             <button
                 class="red-button"
@@ -1046,14 +2343,18 @@ body::before{
 
             </button>
 
+
             <button
                 class="red-button"
-                style="background:#222;"
+                style="
+                background:#222;
+                animation:none;"
                 onclick="closeModal('adminModal')">
 
                 Закрыть
 
             </button>
+
 
         </div>
 
@@ -1062,27 +2363,35 @@ body::before{
 </div>
 
 
-<!-- ================= ROULETTE ================= -->
 
-<div id="rouletteModal" class="modal">
+<!-- =========================================================
+     ROULETTE
+========================================================= -->
+
+<div
+    id="rouletteModal"
+    class="modal">
+
 
     <div class="modal-box">
+
 
         <div class="modal-title">
             🎰 Рулетка
         </div>
+
 
         <div
             id="rouletteResult"
             style="
             text-align:center;
             font-size:45px;
-            margin:25px 0;
-            ">
+            margin:25px 0;">
 
             🎰
 
         </div>
+
 
         <button
             class="red-button"
@@ -1092,346 +2401,728 @@ body::before{
 
         </button>
 
+
         <button
             class="red-button"
-            style="margin-top:8px;background:#222;"
+            style="
+            margin-top:8px;
+            background:#222;
+            animation:none;"
             onclick="closeModal('rouletteModal')">
 
             Закрыть
 
         </button>
 
+
     </div>
 
 </div>
 
 
-<!-- ================= TOAST ================= -->
 
-<div id="toast" class="toast"></div>
+<!-- =========================================================
+     TOAST
+========================================================= -->
+
+<div
+    id="toast"
+    class="toast">
+</div>
+
 
 
 <script>
 
-/* ================= TELEGRAM ================= */
+
+/* =========================================================
+   TELEGRAM
+========================================================= */
 
 const tg =
     window.Telegram &&
     window.Telegram.WebApp
-    ? window.Telegram.WebApp
-    : null;
+        ? window.Telegram.WebApp
+        : null;
+
 
 if(tg){
+
     tg.ready();
+
     tg.expand();
+
 }
 
 
-/* ================= USER ================= */
+/* =========================================================
+   USER
+========================================================= */
 
-const DEV_TELEGRAM_ID = "8791077915";
+const DEV_TELEGRAM_ID =
+    "8791077915";
+
 
 let player = null;
 
-if(tg && tg.initDataUnsafe && tg.initDataUnsafe.user){
 
-    player = tg.initDataUnsafe.user;
+if(
+    tg &&
+    tg.initDataUnsafe &&
+    tg.initDataUnsafe.user
+){
 
-    document.getElementById("username").textContent =
-        player.first_name || "Игрок";
+    player =
+        tg.initDataUnsafe.user;
 
-    document.getElementById("tgusername").textContent =
+
+    document
+        .getElementById("username")
+        .textContent =
+        player.first_name ||
+        "Игрок";
+
+
+    document
+        .getElementById("tgusername")
+        .textContent =
         player.username
-        ? "@" + player.username
-        : "Telegram";
+            ? "@" + player.username
+            : "Telegram";
 
-    if(String(player.id) === String(DEV_TELEGRAM_ID)){
-        document.getElementById("adminCategory").style.display = "block";
+
+    if(
+        String(player.id) ===
+        String(DEV_TELEGRAM_ID)
+    ){
+
+        document
+            .getElementById("adminCategory")
+            .style.display =
+            "block";
+
     }
+
 }
 
 
-/* ================= NAVIGATION ================= */
+/* =========================================================
+   NAVIGATION
+========================================================= */
 
 function showPage(page){
 
-    document.querySelectorAll(".page")
-        .forEach(x => x.classList.remove("active"));
+    document
+        .querySelectorAll(".page")
+        .forEach(
+            x =>
+            x.classList.remove("active")
+        );
+
 
     const element =
-        document.getElementById(page + "Page");
+        document.getElementById(
+            page + "Page"
+        );
+
 
     if(element){
-        element.classList.add("active");
+
+        element.classList.add(
+            "active"
+        );
+
     }
 
-    document.querySelectorAll(".nav-button")
-        .forEach(x => x.classList.remove("active"));
+
+    document
+        .querySelectorAll(".nav-button")
+        .forEach(
+            x =>
+            x.classList.remove("active")
+        );
+
 
     const buttons =
-        document.querySelectorAll(".nav-button");
+        document.querySelectorAll(
+            ".nav-button"
+        );
+
 
     const index = {
+
         home:0,
+
         shop:1,
+
         auction:2,
+
         top:3
+
     };
 
-    if(buttons[index[page]]){
-        buttons[index[page]].classList.add("active");
+
+    if(
+        buttons[index[page]]
+    ){
+
+        buttons[
+            index[page]
+        ].classList.add(
+            "active"
+        );
+
     }
 
+
     window.scrollTo({
+
         top:0,
+
         behavior:"smooth"
+
     });
+
 }
 
 
-/* ================= SHOP TABS ================= */
+/* =========================================================
+   SHOP TABS
+========================================================= */
 
 function shopTab(button,type){
 
     document
         .querySelectorAll(".tab")
-        .forEach(x => x.classList.remove("active"));
+        .forEach(
+            x =>
+            x.classList.remove("active")
+        );
 
-    button.classList.add("active");
+
+    button.classList.add(
+        "active"
+    );
+
 
     const content =
-        document.getElementById("shopContent");
+        document.getElementById(
+            "shopContent"
+        );
 
-    if(type === "inventory"){
+
+    if(
+        type === "inventory"
+    ){
 
         content.innerHTML = `
-            <div style="
+
+            <div
+                style="
                 margin-top:15px;
                 padding:30px 15px;
                 text-align:center;
                 border-radius:20px;
                 background:#101010;
                 border:1px solid rgba(255,0,0,.12);
-            ">
-                <div style="font-size:45px;">🎒</div>
-
-                <div style="
-                    margin-top:10px;
-                    font-weight:800;
+                box-shadow:0 0 25px rgba(255,0,0,.04);
                 ">
-                    Инвентарь пуст
+
+                <div
+                    style="
+                    font-size:45px;
+                    filter:drop-shadow(0 0 10px rgba(255,0,0,.2));
+                    ">
+
+                    🎒
+
                 </div>
 
-                <div style="
+
+                <div
+                    style="
+                    margin-top:10px;
+                    font-weight:800;
+                    ">
+
+                    Инвентарь пуст
+
+                </div>
+
+
+                <div
+                    style="
                     margin-top:5px;
                     color:#777;
                     font-size:12px;
-                ">
+                    ">
+
                     Купленные подарки появятся здесь
+
                 </div>
+
             </div>
+
         `;
 
-    }else{
+    }
+    else{
 
         content.innerHTML = `
-            <div class="gifts" style="margin-top:13px;">
+
+            <div
+                class="gifts"
+                style="margin-top:13px;">
 
                 <div class="gift">
-                    <div class="gift-image">🎁</div>
-                    <div class="gift-name">Red Gift</div>
-                    <div class="gift-price">100 🪙</div>
-                    <button onclick="buyGift('Red Gift',100)">
+
+                    <div class="gift-image">
+                        🎁
+                    </div>
+
+                    <div class="gift-name">
+                        Red Gift
+                    </div>
+
+                    <div class="gift-price">
+                        100 🪙
+                    </div>
+
+                    <button
+                        onclick="buyGift('Red Gift',100)">
+
                         Купить
+
                     </button>
+
                 </div>
 
-                <div class="gift">
-                    <div class="gift-image">🔥</div>
-                    <div class="gift-name">Fire</div>
-                    <div class="gift-price">500 🪙</div>
-                    <button onclick="buyGift('Fire',500)">
-                        Купить
-                    </button>
-                </div>
 
                 <div class="gift">
-                    <div class="gift-image">💎</div>
-                    <div class="gift-name">Red Diamond</div>
-                    <div class="gift-price">1000 🪙</div>
-                    <button onclick="buyGift('Red Diamond',1000)">
+
+                    <div class="gift-image">
+                        🔥
+                    </div>
+
+                    <div class="gift-name">
+                        Fire
+                    </div>
+
+                    <div class="gift-price">
+                        500 🪙
+                    </div>
+
+                    <button
+                        onclick="buyGift('Fire',500)">
+
                         Купить
+
                     </button>
+
                 </div>
 
+
                 <div class="gift">
-                    <div class="gift-image">👑</div>
-                    <div class="gift-name">Red Crown</div>
-                    <div class="gift-price">2500 🪙</div>
-                    <button onclick="buyGift('Red Crown',2500)">
+
+                    <div class="gift-image">
+                        💎
+                    </div>
+
+                    <div class="gift-name">
+                        Red Diamond
+                    </div>
+
+                    <div class="gift-price">
+                        1000 🪙
+                    </div>
+
+                    <button
+                        onclick="buyGift('Red Diamond',1000)">
+
                         Купить
+
                     </button>
+
+                </div>
+
+
+                <div class="gift">
+
+                    <div class="gift-image">
+                        👑
+                    </div>
+
+                    <div class="gift-name">
+                        Red Crown
+                    </div>
+
+                    <div class="gift-price">
+                        2500 🪙
+                    </div>
+
+                    <button
+                        onclick="buyGift('Red Crown',2500)">
+
+                        Купить
+
+                    </button>
+
                 </div>
 
             </div>
+
         `;
+
     }
+
 }
 
 
-/* ================= MODALS ================= */
+/* =========================================================
+   MODALS
+========================================================= */
 
 function openRoulette(){
+
     document
-        .getElementById("rouletteModal")
-        .classList.add("show");
+        .getElementById(
+            "rouletteModal"
+        )
+        .classList.add(
+            "show"
+        );
+
 }
+
 
 function openAdminLogin(){
+
     document
-        .getElementById("adminModal")
-        .classList.add("show");
+        .getElementById(
+            "adminModal"
+        )
+        .classList.add(
+            "show"
+        );
+
 }
+
 
 function closeModal(id){
+
     document
         .getElementById(id)
-        .classList.remove("show");
+        .classList.remove(
+            "show"
+        );
+
 }
 
 
-/* ================= ROULETTE ================= */
+/* =========================================================
+   ROULETTE
+========================================================= */
 
 function spinRoulette(){
 
     const result =
-        document.getElementById("rouletteResult");
+        document.getElementById(
+            "rouletteResult"
+        );
 
-    result.textContent = "🔴";
+
+    result.textContent =
+        "🔴";
+
+
+    result.style.transform =
+        "scale(1.3)";
+
+
+    result.style.transition =
+        ".2s";
+
+
+    setTimeout(() => {
+
+        result.style.transform =
+            "scale(1)";
+
+    },200);
+
 
     setTimeout(() => {
 
         const values = [
+
             "🪙",
+
             "🎁",
+
             "🔥",
+
             "💎",
+
             "👑"
+
         ];
 
-        result.textContent =
-            values[Math.floor(Math.random()*values.length)];
 
-        toast("Рулетка остановилась!");
+        result.textContent =
+            values[
+                Math.floor(
+                    Math.random() *
+                    values.length
+                )
+            ];
+
+
+        toast(
+            "Рулетка остановилась!"
+        );
 
     },1200);
+
 }
 
 
-/* ================= BUY ================= */
+/* =========================================================
+   BUY
+========================================================= */
 
 function buyGift(name,price){
 
     toast(
-        name + " — " + price + " 🪙"
+        name +
+        " — " +
+        price +
+        " 🪙"
     );
 
-    /*
-      Здесь оставь свою существующую
-      функцию покупки через API.
-    */
 }
 
 
-/* ================= REFERRAL ================= */
+/* =========================================================
+   REFERRAL
+========================================================= */
 
 function copyReferral(){
 
     const text =
-        document.getElementById("referralLink")
-        .textContent;
+        document
+            .getElementById(
+                "referralLink"
+            )
+            .textContent;
+
 
     if(
         navigator.clipboard &&
         text &&
-        text !== "Загрузка..."
+        text !==
+        "Загрузка..."
     ){
 
-        navigator.clipboard.writeText(text);
+        navigator.clipboard
+            .writeText(text)
+            .then(() => {
 
-        toast("Ссылка скопирована!");
+                toast(
+                    "Ссылка скопирована!"
+                );
 
-    }else{
+            })
+            .catch(() => {
 
-        toast("Ссылка пока не загружена");
+                toast(
+                    "Не удалось скопировать"
+                );
+
+            });
 
     }
+    else{
+
+        toast(
+            "Ссылка пока не загружена"
+        );
+
+    }
+
 }
 
 
-/* ================= ADMIN ================= */
+/* =========================================================
+   ADMIN
+========================================================= */
 
 function loginAdmin(){
 
     const password =
-        document.getElementById("adminPassword").value;
+        document
+            .getElementById(
+                "adminPassword"
+            )
+            .value;
+
 
     /*
-      ВАЖНО:
-      Для настоящей админки проверяй пароль
-      на сервере, а не только в HTML.
+       Здесь пока оставлена
+       твоя текущая логика.
     */
 
-    if(password === "LexaJordon1122"){
+    if(
+        password ===
+        "LexaJordon1122"
+    ){
 
-        closeModal("adminModal");
+        closeModal(
+            "adminModal"
+        );
 
-        toast("Админка открыта");
 
-        // Здесь подключается твоя существующая
-        // функция открытия панели.
+        toast(
+            "Админка открыта"
+        );
 
-    }else{
 
-        toast("Неверный пароль");
+        /*
+           Здесь подключается
+           существующая функция
+           открытия панели.
+        */
 
     }
+    else{
+
+        toast(
+            "Неверный пароль"
+        );
+
+    }
+
 }
 
 
-/* ================= TOAST ================= */
+/* =========================================================
+   TOAST
+========================================================= */
 
 let toastTimer = null;
+
 
 function toast(message){
 
     const el =
-        document.getElementById("toast");
+        document.getElementById(
+            "toast"
+        );
 
-    el.textContent = message;
 
-    el.classList.add("show");
+    el.textContent =
+        message;
 
-    clearTimeout(toastTimer);
 
-    toastTimer = setTimeout(() => {
+    el.classList.add(
+        "show"
+    );
 
-        el.classList.remove("show");
 
-    },2200);
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(() => {
+
+            el.classList.remove(
+                "show"
+            );
+
+        },2200);
+
 }
 
 
-/* ================= DEMO BALANCE ================= */
+/* =========================================================
+   BALANCE
+========================================================= */
 
-document.getElementById("balance")
-    .textContent = "0";
-
-document.getElementById("referralLink")
+document
+    .getElementById(
+        "balance"
+    )
     .textContent =
-        player && player.username
-        ? "https://t.me/RaneGameBot?start=" + player.username
+    "0";
+
+
+/* =========================================================
+   REFERRAL LINK
+========================================================= */
+
+document
+    .getElementById(
+        "referralLink"
+    )
+    .textContent =
+
+    player &&
+    player.username
+
+        ? "https://t.me/RaneGameBot?start=" +
+          player.username
+
         : "Загрузка...";
+
+
+/* =========================================================
+   CLOSE MODAL BY BACKDROP
+========================================================= */
+
+document
+    .querySelectorAll(".modal")
+    .forEach(modal => {
+
+        modal.addEventListener(
+            "click",
+            function(e){
+
+                if(
+                    e.target === modal
+                ){
+
+                    modal.classList.remove(
+                        "show"
+                    );
+
+                }
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   TELEGRAM BACK BUTTON
+========================================================= */
+
+if(tg){
+
+    try{
+
+        tg.BackButton.onClick(
+            () => {
+
+                showPage("home");
+
+            }
+        );
+
+    }catch(e){}
+
+}
 
 </script>
 
