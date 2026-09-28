@@ -13,6 +13,11 @@ app.use(express.json());
 
 const PORT = Number(process.env.PORT) || 3000;
 
+
+/* =========================================================
+   ENV
+========================================================= */
+
 const SUPABASE_URL =
     process.env.SUPABASE_URL;
 
@@ -30,8 +35,8 @@ const BOT_TOKEN =
 const DEV_TELEGRAM_ID =
     "8791077915";
 
-const ADMIN_PASSWORD =
-    "LexaJordon1122";
+const ADMIN_SESSION_SECRET =
+    process.env.ADMIN_SESSION_SECRET;
 
 
 /* =========================================================
@@ -52,6 +57,16 @@ if (!BOT_TOKEN) {
     console.error("❌ BOT_TOKEN не задан");
 }
 
+if (!ADMIN_SESSION_SECRET) {
+    console.error(
+        "❌ ADMIN_SESSION_SECRET не задан"
+    );
+}
+
+
+/* =========================================================
+   SUPABASE
+========================================================= */
 
 const supabase =
     createClient(
@@ -75,7 +90,7 @@ const ROULETTE_DURATION_MS =
 
 
 /* =========================================================
-   FRONTEND — INDEX.HTML
+   FRONTEND
 ========================================================= */
 
 app.use(
@@ -121,18 +136,580 @@ function getTelegramUser(req) {
 
 
 /* =========================================================
+   TELEGRAM INIT DATA
+========================================================= */
+
+function validateTelegramInitData(
+    initData
+) {
+
+    if (
+        !initData ||
+        !BOT_TOKEN
+    ) {
+        return null;
+    }
+
+    try {
+
+        const params =
+            new URLSearchParams(
+                initData
+            );
+
+        const receivedHash =
+            params.get("hash");
+
+        if (!receivedHash) {
+            return null;
+        }
+
+        params.delete("hash");
+
+        const dataCheckString =
+            Array
+                .from(
+                    params.entries()
+                )
+                .sort(
+                    ([a], [b]) =>
+                        a.localeCompare(b)
+                )
+                .map(
+                    ([key, value]) =>
+                        `${key}=${value}`
+                )
+                .join("\n");
+
+        const secretKey =
+            crypto
+                .createHmac(
+                    "sha256",
+                    "WebAppData"
+                )
+                .update(BOT_TOKEN)
+                .digest();
+
+        const calculatedHash =
+            crypto
+                .createHmac(
+                    "sha256",
+                    secretKey
+                )
+                .update(dataCheckString)
+                .digest("hex");
+
+        if (
+            receivedHash.length !==
+            calculatedHash.length
+        ) {
+            return null;
+        }
+
+        if (
+            !crypto.timingSafeEqual(
+                Buffer.from(
+                    receivedHash,
+                    "utf8"
+                ),
+                Buffer.from(
+                    calculatedHash,
+                    "utf8"
+                )
+            )
+        ) {
+            return null;
+        }
+
+        const authDate =
+            Number(
+                params.get(
+                    "auth_date"
+                )
+            );
+
+        if (!authDate) {
+            return null;
+        }
+
+        const age =
+            Math.floor(
+                Date.now() / 1000
+            ) -
+            authDate;
+
+        /*
+         * initData действителен максимум 24 часа
+         */
+
+        if (
+            age < 0 ||
+            age > 86400
+        ) {
+            return null;
+        }
+
+        const userRaw =
+            params.get(
+                "user"
+            );
+
+        if (!userRaw) {
+            return null;
+        }
+
+        const user =
+            JSON.parse(
+                userRaw
+            );
+
+        if (
+            !user ||
+            !user.id
+        ) {
+            return null;
+        }
+
+        return {
+
+            user,
+
+            authDate
+
+        };
+
+    } catch (error) {
+
+        console.error(
+            "TELEGRAM INIT DATA ERROR:",
+            error.message
+        );
+
+        return null;
+    }
+}
+
+
+/* =========================================================
+   ADMIN SESSION TOKEN
+========================================================= */
+
+function createAdminToken(
+    telegramId
+) {
+
+    if (!ADMIN_SESSION_SECRET) {
+        throw new Error(
+            "ADMIN_SESSION_SECRET не задан"
+        );
+    }
+
+    const expiresAt =
+        Date.now() +
+        12 * 60 * 60 * 1000;
+
+    const payload =
+        `${telegramId}.${expiresAt}`;
+
+    const signature =
+        crypto
+            .createHmac(
+                "sha256",
+                ADMIN_SESSION_SECRET
+            )
+            .update(payload)
+            .digest("hex");
+
+    return Buffer
+        .from(
+            `${payload}.${signature}`
+        )
+        .toString(
+            "base64url"
+        );
+}
+
+
+/* =========================================================
+   ПРОВЕРКА ADMIN TOKEN
+========================================================= */
+
+function verifyAdminToken(
+    token
+) {
+
+    if (
+        !token ||
+        !ADMIN_SESSION_SECRET
+    ) {
+        return null;
+    }
+
+    try {
+
+        const decoded =
+            Buffer
+                .from(
+                    token,
+                    "base64url"
+                )
+                .toString(
+                    "utf8"
+                );
+
+        const parts =
+            decoded.split(
+                "."
+            );
+
+        if (
+            parts.length !== 3
+        ) {
+            return null;
+        }
+
+        const telegramId =
+            parts[0];
+
+        const expiresAt =
+            Number(
+                parts[1]
+            );
+
+        const signature =
+            parts[2];
+
+        const payload =
+            `${telegramId}.${expiresAt}`;
+
+        const expectedSignature =
+            crypto
+                .createHmac(
+                    "sha256",
+                    ADMIN_SESSION_SECRET
+                )
+                .update(payload)
+                .digest("hex");
+
+        if (
+            signature.length !==
+            expectedSignature.length
+        ) {
+            return null;
+        }
+
+        if (
+            !crypto.timingSafeEqual(
+                Buffer.from(
+                    signature,
+                    "utf8"
+                ),
+                Buffer.from(
+                    expectedSignature,
+                    "utf8"
+                )
+            )
+        ) {
+            return null;
+        }
+
+        if (
+            !Number.isFinite(
+                expiresAt
+            )
+        ) {
+            return null;
+        }
+
+        if (
+            Date.now() >
+            expiresAt
+        ) {
+            return null;
+        }
+
+        if (
+            String(telegramId) !==
+            DEV_TELEGRAM_ID
+        ) {
+            return null;
+        }
+
+        return {
+
+            telegramId:
+                String(telegramId),
+
+            expiresAt
+
+        };
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
+
+/* =========================================================
+   ADMIN MIDDLEWARE
+========================================================= */
+
+function requireAdmin(
+    req,
+    res,
+    next
+) {
+
+    const authorization =
+        req.headers.authorization ||
+        "";
+
+    if (
+        !authorization.startsWith(
+            "Bearer "
+        )
+    ) {
+
+        return res
+            .status(401)
+            .json({
+
+                ok:
+                    false,
+
+                error:
+                    "Требуется админская авторизация"
+
+            });
+
+    }
+
+    const token =
+        authorization.substring(
+            7
+        );
+
+    const session =
+        verifyAdminToken(
+            token
+        );
+
+    if (!session) {
+
+        return res
+            .status(401)
+            .json({
+
+                ok:
+                    false,
+
+                error:
+                    "Админская сессия недействительна"
+
+            });
+
+    }
+
+    req.adminTelegramId =
+        session.telegramId;
+
+    next();
+}
+
+
+/* =========================================================
+   ADMIN AUTH
+========================================================= */
+
+app.post(
+    "/api/admin/auth",
+    async (req, res) => {
+
+        try {
+
+            const initData =
+                req.body?.initData;
+
+            if (!initData) {
+
+                return res
+                    .status(400)
+                    .json({
+
+                        ok:
+                            false,
+
+                        error:
+                            "Telegram initData не передан"
+
+                    });
+
+            }
+
+            const validated =
+                validateTelegramInitData(
+                    initData
+                );
+
+            if (!validated) {
+
+                return res
+                    .status(401)
+                    .json({
+
+                        ok:
+                            false,
+
+                        error:
+                            "Telegram авторизация недействительна"
+
+                    });
+
+            }
+
+            const telegramId =
+                String(
+                    validated.user.id
+                );
+
+            if (
+                telegramId !==
+                DEV_TELEGRAM_ID
+            ) {
+
+                return res
+                    .status(403)
+                    .json({
+
+                        ok:
+                            false,
+
+                        error:
+                            "Доступ запрещён"
+
+                    });
+
+            }
+
+            const token =
+                createAdminToken(
+                    telegramId
+                );
+
+            return res.json({
+
+                ok:
+                    true,
+
+                admin:
+                    true,
+
+                telegram_id:
+                    telegramId,
+
+                token
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "ADMIN AUTH ERROR:",
+                error
+            );
+
+            return res
+                .status(500)
+                .json({
+
+                    ok:
+                        false,
+
+                    error:
+                        "Ошибка авторизации администратора"
+
+                });
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ADMIN STATUS
+========================================================= */
+
+app.get(
+    "/api/admin/status",
+    requireAdmin,
+    (req, res) => {
+
+        return res.json({
+
+            ok:
+                true,
+
+            admin:
+                true,
+
+            telegram_id:
+                req.adminTelegramId
+
+        });
+
+    }
+);
+
+
+/* =========================================================
+   ADMIN TEST
+========================================================= */
+
+app.get(
+    "/api/admin/test",
+    requireAdmin,
+    (req, res) => {
+
+        return res.json({
+
+            ok:
+                true,
+
+            message:
+                "Админская защита работает",
+
+            telegram_id:
+                req.adminTelegramId
+
+        });
+
+    }
+);
+
+
+/* =========================================================
    СОЗДАНИЕ / ПОЛУЧЕНИЕ ИГРОКА
 ========================================================= */
 
-async function getOrCreatePlayer(user) {
+async function getOrCreatePlayer(
+    user
+) {
 
     const telegramId =
-        Number(user.id);
+        Number(
+            user.id
+        );
 
     if (!telegramId) {
+
         throw new Error(
             "Не передан Telegram user"
         );
+
     }
 
     const {
@@ -216,7 +793,9 @@ async function getPlayerByTelegramId(
             .select("*")
             .eq(
                 "telegram_id",
-                Number(telegramId)
+                Number(
+                    telegramId
+                )
             )
             .single();
 
@@ -243,10 +822,14 @@ async function updatePlayer(
     } =
         await supabase
             .from("players")
-            .update(values)
+            .update(
+                values
+            )
             .eq(
                 "telegram_id",
-                Number(telegramId)
+                Number(
+                    telegramId
+                )
             )
             .select("*")
             .single();
@@ -260,41 +843,20 @@ async function updatePlayer(
 
 
 /* =========================================================
-   ADMIN — СБРОС МОЕГО АККАУНТА
+   ADMIN — СБРОС АККАУНТА
 ========================================================= */
 
 app.post(
     "/api/dev/reset-account",
+    requireAdmin,
     async (req, res) => {
 
         try {
 
-            const user =
-                req.body?.user;
-
-
-            /* =========================================
-               ПРОВЕРКА АДМИНА
-            ========================================= */
-
-            if (
-                !user ||
-                String(user.id) !== DEV_TELEGRAM_ID
-            ) {
-
-                return res
-                    .status(403)
-                    .json({
-                        ok: false,
-                        error: "Доступ запрещён"
-                    });
-
-            }
-
-
             const telegramId =
-                Number(DEV_TELEGRAM_ID);
-
+                Number(
+                    req.adminTelegramId
+                );
 
             /* =========================================
                УДАЛЯЕМ ПОКУПКИ
@@ -371,15 +933,10 @@ app.post(
                     .select("*")
                     .single();
 
-
             if (playerError) {
                 throw playerError;
             }
 
-
-            /* =========================================
-               ГОТОВО
-            ========================================= */
 
             return res.json({
 
@@ -395,7 +952,6 @@ app.post(
                 player
 
             });
-
 
         } catch (error) {
 
@@ -434,8 +990,9 @@ app.post(
         try {
 
             const user =
-                getTelegramUser(req);
-
+                getTelegramUser(
+                    req
+                );
 
             if (!user) {
 
@@ -453,12 +1010,10 @@ app.post(
 
             }
 
-
             const player =
                 await getOrCreatePlayer(
                     user
                 );
-
 
             return res.json({
 
@@ -513,16 +1068,13 @@ async function getShopState() {
             )
             .maybeSingle();
 
-
     if (error) {
         throw error;
     }
 
-
     if (data) {
         return data;
     }
-
 
     const {
         data: created,
@@ -542,11 +1094,9 @@ async function getShopState() {
             .select("*")
             .single();
 
-
     if (createError) {
         throw createError;
     }
-
 
     return created;
 }
@@ -570,36 +1120,42 @@ async function refreshGiftShop() {
                 true
             );
 
-
     if (error) {
         throw error;
     }
-
 
     const groups = {
 
         15:
             allGifts.filter(
                 gift =>
-                    Number(gift.price) === 15
+                    Number(
+                        gift.price
+                    ) === 15
             ),
 
         18:
             allGifts.filter(
                 gift =>
-                    Number(gift.price) === 18
+                    Number(
+                        gift.price
+                    ) === 18
             ),
 
         22:
             allGifts.filter(
                 gift =>
-                    Number(gift.price) === 22
+                    Number(
+                        gift.price
+                    ) === 22
             ),
 
         33:
             allGifts.filter(
                 gift =>
-                    Number(gift.price) === 33
+                    Number(
+                        gift.price
+                    ) === 33
             )
 
     };
@@ -611,11 +1167,13 @@ async function refreshGiftShop() {
     ) {
 
         const copy =
-            [...array];
-
+            [
+                ...array
+            ];
 
         for (
-            let i = copy.length - 1;
+            let i =
+                copy.length - 1;
             i > 0;
             i--
         ) {
@@ -625,7 +1183,6 @@ async function refreshGiftShop() {
                     Math.random() *
                     (i + 1)
                 );
-
 
             [
                 copy[i],
@@ -637,7 +1194,6 @@ async function refreshGiftShop() {
             ];
 
         }
-
 
         return copy.slice(
             0,
@@ -686,13 +1242,14 @@ async function refreshGiftShop() {
                 1
             );
 
-
     if (deleteError) {
         throw deleteError;
     }
 
 
-    if (selected.length > 0) {
+    if (
+        selected.length > 0
+    ) {
 
         const rows =
             selected.map(
@@ -707,14 +1264,14 @@ async function refreshGiftShop() {
                 })
             );
 
-
         const {
             error: insertError
         } =
             await supabase
                 .from("shop_gifts")
-                .insert(rows);
-
+                .insert(
+                    rows
+                );
 
         if (insertError) {
             throw insertError;
@@ -739,11 +1296,9 @@ async function refreshGiftShop() {
                 1
             );
 
-
     if (stateError) {
         throw stateError;
     }
-
 
     return selected;
 }
@@ -758,16 +1313,13 @@ async function ensureGiftShop() {
     const state =
         await getShopState();
 
-
     const updatedAt =
         new Date(
             state.updated_at
         ).getTime();
 
-
     const now =
         Date.now();
-
 
     const {
         data: currentShop,
@@ -781,22 +1333,18 @@ async function ensureGiftShop() {
                 1
             );
 
-
     if (shopError) {
         throw shopError;
     }
-
 
     const shopIsEmpty =
         !currentShop ||
         currentShop.length === 0;
 
-
     const timeToRefresh =
         !updatedAt ||
         now - updatedAt >=
         SHOP_REFRESH_MS;
-
 
     if (
         shopIsEmpty ||
@@ -807,11 +1355,9 @@ async function ensureGiftShop() {
             "🎁 Обновляем магазин подарков..."
         );
 
-
         return await refreshGiftShop();
 
     }
-
 
     return null;
 }
@@ -828,7 +1374,6 @@ app.get(
         try {
 
             await ensureGiftShop();
-
 
             const {
                 data,
@@ -851,11 +1396,9 @@ app.get(
                         1
                     );
 
-
             if (error) {
                 throw error;
             }
-
 
             const gifts =
                 data
@@ -869,10 +1412,8 @@ app.get(
                             gift.active
                     );
 
-
             const state =
                 await getShopState();
-
 
             return res.json({
 
@@ -900,7 +1441,6 @@ app.get(
                 "GIFTS ERROR:",
                 error
             );
-
 
             return res
                 .status(500)
@@ -935,7 +1475,6 @@ app.get(
                     req.query.telegram_id
                 );
 
-
             if (!telegramId) {
 
                 return res
@@ -951,7 +1490,6 @@ app.get(
                     });
 
             }
-
 
             const {
                 data,
@@ -985,11 +1523,9 @@ app.get(
                         }
                     );
 
-
             if (error) {
                 throw error;
             }
-
 
             const {
                 data: purchases,
@@ -1014,14 +1550,14 @@ app.get(
                         }
                     );
 
-
             if (purchasesError) {
                 throw purchasesError;
             }
 
-
             const inventory =
-                (data || []).map(
+                (
+                    data || []
+                ).map(
                     item => ({
 
                         id:
@@ -1043,20 +1579,20 @@ app.get(
                             item.gift,
 
                         purchases:
-                            (purchases || [])
-                                .filter(
-                                    purchase =>
-                                        Number(
-                                            purchase.gift_id
-                                        ) ===
-                                        Number(
-                                            item.gift_id
-                                        )
-                                )
+                            (
+                                purchases || []
+                            ).filter(
+                                purchase =>
+                                    Number(
+                                        purchase.gift_id
+                                    ) ===
+                                    Number(
+                                        item.gift_id
+                                    )
+                            )
 
                     })
                 );
-
 
             return res.json({
 
@@ -1073,7 +1609,6 @@ app.get(
                 "INVENTORY ERROR:",
                 error
             );
-
 
             return res
                 .status(500)
@@ -1104,8 +1639,9 @@ app.post(
         try {
 
             const user =
-                getTelegramUser(req);
-
+                getTelegramUser(
+                    req
+                );
 
             if (!user) {
 
@@ -1123,12 +1659,10 @@ app.post(
 
             }
 
-
             const giftId =
                 Number(
                     req.body?.gift_id
                 );
-
 
             if (!giftId) {
 
@@ -1146,12 +1680,10 @@ app.post(
 
             }
 
-
             let quantity =
                 Number(
                     req.body?.quantity
                 );
-
 
             if (
                 !Number.isFinite(
@@ -1165,12 +1697,10 @@ app.post(
 
             }
 
-
             quantity =
                 Math.floor(
                     quantity
                 );
-
 
             if (
                 quantity > 5
@@ -1181,12 +1711,10 @@ app.post(
 
             }
 
-
             const player =
                 await getOrCreatePlayer(
                     user
                 );
-
 
             const {
                 data: shopGift,
@@ -1214,11 +1742,9 @@ app.post(
                     )
                     .maybeSingle();
 
-
             if (shopError) {
                 throw shopError;
             }
-
 
             if (
                 !shopGift ||
@@ -1240,23 +1766,19 @@ app.post(
 
             }
 
-
             const gift =
                 shopGift.gift;
-
 
             const price =
                 Number(
                     gift.price
                 );
 
-
             const giftIncome =
                 Number(
                     gift.income ||
                     1
                 );
-
 
             const {
                 data: existingGift,
@@ -1267,7 +1789,9 @@ app.post(
                     .select("*")
                     .eq(
                         "telegram_id",
-                        Number(user.id)
+                        Number(
+                            user.id
+                        )
                     )
                     .eq(
                         "gift_id",
@@ -1275,11 +1799,9 @@ app.post(
                     )
                     .maybeSingle();
 
-
             if (existingError) {
                 throw existingError;
             }
-
 
             const currentQuantity =
                 existingGift
@@ -1288,11 +1810,9 @@ app.post(
                     )
                     : 0;
 
-
             const remaining =
                 5 -
                 currentQuantity;
-
 
             if (
                 remaining <= 0
@@ -1312,7 +1832,6 @@ app.post(
 
             }
 
-
             if (
                 quantity >
                 remaining
@@ -1323,14 +1842,14 @@ app.post(
 
             }
 
-
             const totalPrice =
                 price *
                 quantity;
 
-
             if (
-                Number(player.balance) <
+                Number(
+                    player.balance
+                ) <
                 totalPrice
             ) {
 
@@ -1348,13 +1867,11 @@ app.post(
 
             }
 
-
             const newBalance =
                 Number(
                     player.balance
                 ) -
                 totalPrice;
-
 
             const newIncome =
                 Number(
@@ -1364,7 +1881,6 @@ app.post(
                     giftIncome *
                     quantity
                 );
-
 
             const {
                 data: updatedPlayer,
@@ -1383,16 +1899,16 @@ app.post(
                     })
                     .eq(
                         "telegram_id",
-                        Number(user.id)
+                        Number(
+                            user.id
+                        )
                     )
                     .select("*")
                     .single();
 
-
             if (playerUpdateError) {
                 throw playerUpdateError;
             }
-
 
             const purchaseRows =
                 Array.from(
@@ -1403,7 +1919,9 @@ app.post(
                     () => ({
 
                         telegram_id:
-                            Number(user.id),
+                            Number(
+                                user.id
+                            ),
 
                         gift_id:
                             giftId,
@@ -1413,7 +1931,6 @@ app.post(
 
                     })
                 );
-
 
             const {
                 data: purchases,
@@ -1426,21 +1943,19 @@ app.post(
                     )
                     .select("*");
 
-
             if (purchaseError) {
                 throw purchaseError;
             }
-
 
             const newQuantity =
                 currentQuantity +
                 quantity;
 
-
             if (existingGift) {
 
                 const {
-                    error: updateGiftError
+                    error:
+                        updateGiftError
                 } =
                     await supabase
                         .from("player_gifts")
@@ -1455,13 +1970,14 @@ app.post(
                         })
                         .eq(
                             "telegram_id",
-                            Number(user.id)
+                            Number(
+                                user.id
+                            )
                         )
                         .eq(
                             "gift_id",
                             giftId
                         );
-
 
                 if (updateGiftError) {
                     throw updateGiftError;
@@ -1470,14 +1986,17 @@ app.post(
             } else {
 
                 const {
-                    error: insertGiftError
+                    error:
+                        insertGiftError
                 } =
                     await supabase
                         .from("player_gifts")
                         .insert({
 
                             telegram_id:
-                                Number(user.id),
+                                Number(
+                                    user.id
+                                ),
 
                             gift_id:
                                 giftId,
@@ -1490,13 +2009,11 @@ app.post(
 
                         });
 
-
                 if (insertGiftError) {
                     throw insertGiftError;
                 }
 
             }
-
 
             return res.json({
 
@@ -1524,7 +2041,6 @@ app.post(
                 "BUY GIFT ERROR:",
                 error
             );
-
 
             return res
                 .status(500)
@@ -1555,8 +2071,9 @@ app.post(
         try {
 
             const user =
-                getTelegramUser(req);
-
+                getTelegramUser(
+                    req
+                );
 
             if (!user) {
 
@@ -1574,12 +2091,10 @@ app.post(
 
             }
 
-
             const purchaseId =
                 Number(
                     req.body?.purchase_id
                 );
-
 
             if (!purchaseId) {
 
@@ -1596,7 +2111,6 @@ app.post(
                     });
 
             }
-
 
             const {
                 data: purchase,
@@ -1623,15 +2137,15 @@ app.post(
                     )
                     .eq(
                         "telegram_id",
-                        Number(user.id)
+                        Number(
+                            user.id
+                        )
                     )
                     .maybeSingle();
-
 
             if (purchaseError) {
                 throw purchaseError;
             }
-
 
             if (!purchase) {
 
@@ -1649,17 +2163,14 @@ app.post(
 
             }
 
-
             const purchasedAt =
                 new Date(
                     purchase.purchased_at
                 ).getTime();
 
-
             const sellAt =
                 purchasedAt +
                 GIFT_SELL_DELAY_MS;
-
 
             if (
                 Date.now() <
@@ -1670,13 +2181,11 @@ app.post(
                     sellAt -
                     Date.now();
 
-
                 const hours =
                     Math.floor(
                         remaining /
                         3600000
                     );
-
 
                 const minutes =
                     Math.floor(
@@ -1686,7 +2195,6 @@ app.post(
                         ) /
                         60000
                     );
-
 
                 return res
                     .status(400)
@@ -1702,23 +2210,19 @@ app.post(
 
             }
 
-
             const gift =
                 purchase.gift;
-
 
             const price =
                 Number(
                     gift.price
                 );
 
-
             const giftIncome =
                 Number(
                     gift.income ||
                     1
                 );
-
 
             const {
                 data: playerGift,
@@ -1729,7 +2233,9 @@ app.post(
                     .select("*")
                     .eq(
                         "telegram_id",
-                        Number(user.id)
+                        Number(
+                            user.id
+                        )
                     )
                     .eq(
                         "gift_id",
@@ -1739,11 +2245,9 @@ app.post(
                     )
                     .maybeSingle();
 
-
             if (playerGiftError) {
                 throw playerGiftError;
             }
-
 
             if (
                 !playerGift ||
@@ -1766,9 +2270,9 @@ app.post(
 
             }
 
-
             const {
-                error: deletePurchaseError
+                error:
+                    deletePurchaseError
             } =
                 await supabase
                     .from("gift_purchases")
@@ -1779,21 +2283,20 @@ app.post(
                     )
                     .eq(
                         "telegram_id",
-                        Number(user.id)
+                        Number(
+                            user.id
+                        )
                     );
-
 
             if (deletePurchaseError) {
                 throw deletePurchaseError;
             }
-
 
             const newQuantity =
                 Number(
                     playerGift.quantity
                 ) -
                 1;
-
 
             if (
                 newQuantity <= 0
@@ -1807,7 +2310,9 @@ app.post(
                         .delete()
                         .eq(
                             "telegram_id",
-                            Number(user.id)
+                            Number(
+                                user.id
+                            )
                         )
                         .eq(
                             "gift_id",
@@ -1815,7 +2320,6 @@ app.post(
                                 purchase.gift_id
                             )
                         );
-
 
                 if (error) {
                     throw error;
@@ -1836,7 +2340,9 @@ app.post(
                         })
                         .eq(
                             "telegram_id",
-                            Number(user.id)
+                            Number(
+                                user.id
+                            )
                         )
                         .eq(
                             "gift_id",
@@ -1845,26 +2351,22 @@ app.post(
                             )
                         );
 
-
                 if (error) {
                     throw error;
                 }
 
             }
 
-
             const player =
                 await getPlayerByTelegramId(
                     user.id
                 );
-
 
             const newBalance =
                 Number(
                     player.balance
                 ) +
                 price;
-
 
             const newIncome =
                 Math.max(
@@ -1874,7 +2376,6 @@ app.post(
                     ) -
                     giftIncome
                 );
-
 
             const updatedPlayer =
                 await updatePlayer(
@@ -1889,7 +2390,6 @@ app.post(
 
                     }
                 );
-
 
             return res.json({
 
@@ -1910,7 +2410,6 @@ app.post(
                 "SELL GIFT ERROR:",
                 error
             );
-
 
             return res
                 .status(500)
@@ -1941,8 +2440,9 @@ app.post(
         try {
 
             const user =
-                getTelegramUser(req);
-
+                getTelegramUser(
+                    req
+                );
 
             if (!user) {
 
@@ -1960,12 +2460,10 @@ app.post(
 
             }
 
-
             const price =
                 Number(
                     req.body?.price
                 );
-
 
             if (!price) {
 
@@ -1983,15 +2481,15 @@ app.post(
 
             }
 
-
             const player =
                 await getOrCreatePlayer(
                     user
                 );
 
-
             if (
-                Number(player.balance) <
+                Number(
+                    player.balance
+                ) <
                 price
             ) {
 
@@ -2008,7 +2506,6 @@ app.post(
                     });
 
             }
-
 
             const updatedPlayer =
                 await updatePlayer(
@@ -2030,7 +2527,6 @@ app.post(
                     }
                 );
 
-
             return res.json({
 
                 ok:
@@ -2047,7 +2543,6 @@ app.post(
                 "OLD BUY ERROR:",
                 error
             );
-
 
             return res
                 .status(500)
@@ -2078,8 +2573,9 @@ app.post(
         try {
 
             const user =
-                getTelegramUser(req);
-
+                getTelegramUser(
+                    req
+                );
 
             if (!user) {
 
@@ -2097,16 +2593,13 @@ app.post(
 
             }
 
-
             const player =
                 await getOrCreatePlayer(
                     user
                 );
 
-
             const now =
                 Date.now();
-
 
             if (
                 player.bonus_claimed_at
@@ -2117,14 +2610,12 @@ app.post(
                         player.bonus_claimed_at
                     ).getTime();
 
-
                 const week =
                     7 *
                     24 *
                     60 *
                     60 *
                     1000;
-
 
                 if (
                     now - lastClaim <
@@ -2138,7 +2629,6 @@ app.post(
                             lastClaim
                         );
 
-
                     const days =
                         Math.ceil(
                             remaining /
@@ -2149,7 +2639,6 @@ app.post(
                                 1000
                             )
                         );
-
 
                     return res
                         .status(400)
@@ -2167,7 +2656,6 @@ app.post(
 
             }
 
-
             const updatedPlayer =
                 await updatePlayer(
                     user.id,
@@ -2184,7 +2672,6 @@ app.post(
 
                     }
                 );
-
 
             return res.json({
 
@@ -2205,7 +2692,6 @@ app.post(
                 "COLLECT ERROR:",
                 error
             );
-
 
             return res
                 .status(500)
@@ -2259,7 +2745,6 @@ function createRouletteSignature(
             issuedAt
         ].join(":");
 
-
     return crypto
         .createHmac(
             "sha256",
@@ -2282,8 +2767,9 @@ app.post(
         try {
 
             const user =
-                getTelegramUser(req);
-
+                getTelegramUser(
+                    req
+                );
 
             if (!user) {
 
@@ -2301,7 +2787,6 @@ app.post(
 
             }
 
-
             const multiplier =
                 ROULETTE_VALUES[
                     Math.floor(
@@ -2310,18 +2795,17 @@ app.post(
                     )
                 ];
 
-
             const issuedAt =
                 Date.now();
 
-
             const signature =
                 createRouletteSignature(
-                    Number(user.id),
+                    Number(
+                        user.id
+                    ),
                     multiplier,
                     issuedAt
                 );
-
 
             return res.json({
 
@@ -2342,7 +2826,6 @@ app.post(
                 "ROULETTE SPIN ERROR:",
                 error
             );
-
 
             return res
                 .status(500)
@@ -2373,8 +2856,9 @@ app.post(
         try {
 
             const user =
-                getTelegramUser(req);
-
+                getTelegramUser(
+                    req
+                );
 
             if (!user) {
 
@@ -2392,22 +2876,18 @@ app.post(
 
             }
 
-
             const multiplier =
                 Number(
                     req.body?.multiplier
                 );
-
 
             const issuedAt =
                 Number(
                     req.body?.issuedAt
                 );
 
-
             const signature =
                 req.body?.signature;
-
 
             if (
                 !multiplier ||
@@ -2429,7 +2909,6 @@ app.post(
 
             }
 
-
             if (
                 !ROULETTE_VALUES.includes(
                     multiplier
@@ -2449,7 +2928,6 @@ app.post(
                     });
 
             }
-
 
             if (
                 Date.now() -
@@ -2471,14 +2949,14 @@ app.post(
 
             }
 
-
             const expectedSignature =
                 createRouletteSignature(
-                    Number(user.id),
+                    Number(
+                        user.id
+                    ),
                     multiplier,
                     issuedAt
                 );
-
 
             if (
                 signature !==
@@ -2499,19 +2977,16 @@ app.post(
 
             }
 
-
             const player =
                 await getOrCreatePlayer(
                     user
                 );
-
 
             const expiresAt =
                 new Date(
                     Date.now() +
                     ROULETTE_DURATION_MS
                 ).toISOString();
-
 
             const updatedPlayer =
                 await updatePlayer(
@@ -2526,7 +3001,6 @@ app.post(
 
                     }
                 );
-
 
             return res.json({
 
@@ -2549,7 +3023,6 @@ app.post(
                 "ROULETTE CLAIM ERROR:",
                 error
             );
-
 
             return res
                 .status(500)
@@ -2626,15 +3099,15 @@ async function telegramRequest(
                 },
 
                 body:
-                    JSON.stringify(body)
+                    JSON.stringify(
+                        body
+                    )
 
             }
         );
 
-
     const data =
         await response.json();
-
 
     if (!data.ok) {
 
@@ -2644,7 +3117,6 @@ async function telegramRequest(
         );
 
     }
-
 
     return data;
 }
@@ -2684,32 +3156,24 @@ async function processReferral(
             inviterTelegramId
         );
 
-
     const invitedId =
         Number(
             invitedUser.id
         );
 
-
     if (
         !inviterId ||
         !invitedId
     ) {
-
         return;
-
     }
-
 
     if (
         inviterId ===
         invitedId
     ) {
-
         return;
-
     }
-
 
     const {
         data: existingReferral,
@@ -2724,22 +3188,18 @@ async function processReferral(
             )
             .maybeSingle();
 
-
     if (existingError) {
         throw existingError;
     }
-
 
     if (existingReferral) {
         return;
     }
 
-
     const invitedPlayer =
         await getOrCreatePlayer(
             invitedUser
         );
-
 
     await updatePlayer(
         invitedId,
@@ -2753,7 +3213,6 @@ async function processReferral(
 
         }
     );
-
 
     const {
         count,
@@ -2778,11 +3237,9 @@ async function processReferral(
                 inviterId
             );
 
-
     if (countError) {
         throw countError;
     }
-
 
     const inviteNumber =
         Number(
@@ -2790,9 +3247,9 @@ async function processReferral(
         ) +
         1;
 
-
     const {
-        error: referralInsertError
+        error:
+            referralInsertError
     } =
         await supabase
             .from("referrals")
@@ -2809,17 +3266,14 @@ async function processReferral(
 
             });
 
-
     if (referralInsertError) {
         throw referralInsertError;
     }
-
 
     const reward =
         referralRewards[
             inviteNumber
         ] || 0;
-
 
     if (
         reward > 0
@@ -2829,7 +3283,6 @@ async function processReferral(
             await getPlayerByTelegramId(
                 inviterId
             );
-
 
         await updatePlayer(
             inviterId,
@@ -2860,36 +3313,28 @@ async function handleTelegramUpdate(
     const message =
         update.message;
 
-
     if (!message) {
         return;
     }
 
-
     const from =
         message.from;
-
 
     if (!from) {
         return;
     }
 
-
     const text =
         message.text ||
         "";
-
 
     if (
         !text.startsWith(
             "/start"
         )
     ) {
-
         return;
-
     }
-
 
     const parts =
         text
@@ -2898,17 +3343,13 @@ async function handleTelegramUpdate(
                 /\s+/
             );
 
-
     const startParam =
         parts[1] ||
         "";
 
-
-    const player =
-        await getOrCreatePlayer(
-            from
-        );
-
+    await getOrCreatePlayer(
+        from
+    );
 
     if (
         startParam.startsWith(
@@ -2923,11 +3364,12 @@ async function handleTelegramUpdate(
                 )
             );
 
-
         if (
             inviterId &&
             inviterId !==
-            Number(from.id)
+            Number(
+                from.id
+            )
         ) {
 
             try {
@@ -2949,7 +3391,6 @@ async function handleTelegramUpdate(
         }
 
     }
-
 
     await telegramRequest(
         "sendMessage",
@@ -3009,7 +3450,6 @@ async function telegramPolling() {
 
     }
 
-
     try {
 
         const data =
@@ -3026,7 +3466,6 @@ async function telegramPolling() {
                 }
             );
 
-
         for (
             const update
             of data.result
@@ -3035,7 +3474,6 @@ async function telegramPolling() {
             telegramOffset =
                 update.update_id +
                 1;
-
 
             try {
 
@@ -3062,7 +3500,6 @@ async function telegramPolling() {
         );
 
     }
-
 
     setTimeout(
         telegramPolling,
@@ -3102,7 +3539,7 @@ app.listen(
         );
 
         console.log(
-            "🛠️ Admin Panel: OK"
+            "🛠️ Admin Panel: SECURE"
         );
 
         console.log(
