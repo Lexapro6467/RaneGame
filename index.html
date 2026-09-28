@@ -98,8 +98,7 @@ button{
     align-items:center;
     justify-content:center;
     overflow:hidden;
-    background:
-        linear-gradient(145deg,#ff2020,#630000);
+    background:linear-gradient(145deg,#ff2020,#630000);
     border:1px solid rgba(255,50,50,.35);
     box-shadow:0 7px 24px rgba(255,0,0,.12);
     font-size:22px;
@@ -223,6 +222,13 @@ button{
     font-weight:700;
 }
 
+.multiplier{
+    margin-top:8px;
+    color:#ff3b3b;
+    font-size:14px;
+    font-weight:900;
+}
+
 /* ACTION CARDS */
 
 .cards-grid{
@@ -299,8 +305,7 @@ button{
     min-height:245px;
     padding:12px;
     border-radius:18px;
-    background:
-        linear-gradient(145deg,#171717,#0d0d0d);
+    background:linear-gradient(145deg,#171717,#0d0d0d);
     border:1px solid rgba(255,255,255,.065);
     transition:
         transform .2s ease,
@@ -1029,7 +1034,7 @@ button{
         font-size:9px;
     }
 
-    .balance-value{
+    .balance{
         font-size:31px;
     }
 }
@@ -1079,23 +1084,494 @@ button{
 
 <div class="app">
 
-    <!-- HEADER -->
+<header class="header">
 
-    <header class="header">
+    <div class="profile">
 
-        <div class="profile">
+        <div class="avatar" id="headerAvatar">
+            R
+        </div>
 
-            <div class="avatar" id="headerAvatar">
+        <div class="profile-text">
+
+            <div class="profile-name" id="headerName">
+                Rane
+            </div>
+
+            <div class="profile-username" id="headerUsername">
+                @username
+            </div>
+
+        </div>
+
+    </div>
+
+    <button
+        class="bell"
+        type="button"
+        onclick="showToast('🔔 Уведомлений пока нет')"
+    >
+        🔔
+    </button>
+
+</header>
+
+
+<!-- ================= HOME ================= -->
+
+<main id="homePage" class="page active">
+
+    <div
+        id="adminCategory"
+        class="admin-category"
+        style="display:none;"
+    >
+
+        <div class="admin-category-title">
+            ⚙️ Админ Панель
+        </div>
+
+        <div class="admin-category-description">
+            Управление игрой
+        </div>
+
+        <button
+            class="admin-button"
+            type="button"
+            onclick="openAdminLogin()"
+        >
+            🔐 Открыть админ панель
+        </button>
+
+    </div>
+
+
+    <!-- BALANCE -->
+
+    <section class="balance-card">
+
+        <div class="balance-title">
+            Твой баланс
+        </div>
+
+        <div
+            class="balance"
+            id="balanceValue"
+        >
+            0
+        </div>
+
+        <div>
+            <span class="income">
+                +<span id="incomeValue">0</span> ⭐/час
+            </span>
+        </div>
+
+        <div class="multiplier">
+            Множитель ×<span id="multiplierValue">1.00</span>
+        </div>
+
+    </section>
+
+
+    <!-- QUICK ACTIONS -->
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                ⚡ Быстрые действия
+            </div>
+
+        </div>
+
+        <div class="cards-grid">
+
+            <div
+                class="action-card"
+                onclick="openRoulette()"
+            >
+
+                <div class="action-icon">
+                    🎰
+                </div>
+
+                <div class="action-title">
+                    Рулетка
+                </div>
+
+                <div class="action-description">
+                    Испытай удачу
+                </div>
+
+            </div>
+
+
+            <div
+                class="action-card"
+                onclick="claimWeeklyBonus()"
+            >
+
+                <div class="action-icon">
+                    🎁
+                </div>
+
+                <div class="action-title">
+                    Еженедельный бонус
+                </div>
+
+                <div class="action-description">
+                    Забрать награду
+                </div>
+
+            </div>
+
+
+            <div
+                class="action-card"
+                onclick="showToast('👥 Реферальная система скоро')"
+            >
+
+                <div class="action-icon">
+                    👥
+                </div>
+
+                <div class="action-title">
+                    Рефералы
+                </div>
+
+                <div class="action-description">
+                    Приглашай друзей
+                </div>
+
+            </div>
+
+
+            <div
+                class="action-card"
+                onclick="goTo('auction')"
+            >
+
+                <div class="action-icon">
+                    🔨
+                </div>
+
+                <div class="action-title">
+                    Аукцион
+                </div>
+
+                <div class="action-description">
+                    Скоро доступно
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- HOME SHOP -->
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                🎁 Магазин подарков
+            </div>
+
+            <button
+                class="section-action"
+                type="button"
+                onclick="goTo('shop')"
+            >
+                Все →
+            </button>
+
+        </div>
+
+        <div
+            id="homeShop"
+            class="horizontal-scroll"
+        >
+
+            <div class="loading">
+                Загружаем магазин...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- HOME INVENTORY -->
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                🎒 Мой инвентарь
+            </div>
+
+            <button
+                class="section-action"
+                type="button"
+                onclick="goTo('inventory')"
+            >
+                Открыть →
+            </button>
+
+        </div>
+
+        <div
+            id="homeInventory"
+            class="horizontal-scroll"
+            onclick="handleHomeInventoryClick(event)"
+        >
+
+            <div class="empty">
+                Инвентарь пока пуст
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- INCOME -->
+
+    <section class="section">
+
+        <div class="action-card">
+
+            <div class="action-icon">
+                💰
+            </div>
+
+            <div class="action-title">
+                Доход с подарков
+            </div>
+
+            <div class="action-description">
+                Каждый купленный подарок приносит
+                +1 ⭐ в час.
+                Максимум — 5 копий каждого типа.
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ================= SHOP ================= -->
+
+<main id="shopPage" class="page">
+
+    <section class="shop-header">
+
+        <div class="shop-header-title">
+            🎁 Магазин подарков
+        </div>
+
+        <div class="shop-header-description">
+            Покупай подарки и получай пассивный доход.
+            Каждый подарок даёт +1 ⭐/час.
+        </div>
+
+        <div class="shop-status">
+
+            <span class="status-dot"></span>
+
+            Магазин обновляется каждые 3 часа
+
+        </div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                Доступные подарки
+            </div>
+
+        </div>
+
+        <div
+            id="shopGifts"
+            class="shop-grid"
+        >
+
+            <div class="loading">
+                Загружаем магазин...
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ================= INVENTORY ================= -->
+
+<main id="inventoryPage" class="page">
+
+    <section class="shop-header">
+
+        <div class="shop-header-title">
+            🎒 Мой инвентарь
+        </div>
+
+        <div class="shop-header-description">
+            Здесь находятся все купленные тобой
+            подарки. Их можно продать после
+            окончания таймера.
+        </div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="section-head">
+
+            <div class="section-title">
+                🎁 Мои подарки
+            </div>
+
+            <button
+                class="section-action"
+                type="button"
+                onclick="goTo('shop')"
+            >
+                Магазин →
+            </button>
+
+        </div>
+
+        <div
+            id="inventoryPageList"
+            class="shop-grid"
+        >
+
+            <div class="empty">
+                🎒 Инвентарь пуст
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="section">
+
+        <div class="action-card">
+
+            <div class="action-icon">
+                💰
+            </div>
+
+            <div class="action-title">
+                Продажа подарков
+            </div>
+
+            <div class="action-description">
+                Подарок можно продать через
+                5 часов после покупки.
+                При продаже возвращается его цена,
+                а доход с него снимается.
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ================= AUCTION ================= -->
+
+<main id="auctionPage" class="page">
+
+    <div class="placeholder">
+
+        <div class="placeholder-icon">
+            🔨
+        </div>
+
+        <div class="placeholder-title">
+            Аукцион
+        </div>
+
+        <div class="placeholder-text">
+            Здесь появится аукцион подарков.
+            Функция находится в разработке.
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- ================= TOP ================= -->
+
+<main id="topPage" class="page">
+
+    <div class="placeholder">
+
+        <div class="placeholder-icon">
+            🏆
+        </div>
+
+        <div class="placeholder-title">
+            Топ игроков
+        </div>
+
+        <div class="placeholder-text">
+            Таблица лидеров скоро появится.
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- ================= PROFILE ================= -->
+
+<main id="profilePage" class="page">
+
+    <div class="profile-panel">
+
+        <div class="profile-large">
+
+            <div
+                class="avatar"
+                id="profileAvatar"
+            >
                 R
             </div>
 
-            <div class="profile-text">
+            <div>
 
-                <div class="profile-name" id="headerName">
+                <div
+                    class="profile-large-name"
+                    id="profileName"
+                >
                     Rane
                 </div>
 
-                <div class="profile-username" id="headerUsername">
+                <div
+                    class="profile-large-username"
+                    id="profileUsername"
+                >
                     @username
                 </div>
 
@@ -1103,601 +1579,131 @@ button{
 
         </div>
 
+
+        <div class="profile-row">
+
+            <div class="profile-row-left">
+
+                <div class="profile-row-icon">
+                    ⭐
+                </div>
+
+                <div class="profile-row-title">
+                    Баланс
+                </div>
+
+            </div>
+
+            <div
+                class="profile-row-value"
+                id="profileBalance"
+            >
+                0 ⭐
+            </div>
+
+        </div>
+
+
+        <div class="profile-row">
+
+            <div class="profile-row-left">
+
+                <div class="profile-row-icon">
+                    🎁
+                </div>
+
+                <div class="profile-row-title">
+                    Доход
+                </div>
+
+            </div>
+
+            <div
+                class="profile-row-value"
+                id="profileIncome"
+            >
+                0 ⭐/ч
+            </div>
+
+        </div>
+
+
+        <div class="profile-row">
+
+            <div class="profile-row-left">
+
+                <div class="profile-row-icon">
+                    🎒
+                </div>
+
+                <div class="profile-row-title">
+                    Подарки
+                </div>
+
+            </div>
+
+            <div
+                class="profile-row-value"
+                id="profileGiftCount"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="profile-row">
+
+            <div class="profile-row-left">
+
+                <div class="profile-row-icon">
+                    ✖️
+                </div>
+
+                <div class="profile-row-title">
+                    Множитель
+                </div>
+
+            </div>
+
+            <div
+                class="profile-row-value"
+                id="profileMultiplier"
+            >
+                ×1.00
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <section class="section">
+
         <button
-            class="bell"
+            class="red-button"
             type="button"
-            onclick="showToast('🔔 Уведомлений пока нет')"
+            onclick="goTo('inventory')"
         >
-            🔔
+            🎒 Открыть мой инвентарь
         </button>
 
-    </header>
+    </section>
 
 
-    <!-- ================= HOME ================= -->
+    <section class="section">
 
-    <main id="homePage" class="page active">
-
-        <!-- ADMIN -->
-
-        <div
-            id="adminCategory"
-            class="admin-category"
-            style="display:none;"
+        <button
+            class="red-button"
+            type="button"
+            onclick="goTo('shop')"
         >
+            🎁 Открыть магазин подарков
+        </button>
 
-            <div class="admin-category-title">
-                ⚙️ Админ Панель
-            </div>
+    </section>
 
-            <div class="admin-category-description">
-                Управление игрой
-            </div>
-
-            <button
-                class="admin-button"
-                type="button"
-                onclick="openAdminLogin()"
-            >
-                🔐 Открыть админ панель
-            </button>
-
-        </div>
-
-
-        <!-- BALANCE -->
-
-        <section class="balance-card">
-
-            <div class="balance-card">
-
-    <div class="balance-card">
-
-    <div class="balance-title">
-        Твой баланс
-    </div>
-
-    <div class="balance" id="balance">
-        0
-    </div>
-
-    <div>
-        <span class="income">
-            +<span id="income">0</span> в /час
-        </span>
-    </div>
-
-    <div class="multiplier">
-     <span id="multiplier">1</span>
-    </div>
-
-</div>
-        </section>
-
-
-        <!-- QUICK ACTIONS -->
-
-        <section class="section">
-
-            <div class="section-head">
-
-                <div class="section-title">
-                    ⚡ Быстрые действия
-                </div>
-
-            </div>
-
-            <div class="cards-grid">
-
-                <div
-                    class="action-card"
-                    onclick="openRoulette()"
-                >
-
-                    <div class="action-icon">
-                        🎰
-                    </div>
-
-                    <div class="action-title">
-                        Рулетка
-                    </div>
-
-                    <div class="action-description">
-                        Испытай удачу
-                    </div>
-
-                </div>
-
-
-                <div
-                    class="action-card"
-                    onclick="claimWeeklyBonus()"
-                >
-
-                    <div class="action-icon">
-                        🎁
-                    </div>
-
-                    <div class="action-title">
-                        Еженедельный бонус
-                    </div>
-
-                    <div class="action-description">
-                        Забрать награду
-                    </div>
-
-                </div>
-
-
-                <div
-                    class="action-card"
-                    onclick="showToast('👥 Реферальная система скоро')"
-                >
-
-                    <div class="action-icon">
-                        👥
-                    </div>
-
-                    <div class="action-title">
-                        Рефералы
-                    </div>
-
-                    <div class="action-description">
-                        Приглашай друзей
-                    </div>
-
-                </div>
-
-
-                <div
-                    class="action-card"
-                    onclick="goTo('auction')"
-                >
-
-                    <div class="action-icon">
-                        🔨
-                    </div>
-
-                    <div class="action-title">
-                        Аукцион
-                    </div>
-
-                    <div class="action-description">
-                        Скоро доступно
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- HOME SHOP -->
-
-        <section class="section">
-
-            <div class="section-head">
-
-                <div class="section-title">
-                    🎁 Магазин подарков
-                </div>
-
-                <button
-                    class="section-action"
-                    type="button"
-                    onclick="goTo('shop')"
-                >
-                    Все →
-                </button>
-
-            </div>
-
-            <div
-                id="homeShop"
-                class="horizontal-scroll"
-            >
-
-                <div class="loading">
-                    Загружаем магазин...
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- HOME INVENTORY -->
-
-        <section class="section">
-
-            <div class="section-head">
-
-                <div class="section-title">
-                    🎒 Мой инвентарь
-                </div>
-
-                <button
-                    class="section-action"
-                    type="button"
-                    onclick="goTo('inventory')"
-                >
-                    Открыть →
-                </button>
-
-            </div>
-
-
-            <!-- Нажатие на карточки инвентаря тоже
-                 открывает полный инвентарь -->
-
-            <div
-                id="homeInventory"
-                class="horizontal-scroll"
-                onclick="handleHomeInventoryClick(event)"
-            >
-
-                <div class="empty">
-                    Инвентарь пока пуст
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- INCOME -->
-
-        <section class="section">
-
-            <div class="action-card">
-
-                <div class="action-icon">
-                    💰
-                </div>
-
-                <div class="action-title">
-                    Доход с подарков
-                </div>
-
-                <div class="action-description">
-                    Каждый купленный подарок приносит
-                    +1 ⭐ в час.
-                    Максимум — 5 копий каждого типа.
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- ================= SHOP ================= -->
-
-    <main id="shopPage" class="page">
-
-        <section class="shop-header">
-
-            <div class="shop-header-title">
-                🎁 Магазин подарков
-            </div>
-
-            <div class="shop-header-description">
-                Покупай подарки и получай пассивный доход.
-                Каждый подарок даёт +1 ⭐/час.
-            </div>
-
-            <div class="shop-status">
-
-                <span class="status-dot"></span>
-
-                Магазин обновляется каждые 3 часа
-
-            </div>
-
-        </section>
-
-
-        <section class="section">
-
-            <div class="section-head">
-
-                <div class="section-title">
-                    Доступные подарки
-                </div>
-
-            </div>
-
-
-            <!--
-                ВАЖНО:
-                Здесь теперь 2 карточки в ряд.
-                Страница магазина листается сверху вниз.
-            -->
-
-            <div
-                id="shopGifts"
-                class="shop-grid"
-            >
-
-                <div class="loading">
-                    Загружаем магазин...
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- ================= INVENTORY ================= -->
-
-    <main id="inventoryPage" class="page">
-
-        <section class="shop-header">
-
-            <div class="shop-header-title">
-                🎒 Мой инвентарь
-            </div>
-
-            <div class="shop-header-description">
-                Здесь находятся все купленные тобой
-                подарки. Их можно продать после
-                окончания таймера.
-            </div>
-
-        </section>
-
-
-        <section class="section">
-
-            <div class="section-head">
-
-                <div class="section-title">
-                    🎁 Мои подарки
-                </div>
-
-                <button
-                    class="section-action"
-                    type="button"
-                    onclick="goTo('shop')"
-                >
-                    Магазин →
-                </button>
-
-            </div>
-
-
-            <!--
-                Инвентарь тоже 2 карточки в ряд.
-                Листание страницы идёт сверху вниз.
-            -->
-
-            <div
-                id="inventoryPageList"
-                class="shop-grid"
-            >
-
-                <div class="empty">
-                    🎒 Инвентарь пуст
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="section">
-
-            <div class="action-card">
-
-                <div class="action-icon">
-                    💰
-                </div>
-
-                <div class="action-title">
-                    Продажа подарков
-                </div>
-
-                <div class="action-description">
-                    Подарок можно продать через
-                    5 часов после покупки.
-                    При продаже возвращается его цена,
-                    а доход с него снимается.
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- ================= AUCTION ================= -->
-
-    <main id="auctionPage" class="page">
-
-        <div class="placeholder">
-
-            <div class="placeholder-icon">
-                🔨
-            </div>
-
-            <div class="placeholder-title">
-                Аукцион
-            </div>
-
-            <div class="placeholder-text">
-                Здесь появится аукцион подарков.
-                Функция находится в разработке.
-            </div>
-
-        </div>
-
-    </main>
-
-
-    <!-- ================= TOP ================= -->
-
-    <main id="topPage" class="page">
-
-        <div class="placeholder">
-
-            <div class="placeholder-icon">
-                🏆
-            </div>
-
-            <div class="placeholder-title">
-                Топ игроков
-            </div>
-
-            <div class="placeholder-text">
-                Таблица лидеров скоро появится.
-            </div>
-
-        </div>
-
-    </main>
-
-
-    <!-- ================= PROFILE ================= -->
-
-    <main id="profilePage" class="page">
-
-        <div class="profile-panel">
-
-            <div class="profile-large">
-
-                <div
-                    class="avatar"
-                    id="profileAvatar"
-                >
-                    R
-                </div>
-
-                <div>
-
-                    <div
-                        class="profile-large-name"
-                        id="profileName"
-                    >
-                        Rane
-                    </div>
-
-                    <div
-                        class="profile-large-username"
-                        id="profileUsername"
-                    >
-                        @username
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="profile-row">
-
-                <div class="profile-row-left">
-
-                    <div class="profile-row-icon">
-                        ⭐
-                    </div>
-
-                    <div class="profile-row-title">
-                        Баланс
-                    </div>
-
-                </div>
-
-                <div
-                    class="profile-row-value"
-                    id="profileBalance"
-                >
-                    0 ⭐
-                </div>
-
-            </div>
-
-
-            <div class="profile-row">
-
-                <div class="profile-row-left">
-
-                    <div class="profile-row-icon">
-                        🎁
-                    </div>
-
-                    <div class="profile-row-title">
-                        Доход
-                    </div>
-
-                </div>
-
-                <div
-                    class="profile-row-value"
-                    id="profileIncome"
-                >
-                    0 ⭐/ч
-                </div>
-
-            </div>
-
-
-            <div class="profile-row">
-
-                <div class="profile-row-left">
-
-                    <div class="profile-row-icon">
-                        🎒
-                    </div>
-
-                    <div class="profile-row-title">
-                        Подарки
-                    </div>
-
-                </div>
-
-                <div
-                    class="profile-row-value"
-                    id="profileGiftCount"
-                >
-                    0
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <section class="section">
-
-            <button
-                class="red-button"
-                type="button"
-                onclick="goTo('inventory')"
-            >
-                🎒 Открыть мой инвентарь
-            </button>
-
-        </section>
-
-
-        <section class="section">
-
-            <button
-                class="red-button"
-                type="button"
-                onclick="goTo('shop')"
-            >
-                🎁 Открыть магазин подарков
-            </button>
-
-        </section>
-
-    </main>
+</main>
 
 </div>
 
@@ -1712,14 +1718,8 @@ button{
         type="button"
         onclick="goTo('home')"
     >
-        <span class="nav-icon">
-            ⌂
-        </span>
-
-        <span>
-            Главная
-        </span>
-
+        <span class="nav-icon">⌂</span>
+        <span>Главная</span>
     </button>
 
 
@@ -1729,14 +1729,8 @@ button{
         type="button"
         onclick="goTo('shop')"
     >
-        <span class="nav-icon">
-            🎁
-        </span>
-
-        <span>
-            Магазин
-        </span>
-
+        <span class="nav-icon">🎁</span>
+        <span>Магазин</span>
     </button>
 
 
@@ -1746,14 +1740,8 @@ button{
         type="button"
         onclick="goTo('auction')"
     >
-        <span class="nav-icon">
-            🔨
-        </span>
-
-        <span>
-            Аукцион
-        </span>
-
+        <span class="nav-icon">🔨</span>
+        <span>Аукцион</span>
     </button>
 
 
@@ -1763,14 +1751,8 @@ button{
         type="button"
         onclick="goTo('top')"
     >
-        <span class="nav-icon">
-            🏆
-        </span>
-
-        <span>
-            Топ
-        </span>
-
+        <span class="nav-icon">🏆</span>
+        <span>Топ</span>
     </button>
 
 
@@ -1780,14 +1762,8 @@ button{
         type="button"
         onclick="goTo('profile')"
     >
-        <span class="nav-icon">
-            👤
-        </span>
-
-        <span>
-            Профиль
-        </span>
-
+        <span class="nav-icon">👤</span>
+        <span>Профиль</span>
     </button>
 
 </nav>
@@ -1890,8 +1866,6 @@ button{
 </div>
 
 
-<!-- TOAST -->
-
 <div
     id="toast"
     class="toast"
@@ -1901,6 +1875,7 @@ button{
 <script>
 "use strict";
 
+
 /* =========================================================
    CONFIG
 ========================================================= */
@@ -1908,10 +1883,6 @@ button{
 const API =
     "https://ranegame.onrender.com";
 
-/*
- * НЕ МЕНЯТЬ.
- * Текущий Telegram ID администратора.
- */
 const DEV_TELEGRAM_ID =
     "8791077915";
 
@@ -1972,9 +1943,7 @@ let isLoadingInventory = false;
 ========================================================= */
 
 function $(id){
-
     return document.getElementById(id);
-
 }
 
 
@@ -1991,24 +1960,17 @@ function escapeHtml(value){
 
 
 function escapeAttr(value){
-
     return escapeHtml(value);
-
 }
 
 
-function number(
-    value,
-    fallback = 0
-){
+function number(value,fallback=0){
 
     const n =
         Number(value);
 
     if(!Number.isFinite(n)){
-
         return fallback;
-
     }
 
     return n;
@@ -2142,7 +2104,6 @@ function getTelegramId(){
 
 let toastTimer = null;
 
-
 function showToast(message){
 
     const el =
@@ -2155,9 +2116,7 @@ function showToast(message){
     el.textContent =
         message;
 
-    el.classList.add(
-        "show"
-    );
+    el.classList.add("show");
 
     clearTimeout(
         toastTimer
@@ -2166,9 +2125,7 @@ function showToast(message){
     toastTimer =
         setTimeout(
             ()=>{
-                el.classList.remove(
-                    "show"
-                );
+                el.classList.remove("show");
             },
             2400
         );
@@ -2206,12 +2163,6 @@ function goTo(page){
 
             }
 
-            /*
-             * У inventory нет отдельной кнопки
-             * в нижней навигации, поэтому
-             * nav-inventory не требуется.
-             */
-
             const navEl =
                 $("nav-" + name);
 
@@ -2235,25 +2186,16 @@ function goTo(page){
 
 
     if(page === "shop"){
-
         renderShop();
-
     }
-
 
     if(page === "inventory"){
-
         renderInventoryPage();
-
     }
 
-
     if(page === "home"){
-
         renderHomeShop();
-
         renderHomeInventory();
-
     }
 
 }
@@ -2264,12 +2206,6 @@ function goTo(page){
 ========================================================= */
 
 function handleHomeInventoryClick(event){
-
-    /*
-     * Кнопки продажи на главной не используются,
-     * поэтому любой клик по области карточек
-     * открывает полный инвентарь.
-     */
 
     const target =
         event.target;
@@ -2299,11 +2235,7 @@ function openModal(id){
         $(id);
 
     if(el){
-
-        el.classList.add(
-            "open"
-        );
-
+        el.classList.add("open");
     }
 
 }
@@ -2315,11 +2247,7 @@ function closeModal(id){
         $(id);
 
     if(el){
-
-        el.classList.remove(
-            "open"
-        );
-
+        el.classList.remove("open");
     }
 
 }
@@ -2327,9 +2255,7 @@ function closeModal(id){
 
 function openAdminLogin(){
 
-    openModal(
-        "adminModal"
-    );
+    openModal("adminModal");
 
 }
 
@@ -2344,9 +2270,7 @@ function updateProfileUI(){
         currentUser;
 
     if(!user){
-
         return;
-
     }
 
 
@@ -2402,7 +2326,6 @@ function updateProfileUI(){
             >
         `;
 
-
         $("profileAvatar").innerHTML = `
             <img
                 src="${escapeAttr(avatarUrl)}"
@@ -2431,12 +2354,14 @@ function updateProfileUI(){
 }
 
 
+/* =========================================================
+   PLAYER UI
+========================================================= */
+
 function updatePlayerUI(){
 
     if(!player){
-
         return;
-
     }
 
 
@@ -2464,36 +2389,90 @@ function updatePlayerUI(){
         );
 
 
-    $("balanceValue").textContent =
-        money(balance);
+    const balanceEl =
+        $("balanceValue");
+
+    const incomeEl =
+        $("incomeValue");
+
+    const multiplierEl =
+        $("multiplierValue");
+
+    const profileBalance =
+        $("profileBalance");
+
+    const profileIncome =
+        $("profileIncome");
+
+    const profileMultiplier =
+        $("profileMultiplier");
 
 
-    $("incomeValue").textContent =
-        money(income) +
-        " ⭐/ч";
+    if(balanceEl){
+
+        balanceEl.textContent =
+            money(balance);
+
+    }
 
 
-    $("multiplierValue").textContent =
-        "x" +
-        multiplier.toFixed(2);
+    if(incomeEl){
+
+        incomeEl.textContent =
+            money(income);
+
+    }
 
 
-    $("profileBalance").textContent =
-        money(balance) +
-        " ⭐";
+    if(multiplierEl){
+
+        multiplierEl.textContent =
+            multiplier.toFixed(2);
+
+    }
 
 
-    $("profileIncome").textContent =
-        money(income) +
-        " ⭐/ч";
+    if(profileBalance){
+
+        profileBalance.textContent =
+            money(balance) +
+            " ⭐";
+
+    }
+
+
+    if(profileIncome){
+
+        profileIncome.textContent =
+            money(income) +
+            " ⭐/ч";
+
+    }
+
+
+    if(profileMultiplier){
+
+        profileMultiplier.textContent =
+            "×" +
+            multiplier.toFixed(2);
+
+    }
 
 
     const count =
         inventoryPurchases.length;
 
 
-    $("profileGiftCount").textContent =
-        money(count);
+    const profileGiftCount =
+        $("profileGiftCount");
+
+
+    if(profileGiftCount){
+
+        profileGiftCount.textContent =
+            money(count);
+
+    }
 
 }
 
@@ -2504,7 +2483,7 @@ function updatePlayerUI(){
 
 async function apiFetch(
     path,
-    options = {}
+    options={}
 ){
 
     const url =
@@ -2619,8 +2598,7 @@ async function loadPlayer(){
                         telegram_id:
                             telegramId,
 
-                        user:
-                            user,
+                        user:user,
 
                         initData:
                             tg?.initData ||
@@ -2634,20 +2612,6 @@ async function loadPlayer(){
             data?.player ||
             data?.data ||
             data;
-
-
-        if(
-            player &&
-            player.id === undefined &&
-            player.telegram_id === undefined
-        ){
-
-            console.warn(
-                "Неожиданный ответ /api/player:",
-                data
-            );
-
-        }
 
 
         updatePlayerUI();
@@ -2677,9 +2641,7 @@ async function loadPlayer(){
 async function loadGifts(){
 
     if(isLoadingGifts){
-
         return;
-
     }
 
 
@@ -2754,7 +2716,6 @@ async function loadGifts(){
         $("shopGifts").innerHTML =
             message;
 
-
         $("homeShop").innerHTML =
             message;
 
@@ -2776,9 +2737,7 @@ async function loadGifts(){
 async function loadInventory(){
 
     if(isLoadingInventory){
-
         return;
-
     }
 
 
@@ -2787,9 +2746,7 @@ async function loadInventory(){
 
 
     if(!telegramId){
-
         return;
-
     }
 
 
@@ -2882,12 +2839,10 @@ async function loadInventory(){
 
 
 /* =========================================================
-   FIND GIFT FOR PURCHASE
+   FIND GIFT
 ========================================================= */
 
-function giftForPurchase(
-    purchase
-){
+function giftForPurchase(purchase){
 
     const id =
         purchase?.gift_id ??
@@ -2906,16 +2861,12 @@ function giftForPurchase(
 
 
     if(found){
-
         return found;
-
     }
 
 
     if(purchase?.gift){
-
         return purchase.gift;
-
     }
 
 
@@ -2951,12 +2902,10 @@ function giftForPurchase(
 
 
 /* =========================================================
-   GIFT SHOP CARD
+   GIFT CARD
 ========================================================= */
 
-function createGiftCard(
-    gift
-){
+function createGiftCard(gift){
 
     const id =
         String(
@@ -3091,9 +3040,7 @@ function renderShop(){
 
 
     if(!container){
-
         return;
-
     }
 
 
@@ -3130,7 +3077,7 @@ function renderShop(){
 
 
 /* =========================================================
-   RENDER HOME SHOP
+   HOME SHOP
 ========================================================= */
 
 function renderHomeShop(){
@@ -3140,9 +3087,7 @@ function renderHomeShop(){
 
 
     if(!container){
-
         return;
-
     }
 
 
@@ -3163,13 +3108,6 @@ function renderHomeShop(){
         "";
 
 
-    /*
-     * На главной оставляем
-     * горизонтальную ленту.
-     * Полный магазин открывается
-     * кнопкой "Все →".
-     */
-
     gifts
         .slice(0,6)
         .forEach(
@@ -3188,7 +3126,7 @@ function renderHomeShop(){
 
 
 /* =========================================================
-   BUY GIFT
+   BUY
 ========================================================= */
 
 async function buyGift(
@@ -3353,17 +3291,13 @@ async function buyGift(
 
 
 /* =========================================================
-   PURCHASE PARTICLES
+   PARTICLES
 ========================================================= */
 
-function createPurchaseParticles(
-    card
-){
+function createPurchaseParticles(card){
 
     if(!card){
-
         return;
-
     }
 
 
@@ -3382,8 +3316,8 @@ function createPurchaseParticles(
 
 
     for(
-        let i = 0;
-        i < 7;
+        let i=0;
+        i<7;
         i++
     ){
 
@@ -3459,9 +3393,7 @@ function createPurchaseParticles(
    INVENTORY CARD
 ========================================================= */
 
-function createInventoryCard(
-    purchase
-){
+function createInventoryCard(purchase){
 
     const gift =
         giftForPurchase(
@@ -3633,9 +3565,7 @@ function createInventoryCard(
    SELL TIMER
 ========================================================= */
 
-function getPurchaseTime(
-    purchase
-){
+function getPurchaseTime(purchase){
 
     const value =
         purchase?.purchased_at ??
@@ -3646,9 +3576,7 @@ function getPurchaseTime(
 
 
     if(!value){
-
         return null;
-
     }
 
 
@@ -3672,9 +3600,7 @@ function getPurchaseTime(
 }
 
 
-function isPurchaseSellable(
-    purchase
-){
+function isPurchaseSellable(purchase){
 
     const date =
         getPurchaseTime(
@@ -3683,13 +3609,7 @@ function isPurchaseSellable(
 
 
     if(!date){
-
-        /*
-         * Сервер всё равно
-         * проверяет реальное время.
-         */
         return true;
-
     }
 
 
@@ -3708,9 +3628,7 @@ function isPurchaseSellable(
 }
 
 
-function getSellWaitText(
-    purchase
-){
+function getSellWaitText(purchase){
 
     const date =
         getPurchaseTime(
@@ -3776,9 +3694,7 @@ function getSellWaitText(
 }
 
 
-function formatPurchaseDate(
-    value
-){
+function formatPurchaseDate(value){
 
     const date =
         new Date(value);
@@ -3810,7 +3726,7 @@ function formatPurchaseDate(
 
 
 /* =========================================================
-   RENDER HOME INVENTORY
+   HOME INVENTORY
 ========================================================= */
 
 function renderHomeInventory(){
@@ -3820,9 +3736,7 @@ function renderHomeInventory(){
 
 
     if(!container){
-
         return;
-
     }
 
 
@@ -3861,7 +3775,7 @@ function renderHomeInventory(){
 
 
 /* =========================================================
-   RENDER FULL INVENTORY
+   FULL INVENTORY
 ========================================================= */
 
 function renderInventoryPage(){
@@ -3871,9 +3785,7 @@ function renderInventoryPage(){
 
 
     if(!container){
-
         return;
-
     }
 
 
@@ -3910,7 +3822,7 @@ function renderInventoryPage(){
 
 
 /* =========================================================
-   SELL GIFT
+   SELL
 ========================================================= */
 
 async function sellGift(
@@ -4054,9 +3966,7 @@ function checkAdmin(){
 
 
     if(!category){
-
         return;
-
     }
 
 
@@ -4179,7 +4089,6 @@ async function loginAdmin(){
 const ROULETTE_KEY =
     "rane_roulette_last_spin";
 
-
 const ROULETTE_DURATION =
     4 *
     60 *
@@ -4192,7 +4101,6 @@ function openRoulette(){
     openModal(
         "rouletteModal"
     );
-
 
     updateRouletteUI();
 
@@ -4280,9 +4188,7 @@ async function spinRoulette(){
 
 
     if(button.disabled){
-
         return;
-
     }
 
 
@@ -4315,7 +4221,6 @@ async function spinRoulette(){
     const interval =
         setInterval(
             ()=>{
-
                 result.textContent =
                     values[
                         index %
@@ -4358,20 +4263,10 @@ async function spinRoulette(){
             );
 
 
-            if(final === "⭐"){
-
-                showToast(
-                    "🎉 Выпало ⭐"
-                );
-
-            }else{
-
-                showToast(
-                    "🎉 Результат: " +
-                    final
-                );
-
-            }
+            showToast(
+                "🎉 Результат: " +
+                final
+            );
 
 
             updateRouletteUI();
@@ -4389,7 +4284,6 @@ async function spinRoulette(){
 
 const WEEKLY_KEY =
     "rane_weekly_bonus";
-
 
 const WEEKLY_DURATION =
     7 *
@@ -4458,7 +4352,7 @@ function claimWeeklyBonus(){
 
 
 /* =========================================================
-   HORIZONTAL SWIPE / MOUSE WHEEL
+   HORIZONTAL SCROLL
 ========================================================= */
 
 function setupHorizontalScroll(){
@@ -4496,9 +4390,13 @@ function setupHorizontalScroll(){
                             container.scrollLeft;
 
 
-                        container.setPointerCapture(
-                            event.pointerId
-                        );
+                        try{
+
+                            container.setPointerCapture(
+                                event.pointerId
+                            );
+
+                        }catch(e){}
 
                     }
                 );
@@ -4509,9 +4407,7 @@ function setupHorizontalScroll(){
                     event => {
 
                         if(!isDown){
-
                             return;
-
                         }
 
 
@@ -4600,18 +4496,7 @@ async function init(){
 
     updateProfileUI();
 
-
     checkAdmin();
-
-
-    /*
-     * Горизонтальная прокрутка
-     * используется только на главной.
-     *
-     * Магазин и полный инвентарь
-     * теперь обычная вертикальная
-     * сетка 2x2.
-     */
 
     setupHorizontalScroll();
 
@@ -4625,16 +4510,13 @@ async function init(){
 
     updatePlayerUI();
 
-
     renderHomeShop();
 
     renderHomeInventory();
 
-
     renderShop();
 
     renderInventoryPage();
-
 
     checkAdmin();
 
@@ -4645,15 +4527,11 @@ async function init(){
     );
 
 
-    /*
-     * Обновляем таймеры продажи
-     * каждую минуту.
-     */
-
     setInterval(
         ()=>{
             renderHomeInventory();
             renderInventoryPage();
+            updatePlayerUI();
         },
         60000
     );
