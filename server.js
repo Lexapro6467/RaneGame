@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const fs = require("fs");
 const crypto = require("crypto");
 
 const { createClient } = require("@supabase/supabase-js");
@@ -33,7 +32,7 @@ const BOT_TOKEN =
 ========================================================= */
 
 const DEV_TELEGRAM_ID =
-    "8791077915";
+    "5370959021438146805";
 
 const ADMIN_SESSION_SECRET =
     process.env.ADMIN_SESSION_SECRET;
@@ -238,10 +237,6 @@ function validateTelegramInitData(
             ) -
             authDate;
 
-        /*
-         * initData действителен максимум 24 часа
-         */
-
         if (
             age < 0 ||
             age > 86400
@@ -271,11 +266,8 @@ function validateTelegramInitData(
         }
 
         return {
-
             user,
-
             authDate
-
         };
 
     } catch (error) {
@@ -436,20 +428,16 @@ function verifyAdminToken(
         }
 
         return {
-
             telegramId:
                 String(telegramId),
 
             expiresAt
-
         };
 
     } catch (error) {
 
         return null;
-
     }
-
 }
 
 
@@ -476,15 +464,10 @@ function requireAdmin(
         return res
             .status(401)
             .json({
-
-                ok:
-                    false,
-
+                ok: false,
                 error:
                     "Требуется админская авторизация"
-
             });
-
     }
 
     const token =
@@ -502,15 +485,10 @@ function requireAdmin(
         return res
             .status(401)
             .json({
-
-                ok:
-                    false,
-
+                ok: false,
                 error:
                     "Админская сессия недействительна"
-
             });
-
     }
 
     req.adminTelegramId =
@@ -538,15 +516,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Telegram initData не передан"
-
                     });
-
             }
 
             const validated =
@@ -559,15 +532,10 @@ app.post(
                 return res
                     .status(401)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Telegram авторизация недействительна"
-
                     });
-
             }
 
             const telegramId =
@@ -583,15 +551,10 @@ app.post(
                 return res
                     .status(403)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Доступ запрещён"
-
                     });
-
             }
 
             const token =
@@ -600,18 +563,11 @@ app.post(
                 );
 
             return res.json({
-
-                ok:
-                    true,
-
-                admin:
-                    true,
-
+                ok: true,
+                admin: true,
                 telegram_id:
                     telegramId,
-
                 token
-
             });
 
         } catch (error) {
@@ -624,17 +580,11 @@ app.post(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         "Ошибка авторизации администратора"
-
                 });
-
         }
-
     }
 );
 
@@ -649,18 +599,11 @@ app.get(
     (req, res) => {
 
         return res.json({
-
-            ok:
-                true,
-
-            admin:
-                true,
-
+            ok: true,
+            admin: true,
             telegram_id:
                 req.adminTelegramId
-
         });
-
     }
 );
 
@@ -675,18 +618,12 @@ app.get(
     (req, res) => {
 
         return res.json({
-
-            ok:
-                true,
-
+            ok: true,
             message:
                 "Админская защита работает",
-
             telegram_id:
                 req.adminTelegramId
-
         });
-
     }
 );
 
@@ -709,7 +646,6 @@ async function getOrCreatePlayer(
         throw new Error(
             "Не передан Telegram user"
         );
-
     }
 
     const {
@@ -740,7 +676,6 @@ async function getOrCreatePlayer(
         await supabase
             .from("players")
             .insert({
-
                 telegram_id:
                     telegramId,
 
@@ -763,7 +698,6 @@ async function getOrCreatePlayer(
 
                 economy_expires_at:
                     null
-
             })
             .select("*")
             .single();
@@ -858,10 +792,6 @@ app.post(
                     req.adminTelegramId
                 );
 
-            /* =========================================
-               УДАЛЯЕМ ПОКУПКИ
-            ========================================= */
-
             const {
                 error: purchasesError
             } =
@@ -876,11 +806,6 @@ app.post(
             if (purchasesError) {
                 throw purchasesError;
             }
-
-
-            /* =========================================
-               УДАЛЯЕМ ПОДАРКИ
-            ========================================= */
 
             const {
                 error: giftsError
@@ -897,11 +822,6 @@ app.post(
                 throw giftsError;
             }
 
-
-            /* =========================================
-               СБРАСЫВАЕМ АККАУНТ
-            ========================================= */
-
             const {
                 data: player,
                 error: playerError
@@ -909,7 +829,6 @@ app.post(
                 await supabase
                     .from("players")
                     .update({
-
                         balance:
                             0,
 
@@ -924,7 +843,6 @@ app.post(
 
                         bonus_claimed_at:
                             null
-
                     })
                     .eq(
                         "telegram_id",
@@ -937,20 +855,12 @@ app.post(
                 throw playerError;
             }
 
-
             return res.json({
-
-                ok:
-                    true,
-
-                success:
-                    true,
-
+                ok: true,
+                success: true,
                 message:
                     "Аккаунт полностью сброшен",
-
                 player
-
             });
 
         } catch (error) {
@@ -963,18 +873,12 @@ app.post(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         error.message ||
                         "Ошибка сброса аккаунта"
-
                 });
-
         }
-
     }
 );
 
@@ -999,15 +903,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не передан Telegram user"
-
                     });
-
             }
 
             const player =
@@ -1016,12 +915,8 @@ app.post(
                 );
 
             return res.json({
-
-                ok:
-                    true,
-
+                ok: true,
                 player
-
             });
 
         } catch (error) {
@@ -1034,17 +929,11 @@ app.post(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         error.message
-
                 });
-
         }
-
     }
 );
 
@@ -1083,13 +972,9 @@ async function getShopState() {
         await supabase
             .from("shop_state")
             .insert({
-
-                id:
-                    1,
-
+                id: 1,
                 updated_at:
                     new Date().toISOString()
-
             })
             .select("*")
             .single();
@@ -1125,7 +1010,6 @@ async function refreshGiftShop() {
     }
 
     const groups = {
-
         15:
             allGifts.filter(
                 gift =>
@@ -1157,7 +1041,6 @@ async function refreshGiftShop() {
                         gift.price
                     ) === 33
             )
-
     };
 
 
@@ -1167,9 +1050,7 @@ async function refreshGiftShop() {
     ) {
 
         const copy =
-            [
-                ...array
-            ];
+            [...array];
 
         for (
             let i =
@@ -1192,7 +1073,6 @@ async function refreshGiftShop() {
                 copy[j],
                 copy[i]
             ];
-
         }
 
         return copy.slice(
@@ -1202,7 +1082,6 @@ async function refreshGiftShop() {
                 copy.length
             )
         );
-
     }
 
 
@@ -1227,7 +1106,6 @@ async function refreshGiftShop() {
             groups[33],
             2
         )
-
     ];
 
 
@@ -1254,13 +1132,11 @@ async function refreshGiftShop() {
         const rows =
             selected.map(
                 gift => ({
-
                     shop_id:
                         1,
 
                     gift_id:
                         gift.id
-
                 })
             );
 
@@ -1276,7 +1152,6 @@ async function refreshGiftShop() {
         if (insertError) {
             throw insertError;
         }
-
     }
 
 
@@ -1286,10 +1161,8 @@ async function refreshGiftShop() {
         await supabase
             .from("shop_state")
             .update({
-
                 updated_at:
                     new Date().toISOString()
-
             })
             .eq(
                 "id",
@@ -1356,7 +1229,6 @@ async function ensureGiftShop() {
         );
 
         return await refreshGiftShop();
-
     }
 
     return null;
@@ -1453,9 +1325,7 @@ app.get(
                         error.message
 
                 });
-
         }
-
     }
 );
 
@@ -1488,7 +1358,6 @@ app.get(
                             "Не передан telegram_id"
 
                     });
-
             }
 
             const {
@@ -1590,17 +1459,12 @@ app.get(
                                         item.gift_id
                                     )
                             )
-
                     })
                 );
 
             return res.json({
-
-                ok:
-                    true,
-
+                ok: true,
                 inventory
-
             });
 
         } catch (error) {
@@ -1613,17 +1477,11 @@ app.get(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         error.message
-
                 });
-
         }
-
     }
 );
 
@@ -1648,15 +1506,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не передан Telegram user"
-
                     });
-
             }
 
             const giftId =
@@ -1669,15 +1522,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не передан gift_id"
-
                     });
-
             }
 
             let quantity =
@@ -1691,10 +1539,7 @@ app.post(
                 ) ||
                 quantity < 1
             ) {
-
-                quantity =
-                    1;
-
+                quantity = 1;
             }
 
             quantity =
@@ -1705,10 +1550,7 @@ app.post(
             if (
                 quantity > 5
             ) {
-
-                quantity =
-                    5;
-
+                quantity = 5;
             }
 
             const player =
@@ -1755,15 +1597,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Этого подарка сейчас нет в магазине"
-
                     });
-
             }
 
             const gift =
@@ -1821,25 +1658,18 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Можно купить максимум 5 одинаковых подарков"
-
                     });
-
             }
 
             if (
                 quantity >
                 remaining
             ) {
-
                 quantity =
                     remaining;
-
             }
 
             const totalPrice =
@@ -1856,15 +1686,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Недостаточно ⭐"
-
                     });
-
             }
 
             const newBalance =
@@ -1889,13 +1714,11 @@ app.post(
                 await supabase
                     .from("players")
                     .update({
-
                         balance:
                             newBalance,
 
                         income:
                             newIncome
-
                     })
                     .eq(
                         "telegram_id",
@@ -1917,7 +1740,6 @@ app.post(
                             quantity
                     },
                     () => ({
-
                         telegram_id:
                             Number(
                                 user.id
@@ -1928,7 +1750,6 @@ app.post(
 
                         purchased_at:
                             new Date().toISOString()
-
                     })
                 );
 
@@ -1960,13 +1781,11 @@ app.post(
                     await supabase
                         .from("player_gifts")
                         .update({
-
                             quantity:
                                 newQuantity,
 
                             purchased_at:
                                 new Date().toISOString()
-
                         })
                         .eq(
                             "telegram_id",
@@ -1992,7 +1811,6 @@ app.post(
                     await supabase
                         .from("player_gifts")
                         .insert({
-
                             telegram_id:
                                 Number(
                                     user.id
@@ -2006,13 +1824,11 @@ app.post(
 
                             purchased_at:
                                 new Date().toISOString()
-
                         });
 
                 if (insertGiftError) {
                     throw insertGiftError;
                 }
-
             }
 
             return res.json({
@@ -2045,17 +1861,11 @@ app.post(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         error.message
-
                 });
-
         }
-
     }
 );
 
@@ -2080,15 +1890,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не передан Telegram user"
-
                     });
-
             }
 
             const purchaseId =
@@ -2101,15 +1906,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не передан purchase_id"
-
                     });
-
             }
 
             const {
@@ -2152,15 +1952,10 @@ app.post(
                 return res
                     .status(404)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Покупка не найдена"
-
                     });
-
             }
 
             const purchasedAt =
@@ -2199,15 +1994,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             `Подарок пока нельзя продать. Осталось примерно ${hours} ч. ${minutes} мин.`
-
                     });
-
             }
 
             const gift =
@@ -2259,15 +2049,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Подарка нет в инвентаре"
-
                     });
-
             }
 
             const {
@@ -2333,10 +2118,8 @@ app.post(
                     await supabase
                         .from("player_gifts")
                         .update({
-
                             quantity:
                                 newQuantity
-
                         })
                         .eq(
                             "telegram_id",
@@ -2354,7 +2137,6 @@ app.post(
                 if (error) {
                     throw error;
                 }
-
             }
 
             const player =
@@ -2381,27 +2163,20 @@ app.post(
                 await updatePlayer(
                     user.id,
                     {
-
                         balance:
                             newBalance,
 
                         income:
                             newIncome
-
                     }
                 );
 
             return res.json({
-
-                ok:
-                    true,
-
+                ok: true,
                 player:
                     updatedPlayer,
-
                 refund:
                     price
-
             });
 
         } catch (error) {
@@ -2414,17 +2189,11 @@ app.post(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         error.message
-
                 });
-
         }
-
     }
 );
 
@@ -2449,15 +2218,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не передан Telegram user"
-
                     });
-
             }
 
             const price =
@@ -2470,15 +2234,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не указана цена"
-
                     });
-
             }
 
             const player =
@@ -2496,22 +2255,16 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Недостаточно ⭐"
-
                     });
-
             }
 
             const updatedPlayer =
                 await updatePlayer(
                     user.id,
                     {
-
                         balance:
                             Number(
                                 player.balance
@@ -2523,18 +2276,13 @@ app.post(
                                 player.income
                             ) +
                             1
-
                     }
                 );
 
             return res.json({
-
-                ok:
-                    true,
-
+                ok: true,
                 player:
                     updatedPlayer
-
             });
 
         } catch (error) {
@@ -2547,17 +2295,11 @@ app.post(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         error.message
-
                 });
-
         }
-
     }
 );
 
@@ -2582,15 +2324,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не передан Telegram user"
-
                     });
-
             }
 
             const player =
@@ -2643,24 +2380,17 @@ app.post(
                     return res
                         .status(400)
                         .json({
-
-                            ok:
-                                false,
-
+                            ok: false,
                             error:
                                 `Бонус будет доступен через ${days} дн.`
-
                         });
-
                 }
-
             }
 
             const updatedPlayer =
                 await updatePlayer(
                     user.id,
                     {
-
                         balance:
                             Number(
                                 player.balance
@@ -2669,21 +2399,15 @@ app.post(
 
                         bonus_claimed_at:
                             new Date().toISOString()
-
                     }
                 );
 
             return res.json({
-
-                ok:
-                    true,
-
+                ok: true,
                 player:
                     updatedPlayer,
-
                 reward:
                     1000
-
             });
 
         } catch (error) {
@@ -2696,17 +2420,11 @@ app.post(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         error.message
-
                 });
-
         }
-
     }
 );
 
@@ -2752,7 +2470,6 @@ function createRouletteSignature(
         )
         .update(text)
         .digest("hex");
-
 }
 
 
@@ -2776,15 +2493,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не передан Telegram user"
-
                     });
-
             }
 
             const multiplier =
@@ -2808,16 +2520,10 @@ app.post(
                 );
 
             return res.json({
-
-                ok:
-                    true,
-
+                ok: true,
                 multiplier,
-
                 issuedAt,
-
                 signature
-
             });
 
         } catch (error) {
@@ -2830,17 +2536,11 @@ app.post(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         error.message
-
                 });
-
         }
-
     }
 );
 
@@ -2865,15 +2565,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Не передан Telegram user"
-
                     });
-
             }
 
             const multiplier =
@@ -2898,15 +2593,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Недостаточно данных рулетки"
-
                     });
-
             }
 
             if (
@@ -2918,15 +2608,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Неверный множитель"
-
                     });
-
             }
 
             if (
@@ -2938,15 +2623,10 @@ app.post(
                 return res
                     .status(400)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Результат рулетки устарел"
-
                     });
-
             }
 
             const expectedSignature =
@@ -2966,15 +2646,10 @@ app.post(
                 return res
                     .status(403)
                     .json({
-
-                        ok:
-                            false,
-
+                        ok: false,
                         error:
                             "Неверная подпись рулетки"
-
                     });
-
             }
 
             const player =
@@ -2992,29 +2667,21 @@ app.post(
                 await updatePlayer(
                     user.id,
                     {
-
                         economy_multiplier:
                             multiplier,
 
                         economy_expires_at:
                             expiresAt
-
                     }
                 );
 
             return res.json({
-
-                ok:
-                    true,
-
+                ok: true,
                 player:
                     updatedPlayer,
-
                 multiplier,
-
                 expires_at:
                     expiresAt
-
             });
 
         } catch (error) {
@@ -3027,17 +2694,11 @@ app.post(
             return res
                 .status(500)
                 .json({
-
-                    ok:
-                        false,
-
+                    ok: false,
                     error:
                         error.message
-
                 });
-
         }
-
     }
 );
 
@@ -3051,18 +2712,12 @@ app.get(
     (req, res) => {
 
         res.json({
-
-            ok:
-                true,
-
+            ok: true,
             service:
                 "RaneGame",
-
             time:
                 new Date().toISOString()
-
         });
-
     }
 );
 
@@ -3087,22 +2742,18 @@ async function telegramRequest(
         await fetch(
             `https://api.telegram.org/bot${BOT_TOKEN}/${method}`,
             {
-
                 method:
                     "POST",
 
                 headers: {
-
                     "Content-Type":
                         "application/json"
-
                 },
 
                 body:
                     JSON.stringify(
                         body
                     )
-
             }
         );
 
@@ -3115,7 +2766,6 @@ async function telegramRequest(
             data.description ||
             "Telegram API error"
         );
-
     }
 
     return data;
@@ -3204,13 +2854,11 @@ async function processReferral(
     await updatePlayer(
         invitedId,
         {
-
             balance:
                 Number(
                     invitedPlayer.balance
                 ) +
                 100
-
         }
     );
 
@@ -3223,13 +2871,11 @@ async function processReferral(
             .select(
                 "id",
                 {
-
                     count:
                         "exact",
 
                     head:
                         true
-
                 }
             )
             .eq(
@@ -3254,7 +2900,6 @@ async function processReferral(
         await supabase
             .from("referrals")
             .insert({
-
                 inviter_telegram_id:
                     inviterId,
 
@@ -3263,7 +2908,6 @@ async function processReferral(
 
                 reward_paid:
                     true
-
             });
 
     if (referralInsertError) {
@@ -3287,18 +2931,14 @@ async function processReferral(
         await updatePlayer(
             inviterId,
             {
-
                 balance:
                     Number(
                         inviter.balance
                     ) +
                     reward
-
             }
         );
-
     }
-
 }
 
 
@@ -3385,17 +3025,13 @@ async function handleTelegramUpdate(
                     "REFERRAL ERROR:",
                     error
                 );
-
             }
-
         }
-
     }
 
     await telegramRequest(
         "sendMessage",
         {
-
             chat_id:
                 message.chat.id,
 
@@ -3409,28 +3045,21 @@ async function handleTelegramUpdate(
                     [
 
                         {
-
                             text:
                                 "🎮 Открыть RaneGame",
 
                             web_app: {
-
                                 url:
                                     "https://ranegame.onrender.com"
-
                             }
-
                         }
 
                     ]
 
                 ]
-
             }
-
         }
     );
-
 }
 
 
@@ -3447,7 +3076,6 @@ async function telegramPolling() {
         );
 
         return;
-
     }
 
     try {
@@ -3456,13 +3084,11 @@ async function telegramPolling() {
             await telegramRequest(
                 "getUpdates",
                 {
-
                     offset:
                         telegramOffset,
 
                     timeout:
                         25
-
                 }
             );
 
@@ -3487,9 +3113,7 @@ async function telegramPolling() {
                     "TELEGRAM UPDATE ERROR:",
                     error
                 );
-
             }
-
         }
 
     } catch (error) {
@@ -3498,14 +3122,12 @@ async function telegramPolling() {
             "TELEGRAM POLLING ERROR:",
             error.message
         );
-
     }
 
     setTimeout(
         telegramPolling,
         1000
     );
-
 }
 
 
